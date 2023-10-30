@@ -1,17 +1,24 @@
 <script lang="ts">
+    import type { Tool } from "$lib/types";
     import NickAc from "../components/homepage/NickAc.svelte";
     import ToolBox from "../components/homepage/ToolBox.svelte";
+    import CubeScanIcon from "../components/icons/CubeScanIcon.svelte";
+    import EraserIcon from "../components/icons/EraserIcon.svelte";
 
     const tools: Tool[] = [
         {
-            name: "Region Eraser",
-            url: "eraser",
-            description: "Easily add Ears mod erase regions to your Minecraft skin"
+            // @ts-ignore I don't know how to type this lol
+            icon: EraserIcon,
+            name: "Ears Region Eraser",
+            url: "region-eraser",
+            description: "Easily add Ears mod erase regions to your Minecraft skin."
         },
         {
+            // @ts-ignore I don't know how to type this lol
+            icon: CubeScanIcon,
             name: "Blockbench Model Generator",
             url: "bbmodel-generator",
-            description: "Generate a Blockbench model from a Minecraft skin, including Ears mod features"
+            description: "Generate a Blockbench model from a Minecraft skin, including Ears mod features."
         },
     ];
 </script>
