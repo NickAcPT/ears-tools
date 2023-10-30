@@ -10,7 +10,6 @@
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
-    let pickerHovered = writable<boolean>(false);
     let hasLayers = writable<boolean>(true);
 
     async function initWasm() {

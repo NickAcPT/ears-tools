@@ -2,6 +2,7 @@
     import "../app.css";
     import { page } from "$app/stores";
     import Navbar from "../components/Navbar.svelte";
+    import { base } from "$app/paths";
 </script>
 
 <svelte:head>
@@ -10,6 +11,21 @@
     {:else}
         <title>Ears Tools by NickAc</title>
     {/if}
+    
+    <meta property="og:title" content="{$page.data.title ?? "Ears Tools"}" />
+    <meta property="og:description" content="{$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."}" />
+    <meta
+        name="description"
+        content="{$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."}"
+    />
+    <meta property="og:site_name" content="Ears Tools by NickAc" />
+    <meta name="keywords" content="NickAc, NickAcPT, nmsr, minecraft, skin, renderer, render, avatar" />
+    <meta
+        property="og:image"
+        content="{base}/favicon.png"
+    />
+    <meta name="theme-color" content="#0FCFF5" />
+    <meta name="color-scheme" content="light dark" />
 </svelte:head>
 
 <Navbar class="mx-auto max-w-[95%] lg:max-w-[85%]" />
