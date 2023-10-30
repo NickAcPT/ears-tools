@@ -1,0 +1,21 @@
+{
+    "tabWidth": 4,
+    "useTabs": false,
+    "bracketSameLine": false,
+    "bracketSpacing": true,
+    "singleQuote": false,
+    "trailingComma": "es5",
+    "htmlWhitespaceSensitivity": "ignore",
+    "printWidth": 140,
+    "quoteProps": "consistent",
+    "svelteSortOrder": "options-scripts-markup-styles",
+    "multilineArraysWrapThreshold": 4,
+    "overrides": [
+        {
+            "files": "*.svelte",
+            "options": {
+                "parser": "svelte"
+            }
+        }
+    ]
+}
