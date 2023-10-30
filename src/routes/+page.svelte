@@ -23,7 +23,7 @@
     ];
 </script>
 
-<div class="mx-auto flex flex-col p-4 gap-20">
+<div class="mx-auto flex flex-col p-4 gap-20 container">
     <div class="text-center text-xl">
         <h1 class="text-3xl">Welcome to Ears Tools</h1>
         <p class="inline">Created by</p>

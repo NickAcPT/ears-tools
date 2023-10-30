@@ -16,6 +16,6 @@
 
 <Navbar class="mx-auto max-w-[95%] lg:max-w-[85%]" />
 
-<article class="mx-auto max-w-[95%] lg:max-w-[85%]">
+<article>
     <slot />
 </article>
