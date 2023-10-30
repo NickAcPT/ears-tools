@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { base } from "$app/paths";
     import type { SvelteComponent } from "svelte";
 
     export let icon: typeof SvelteComponent;
@@ -7,7 +8,7 @@
     export let description: string | undefined = undefined;
 </script>
 
-<a href="/tools/{url}">
+<a href="{base}/tools/{url}">
     <div
         class="shadow-md h-full min-h-[10em] p-4 rounded-lg bg-primary-500 flex flex-col text-background hover:bg-primary-800 hover:shadow-lg"
     >
