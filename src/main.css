@@ -1,0 +1,19 @@
+@layer base {
+    :root {
+        --text: #00080a;
+        --background: #e5eef0;
+        --primary: #056b7f;
+        --secondary: #c9f4fd;
+        --accent: #0acaf0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --text: #f5fdff;
+            --background: #0f181a;
+            --primary: #80e5fa;
+            --secondary: #022d36;
+            --accent: #0fcff5;
+        }
+    }
+}
