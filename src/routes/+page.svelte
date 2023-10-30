@@ -13,20 +13,20 @@
             icon: EraserIcon,
             name: "Ears Region Eraser",
             url: "region-eraser",
-            description: "Easily add Ears mod erase regions to your Minecraft skin.",
+            description: ["Easily add Ears mod erase regions to your Minecraft skin."],
         },
         {
             // @ts-ignore I don't know how to type this lol
             icon: CubeScanIcon,
             name: "Blockbench Model Generator",
             url: "bbmodel-generator",
-            description: "Generate a Blockbench model from a Minecraft skin, including Ears mod features.",
+            description: ["Generate a Blockbench model from a Minecraft skin, including Ears mod features."],
         },
         {
             // @ts-ignore I don't know how to type this lol
             icon: PlusIcon,
             name: "Your tool idea here..",
-            description: "Got a useful tool idea for the Ears mod? Contact @nickacpt on Discord.",
+            description: ["Got a useful tool idea that could help with using the Ears mod?", "Contact @nickacpt on Discord."],
             ghost: true,
         },
     ];
@@ -45,7 +45,7 @@
         {#if tools.length === 0}
             <p class="text-center w-full">No tools exist yet..</p>
         {:else}
-            <div class="grid justify-items-stretch gap-4 grid-cols-1 md:grid-cols-2">
+            <div class="grid justify-items-stretch gap-4 grid-cols-1 md:grid-cols-3">
                 {#each tools as tool}
                     {#if tool.url}
                         <a href="{base}/tools/{tool.url}">

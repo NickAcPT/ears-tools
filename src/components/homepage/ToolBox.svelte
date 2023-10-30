@@ -3,7 +3,7 @@
 
     export let icon: typeof SvelteComponent;
     export let name: string;
-    export let description: string | undefined = undefined;
+    export let description: string[] | undefined = undefined;
     export let ghost: boolean = false;
 </script>
 
@@ -16,7 +16,9 @@
         <h2 class="text-left text-xl font-medium pb-1">{name}</h2>
     </div>
     {#if description}
-        <p>{description}</p>
+        {#each description as desc}
+            <p class="text-center">{desc}</p>
+        {/each}
     {/if}
 </div>
 
