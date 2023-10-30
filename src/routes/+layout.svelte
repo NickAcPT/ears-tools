@@ -1,9 +1,7 @@
 <script lang="ts">
-    import { page } from "$app/stores";
     import "../app.css";
+    import { page } from "$app/stores";
     import Navbar from "../components/Navbar.svelte";
-    export const ssr = true;
-    export const prerender = true;
 </script>
 
 <svelte:head>

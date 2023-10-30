@@ -5,14 +5,14 @@
     import { saveAs } from "file-saver";
     import { browser } from "$app/environment";
     import SkinDropZone from "../../../components/bbmodel-generator/SkinDropZone.svelte";
+    import RequiresJs from "../../../components/RequiresJs.svelte";
 
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));
-
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
     let pickerHovered = writable<boolean>(false);
     let hasLayers = writable<boolean>(true);
-        
+
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
@@ -46,7 +46,7 @@
             handleSkinFile(files[i]);
         }
     }
-    
+
     function replacer(_key: any, value: any) {
         if (value instanceof Map) {
             return Object.fromEntries([...value]);
@@ -64,16 +64,17 @@
 
 <svelte:window on:paste={handlePaste} />
 
-{#await initWasm()}
-    <p>Loading...</p>
-{:catch error}
-    <div class="relative left-0 border-y-2 w-full border-gray-400 bg-red-500/10 flex flex-col items-center gap-2 my-5 p-2">
-        <p class="text-xl p-2 text-center">It seems like your browser doesn't support WebAssembly</p>
-        <p>Please check if you have a recent version of your browser, and if you
-            do, please contact @nickacpt on Discord.</p>
-        <p>Error: {error.message}</p>
-    </div>
-{/await}
+<RequiresJs>
+    {#await initWasm()}
+        <p class="text-center">Loading...</p>
+    {:catch error}
+        <div class="relative left-0 border-y-2 w-full border-gray-400 bg-red-500/10 flex flex-col items-center gap-2 my-5 p-2">
+            <p class="text-xl p-2 text-center">It seems like your browser doesn't support WebAssembly</p>
+            <p>Please check if you have a recent version of your browser, and if you do, please contact @nickacpt on Discord.</p>
+            <p>Error: {error.message}</p>
+        </div>
+    {/await}
+</RequiresJs>
 
 <div class="grid md:grid-cols-2 container">
     <div class="flex flex-col items-center w-full">
@@ -98,6 +99,6 @@
 
     <div class="flex flex-col items-center">
         <h2 class="text-2xl max-w-fit text-center">Input</h2>
-        <SkinDropZone on:files={handleSkinFiles}/>
+        <SkinDropZone on:files={handleSkinFiles} />
     </div>
 </div>

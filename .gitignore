@@ -170,3 +170,5 @@ package
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,svelte
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+build/**
