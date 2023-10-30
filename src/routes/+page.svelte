@@ -1,9 +1,11 @@
 <script lang="ts">
+    import { base } from "$app/paths";
     import type { Tool } from "$lib/types";
     import NickAc from "../components/homepage/NickAc.svelte";
     import ToolBox from "../components/homepage/ToolBox.svelte";
     import CubeScanIcon from "../components/icons/CubeScanIcon.svelte";
     import EraserIcon from "../components/icons/EraserIcon.svelte";
+    import PlusIcon from "../components/icons/PlusIcon.svelte";
 
     const tools: Tool[] = [
         {
@@ -11,14 +13,21 @@
             icon: EraserIcon,
             name: "Ears Region Eraser",
             url: "region-eraser",
-            description: "Easily add Ears mod erase regions to your Minecraft skin."
+            description: "Easily add Ears mod erase regions to your Minecraft skin.",
         },
         {
             // @ts-ignore I don't know how to type this lol
             icon: CubeScanIcon,
             name: "Blockbench Model Generator",
             url: "bbmodel-generator",
-            description: "Generate a Blockbench model from a Minecraft skin, including Ears mod features."
+            description: "Generate a Blockbench model from a Minecraft skin, including Ears mod features.",
+        },
+        {
+            // @ts-ignore I don't know how to type this lol
+            icon: PlusIcon,
+            name: "Your tool idea here..",
+            description: "Got a useful tool idea for the Ears mod? Contact @nickacpt on Discord.",
+            ghost: true,
         },
     ];
 </script>
@@ -38,7 +47,13 @@
         {:else}
             <div class="grid justify-items-stretch gap-4 grid-cols-1 md:grid-cols-2">
                 {#each tools as tool}
-                    <ToolBox {...tool} />
+                    {#if tool.url}
+                        <a href="{base}/tools/{tool.url}">
+                            <ToolBox {...tool} />
+                        </a>
+                    {:else}
+                        <ToolBox {...tool} />
+                    {/if}
                 {/each}
             </div>
         {/if}
