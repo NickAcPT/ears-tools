@@ -1,14 +1,20 @@
 <script lang="ts">
     import { writable } from "svelte/store";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
-    import type { EarsImageWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
-    import init, { get_regions, set_regions, decode_ears_image } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import type { EarsImageWorkspace } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import init, { decode_ears_image, get_regions } from "../../../tools/ears-eraser/ears-eraser_wasm";
 
     import { browser } from "$app/environment";
-    import RequiresJs from "../../../components/RequiresJs.svelte";
     import Moveable from "svelte-moveable";
     import Selecto from "svelte-selecto";
-    import { onMount } from "svelte";
+    import RequiresJs from "../../../components/RequiresJs.svelte";
+
+    interface EraseRegion {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }
 
     let moveable: Moveable;
     let targets: (HTMLElement | SVGElement)[] = [];
@@ -32,16 +38,12 @@
     }
 
     let workspace = writable<EarsImageWorkspace | undefined>(undefined); // @hmr:keep
-    let regions = writable<WasmEraseRegion[]>([]); // @hmr:keep
+    let regions = writable<EraseRegion[]>([]); // @hmr:keep
     let lastSkin = writable<File | undefined>(undefined); // @hmr:keep
 
     async function handleFile(file: File) {
         $workspace?.free();
-
         $lastSkin = file;
-
-        $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
-        $regions = get_regions($workspace);
     }
 
     function removeRegion(index: number) {
@@ -52,7 +54,14 @@
 
     $: imageSource =
         ($lastSkin && URL.createObjectURL($lastSkin)) ?? "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
-        
+
+    async function onImageLoad() {
+        if (!imgCanvas || !$lastSkin) return;
+
+        $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
+        $regions = get_regions($workspace);
+    }
+
     let imgCanvasBounds = {
         get top(): number {
             return imgCanvas?.getBoundingClientRect().top ?? 0;
@@ -71,45 +80,33 @@
     function getImagePixelWidth(): number {
         return imgCanvas.clientWidth / imgCanvas.naturalWidth;
     }
-    
+
     function getImagePixelHeight(): number {
-        return (imgCanvas.clientHeight / imgCanvas.naturalHeight);
+        return imgCanvas.clientHeight / imgCanvas.naturalHeight;
     }
-    
+
     function roundToPixelWidth(value: number): number {
         return Math.round(value / getImagePixelWidth()) * getImagePixelWidth();
     }
-    
+
     function roundToPixelHeight(value: number): number {
         return Math.round(value / getImagePixelHeight()) * getImagePixelHeight();
     }
-    
-    let extraProps = {
-        /* get horizontalGuidelines(): number[] {
-            const step = getImagePixelHeight();
-            const result = [];
-            for (let i = 0; i <= imgCanvas.clientHeight; i += step) {
-                result.push(i);
-            }
-            
-            console.log(result);
-            return result;
-        },
-        
-        get verticalGuidelines(): number[] {
-            const step = getImagePixelWidth();
-            const result = [];
-            for (let i = 0; i <= imgCanvas.clientWidth; i += step) {
-                result.push(i);
-            }
-            
-            return result;
-        },
-        
-        get snapThreshold(): number {
-            return Math.max(getImagePixelWidth(), getImagePixelHeight());
-        }, */
-    };
+
+    function notifyRegionUpdate(element: HTMLElement | SVGElement) {
+        let regionIdData = element.getAttribute("data-region-id");
+        if (!regionIdData) return;
+
+        let regionId = parseInt(regionIdData);
+        let x = parseInt(element.getAttribute("data-x") ?? "0");
+        let y = parseInt(element.getAttribute("data-y") ?? "0");
+        let width = parseInt(element.getAttribute("data-width") ?? "1");
+        let height = parseInt(element.getAttribute("data-height") ?? "1");
+
+        $regions[regionId] = { x, y, width, height };
+    }
+
+    let extraProps = {};
 </script>
 
 <RequiresJs>
@@ -129,11 +126,6 @@
         <SkinDropZone on:files={handleSkinFiles} />
         <div class="flex flex-1 flex-col gap-2">
             {#each $regions as region, i (i)}
-                <!-- 
-                Display the regions with tailwind:
-                Each region has an x, y, width and height (show these)
-                Allow to remove the region (call removeRegion(i))
-                -->
                 <div class="flex items-center gap-2">
                     <p class="text-center">Region {i + 1}</p>
                     <p class="text-center">X: {region.x}</p>
@@ -146,15 +138,25 @@
         </div>
     </div>
     <div>
-        {#each $regions as region, i (i)}
-            <div class="region absolute"
-            style:width="{getImagePixelWidth() * region.width}px"
-            style:height="{getImagePixelHeight() * region.height}px"
-            >Region {i}</div>
-        {/each}
+        {#if imgCanvas}
+            {#each $regions as region, i (i)}
+                <div
+                    class="region absolute block"
+                    style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
+                    style:width="{getImagePixelWidth() * region.width}px"
+                    style:height="{getImagePixelHeight() * region.height}px"
+                    data-region-id={i}
+                    data-x={region.x}
+                    data-y={region.y}
+                    data-width={region.width}
+                    data-height={region.height}
+                ></div>
+            {/each}
+        {/if}
 
         <img
             on:dragstart|preventDefault={() => false}
+            on:load={onImageLoad}
             class="pixelated render aspect-square flex-1"
             width="100%"
             src={imageSource}
@@ -169,23 +171,45 @@
         bind:this={moveable}
         origin={false}
         on:drag={({ detail: e }) => {
-            const left = e.translate[0];
-            const top = e.translate[1];
-            e.target.style.transform = 'translate(' + roundToPixelWidth(left) + 'px, ' + roundToPixelHeight(top) + 'px)';
+            const left = roundToPixelWidth(e.translate[0]);
+            const top = roundToPixelHeight(e.translate[1]);
+            e.target.style.transform = "translate(" + left + "px, " + roundToPixelHeight(top) + "px)";
+
+            e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
+            e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
         }}
         bounds={imgCanvasBounds}
         useResizeObserver={true}
         useMutationObserver={true}
         on:beforeResize={({ detail: e }) => {
-            e.setSize([
-                roundToPixelWidth(e.boundingWidth),
-                roundToPixelHeight(e.boundingHeight),
-            ]);
+            const width = roundToPixelWidth(e.boundingWidth);
+            const height = roundToPixelHeight(e.boundingHeight);
+
+            e.setSize([width, height]);
+
+            e.target.setAttribute("data-width", (width / getImagePixelWidth()).toString());
+            e.target.setAttribute("data-height", (height / getImagePixelHeight()).toString());
         }}
         on:resize={({ detail: e }) => {
-            e.target.style.width = `${(e.boundingWidth)}px`;
-            e.target.style.height = `${(e.boundingHeight)}px`;
+            e.target.style.width = `${e.boundingWidth}px`;
+            e.target.style.height = `${e.boundingHeight}px`;
+
+            if (e.drag) {
+                const left = roundToPixelWidth(e.drag.translate[0]);
+                const top = roundToPixelHeight(e.drag.translate[1]);
+                
+                e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
+                e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
+            }
+
+            console.log(e);
             e.target.style.transform = e.transform;
+        }}
+        on:dragEnd={({ detail: e }) => {
+            notifyRegionUpdate(e.target);
+        }}
+        on:resizeEnd={({ detail: e }) => {
+            notifyRegionUpdate(e.target);
         }}
         props={extraProps}
         snappable
@@ -212,3 +236,9 @@
         }}
     />
 {/if}
+
+<style lang="postcss">
+    .region {
+        @apply border-2 border-dashed border-gray-500/50 bg-gray-500/30;
+    }
+</style>
