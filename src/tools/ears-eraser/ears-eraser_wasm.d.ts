@@ -6,6 +6,12 @@
 */
 export function decode_ears_image(skin_bytes: Uint8Array): EarsImageWorkspace;
 /**
+* @param {Uint8Array} skin_bytes
+* @param {EarsImageWorkspace} workspace
+* @returns {Uint8Array}
+*/
+export function encode_ears_image(skin_bytes: Uint8Array, workspace: EarsImageWorkspace): Uint8Array;
+/**
 * @param {EarsImageWorkspace} decoded
 * @returns {any}
 */
@@ -53,10 +59,13 @@ export interface InitOutput {
   readonly __wbg_set_wasmeraseregion_height: (a: number, b: number) => void;
   readonly __wbg_earsimageworkspace_free: (a: number) => void;
   readonly decode_ears_image: (a: number, b: number) => number;
+  readonly encode_ears_image: (a: number, b: number, c: number, d: number) => void;
   readonly get_regions: (a: number) => number;
   readonly set_regions: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
 }
 

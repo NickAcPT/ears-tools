@@ -105,8 +105,6 @@
 
         $regions[regionId] = { x, y, width, height };
     }
-
-    let extraProps = {};
 </script>
 
 <RequiresJs>
@@ -197,12 +195,11 @@
             if (e.drag) {
                 const left = roundToPixelWidth(e.drag.translate[0]);
                 const top = roundToPixelHeight(e.drag.translate[1]);
-                
+
                 e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
                 e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
             }
 
-            console.log(e);
             e.target.style.transform = e.transform;
         }}
         on:dragEnd={({ detail: e }) => {
@@ -211,7 +208,6 @@
         on:resizeEnd={({ detail: e }) => {
             notifyRegionUpdate(e.target);
         }}
-        props={extraProps}
         snappable
         draggable
         resizable
@@ -220,7 +216,6 @@
 
     <Selecto
         selectableTargets={[".region"]}
-        dragContainer={document.body}
         hitRate={40}
         selectByClick={true}
         selectFromInside={false}

@@ -212,6 +212,34 @@ function _assertClass(instance, klass) {
     }
     return instance.ptr;
 }
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
+}
+/**
+* @param {Uint8Array} skin_bytes
+* @param {EarsImageWorkspace} workspace
+* @returns {Uint8Array}
+*/
+export function encode_ears_image(skin_bytes, workspace) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passArray8ToWasm0(skin_bytes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        _assertClass(workspace, EarsImageWorkspace);
+        var ptr1 = workspace.__destroy_into_raw();
+        wasm.encode_ears_image(retptr, ptr0, len0, ptr1);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        var v3 = getArrayU8FromWasm0(r0, r1).slice();
+        wasm.__wbindgen_free(r0, r1 * 1);
+        return v3;
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
+}
+
 /**
 * @param {EarsImageWorkspace} decoded
 * @returns {any}
