@@ -10,6 +10,10 @@
     "quoteProps": "consistent",
     "svelteSortOrder": "options-scripts-markup-styles",
     "multilineArraysWrapThreshold": 4,
+    "plugins": [
+        "prettier-plugin-svelte",
+        "prettier-plugin-tailwindcss"
+    ],
     "overrides": [
         {
             "files": "*.svelte",
@@ -17,5 +21,6 @@
                 "parser": "svelte"
             }
         }
-    ]
+    ],
+    "pluginSearchDirs": false
 }
