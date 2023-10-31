@@ -45,7 +45,7 @@
         {#if tools.length === 0}
             <p class="w-full text-center">No tools exist yet..</p>
         {:else}
-            <div class="grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-3">
+            <div class="grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-2">
                 {#each tools as tool}
                     {#if tool.url}
                         <a href="{base}/tools/{tool.url}">

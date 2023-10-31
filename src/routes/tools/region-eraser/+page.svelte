@@ -1,19 +1,21 @@
 <script lang="ts">
     import { writable } from "svelte/store";
-    import SkinDropZone from "../../../components/SkinDropZone.svelte";
-    import type { EarsImageWorkspace } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import { browser } from "$app/environment";
+
+    import type { EarsImageWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
     import init, { decode_ears_image, get_regions } from "../../../tools/ears-eraser/ears-eraser_wasm";
 
-    import { browser } from "$app/environment";
-    import Moveable from "svelte-moveable";
     import Selecto from "svelte-selecto";
+    import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
     import RequiresJs from "../../../components/RequiresJs.svelte";
+    import SkinDropZone from "../../../components/SkinDropZone.svelte";
 
     interface EraseRegion {
         x: number;
         y: number;
         width: number;
         height: number;
+        free?: () => void;
     }
 
     let moveable: Moveable;
@@ -37,6 +39,36 @@
         handleFile(files[0]);
     }
 
+    function handleDragEvent(e: OnDrag) {
+        const left = roundToPixelWidth(e.translate[0]);
+        const top = roundToPixelHeight(e.translate[1]);
+        e.target.style.transform = "translate(" + left + "px, " + roundToPixelHeight(top) + "px)";
+
+        e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
+        e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
+    }
+
+    function handleBeforeResizeEvent(e: OnBeforeResize) {
+        const width = roundToPixelWidth(e.boundingWidth);
+        const height = roundToPixelHeight(e.boundingHeight);
+
+        e.setSize([width, height]);
+
+        e.target.setAttribute("data-width", (width / getImagePixelWidth()).toString());
+        e.target.setAttribute("data-height", (height / getImagePixelHeight()).toString());
+    }
+
+    function handleResizeEvent(e: OnResize) {
+        e.target.style.width = `${e.boundingWidth}px`;
+        e.target.style.height = `${e.boundingHeight}px`;
+
+        if (e.drag) {
+            handleDragEvent(e.drag);
+        }
+
+        e.target.style.transform = e.transform;
+    }
+
     let workspace = writable<EarsImageWorkspace | undefined>(undefined); // @hmr:keep
     let regions = writable<EraseRegion[]>([]); // @hmr:keep
     let lastSkin = writable<File | undefined>(undefined); // @hmr:keep
@@ -49,8 +81,6 @@
     function removeRegion(index: number) {
         $regions = $regions.filter((_, i) => i != index);
     }
-
-    $: $regions && console.log($regions);
 
     $: imageSource =
         ($lastSkin && URL.createObjectURL($lastSkin)) ?? "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
@@ -105,6 +135,28 @@
 
         $regions[regionId] = { x, y, width, height };
     }
+
+    function addRegion(x: number, y: number, w: number, h: number) {
+        $regions = [...$regions, { x, y, width: w, height: h }];
+    }
+
+    function handleKeyPress(event: KeyboardEvent) {
+        if (event.key == "Delete") {
+            targets.forEach((target) => {
+                let regionIdData = target.getAttribute("data-region-id");
+                if (!regionIdData) return;
+
+                let regionId = parseInt(regionIdData);
+                let region = $regions[regionId];
+
+                region?.free?.();
+                
+                removeRegion(regionId);
+            });
+
+            targets = [];
+        }
+    }
 </script>
 
 <RequiresJs>
@@ -130,9 +182,12 @@
                     <p class="text-center">Y: {region.y}</p>
                     <p class="text-center">Width: {region.width}</p>
                     <p class="text-center">Height: {region.height}</p>
-                    <button on:click={() => removeRegion(i)}>Remove</button>
+                    <button class="secondary" on:click={() => removeRegion(i)}>Remove</button>
                 </div>
             {/each}
+            {#if $lastSkin}
+                <button class="secondary" on:click={() => addRegion(0, 0, 5, 5)}>Add</button>
+            {/if}
         </div>
     </div>
     <div>
@@ -167,50 +222,18 @@
 {#if browser}
     <Moveable
         bind:this={moveable}
-        origin={false}
-        on:drag={({ detail: e }) => {
-            const left = roundToPixelWidth(e.translate[0]);
-            const top = roundToPixelHeight(e.translate[1]);
-            e.target.style.transform = "translate(" + left + "px, " + roundToPixelHeight(top) + "px)";
-
-            e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
-            e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
-        }}
         bounds={imgCanvasBounds}
-        useResizeObserver={true}
-        useMutationObserver={true}
-        on:beforeResize={({ detail: e }) => {
-            const width = roundToPixelWidth(e.boundingWidth);
-            const height = roundToPixelHeight(e.boundingHeight);
-
-            e.setSize([width, height]);
-
-            e.target.setAttribute("data-width", (width / getImagePixelWidth()).toString());
-            e.target.setAttribute("data-height", (height / getImagePixelHeight()).toString());
-        }}
-        on:resize={({ detail: e }) => {
-            e.target.style.width = `${e.boundingWidth}px`;
-            e.target.style.height = `${e.boundingHeight}px`;
-
-            if (e.drag) {
-                const left = roundToPixelWidth(e.drag.translate[0]);
-                const top = roundToPixelHeight(e.drag.translate[1]);
-
-                e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
-                e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
-            }
-
-            e.target.style.transform = e.transform;
-        }}
-        on:dragEnd={({ detail: e }) => {
-            notifyRegionUpdate(e.target);
-        }}
-        on:resizeEnd={({ detail: e }) => {
-            notifyRegionUpdate(e.target);
-        }}
+        on:drag={({ detail: e }) => handleDragEvent(e)}
+        on:beforeResize={({ detail: e }) => handleBeforeResizeEvent(e)}
+        on:resize={({ detail: e }) => handleResizeEvent(e)}
+        on:dragEnd={({ detail: e }) => notifyRegionUpdate(e.target)}
+        on:resizeEnd={({ detail: e }) => notifyRegionUpdate(e.target)}
         snappable
         draggable
         resizable
+        useResizeObserver
+        useMutationObserver
+        origin={false}
         target={targets}
     />
 
@@ -228,9 +251,20 @@
                 });
             }
             targets = e.selected;
+
+            if (targets.length == 0 && e.isDouble) {
+                let eventX = e.inputEvent.clientX - imgCanvasBounds.left;
+                let eventY = e.inputEvent.clientY - imgCanvasBounds.top;
+                let x = Math.round(eventX / getImagePixelWidth()) - 2;
+                let y = Math.round(eventY / getImagePixelHeight()) - 2;
+
+                addRegion(Math.max(0, x), Math.max(0, y), 4, 4);
+            }
         }}
     />
 {/if}
+
+<svelte:document on:keyup={handleKeyPress} />
 
 <style lang="postcss">
     .region {

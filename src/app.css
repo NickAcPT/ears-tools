@@ -10,6 +10,10 @@
         @apply text-text bg-primary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
     }
     
+    button.secondary {
+        @apply text-text bg-secondary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
+    }
+    
     @media (prefers-color-scheme: dark) {
         button {
             @apply text-background;
