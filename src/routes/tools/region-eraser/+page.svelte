@@ -91,33 +91,35 @@
         $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
         $regions = get_regions($workspace);
     }
-    
+
     async function updateSkinFile() {
         if (!$workspace || !$lastSkin) return;
-        
-        console.log("Changed skin file");
-        
+
         const existingRegions: EraseRegion[] = get_regions($workspace);
-        
-        const changed = existingRegions.length != $regions.length || existingRegions.map((region, i) => {
-            const newRegion = $regions[i];
-            
-            const differentX = region.x != newRegion.x;
-            const differentY = region.y != newRegion.y;
-            const differentWidth = region.width != newRegion.width;
-            const differentHeight = region.height != newRegion.height;
-            
-            region.free?.();
-            
-            return differentX || differentY || differentWidth || differentHeight;
-        });
-        
+
+        const changed =
+            existingRegions.length != $regions.length ||
+            existingRegions.map((region, i) => {
+                const newRegion = $regions[i];
+
+                const differentX = region.x != newRegion.x;
+                const differentY = region.y != newRegion.y;
+                const differentWidth = region.width != newRegion.width;
+                const differentHeight = region.height != newRegion.height;
+
+                region.free?.();
+
+                return differentX || differentY || differentWidth || differentHeight;
+            }).includes(true);
+
         if (!changed) return;
-        
+
+        console.log("Changed skin file");
+
         set_regions($workspace, $regions);
-        
+
         const newImage = encode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()), $workspace);
-        
+
         $lastSkin = new File([newImage], $lastSkin.name, { type: $lastSkin.type });
     }
 
@@ -163,12 +165,16 @@
         let height = parseInt(element.getAttribute("data-height") ?? "1");
 
         $regions[regionId] = { x, y, width, height };
-        
+
         updateSkinFile();
     }
 
     function addRegion(x: number, y: number, w: number, h: number) {
+        if (!$workspace) return;
+        
         $regions = [...$regions, { x, y, width: w, height: h }];
+        
+        updateSkinFile();
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -186,10 +192,10 @@
             });
 
             targets = [];
+            
+            updateSkinFile();
         }
     }
-
-
 </script>
 
 <RequiresJs>
@@ -282,18 +288,22 @@
     />
 {/if}
 
+<svelte:window
+    on:resize={() => {
+        $regions = $regions;
+    }}
+/>
 <svelte:document on:keyup={handleKeyPress} />
 
 <style lang="postcss">
     .region {
         @apply bg-secondary-500/20;
-        
+
         --border-color: rgb(var(--accent-500));
 
         background-image: linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
             linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
-            linear-gradient(0deg, var(--border-color) 50%, transparent 50%),
-            linear-gradient(0deg, var(--border-color) 50%, transparent 50%);
+            linear-gradient(0deg, var(--border-color) 50%, transparent 50%), linear-gradient(0deg, var(--border-color) 50%, transparent 50%);
         background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
 
         background-size:
