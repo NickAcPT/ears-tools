@@ -3,7 +3,7 @@
     import { browser } from "$app/environment";
 
     import type { EarsImageWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
-    import init, { decode_ears_image, get_regions } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import init, { decode_ears_image, encode_ears_image, get_regions, set_regions } from "../../../tools/ears-eraser/ears-eraser_wasm";
 
     import Selecto from "svelte-selecto";
     import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
@@ -91,6 +91,35 @@
         $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
         $regions = get_regions($workspace);
     }
+    
+    async function updateSkinFile() {
+        if (!$workspace || !$lastSkin) return;
+        
+        console.log("Changed skin file");
+        
+        const existingRegions: EraseRegion[] = get_regions($workspace);
+        
+        const changed = existingRegions.length != $regions.length || existingRegions.map((region, i) => {
+            const newRegion = $regions[i];
+            
+            const differentX = region.x != newRegion.x;
+            const differentY = region.y != newRegion.y;
+            const differentWidth = region.width != newRegion.width;
+            const differentHeight = region.height != newRegion.height;
+            
+            region.free?.();
+            
+            return differentX || differentY || differentWidth || differentHeight;
+        });
+        
+        if (!changed) return;
+        
+        set_regions($workspace, $regions);
+        
+        const newImage = encode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()), $workspace);
+        
+        $lastSkin = new File([newImage], $lastSkin.name, { type: $lastSkin.type });
+    }
 
     let imgCanvasBounds = {
         get top(): number {
@@ -134,6 +163,8 @@
         let height = parseInt(element.getAttribute("data-height") ?? "1");
 
         $regions[regionId] = { x, y, width, height };
+        
+        updateSkinFile();
     }
 
     function addRegion(x: number, y: number, w: number, h: number) {
@@ -157,6 +188,8 @@
             targets = [];
         }
     }
+
+
 </script>
 
 <RequiresJs>
