@@ -150,7 +150,7 @@
                 let region = $regions[regionId];
 
                 region?.free?.();
-                
+
                 removeRegion(regionId);
             });
 
@@ -174,21 +174,6 @@
 <div class="container grid grid-cols-[auto_auto]">
     <div class="flex flex-col">
         <SkinDropZone on:files={handleSkinFiles} />
-        <div class="flex flex-1 flex-col gap-2">
-            {#each $regions as region, i (i)}
-                <div class="flex items-center gap-2">
-                    <p class="text-center">Region {i + 1}</p>
-                    <p class="text-center">X: {region.x}</p>
-                    <p class="text-center">Y: {region.y}</p>
-                    <p class="text-center">Width: {region.width}</p>
-                    <p class="text-center">Height: {region.height}</p>
-                    <button class="secondary" on:click={() => removeRegion(i)}>Remove</button>
-                </div>
-            {/each}
-            {#if $lastSkin}
-                <button class="secondary" on:click={() => addRegion(0, 0, 5, 5)}>Add</button>
-            {/if}
-        </div>
     </div>
     <div>
         {#if imgCanvas}
@@ -268,6 +253,43 @@
 
 <style lang="postcss">
     .region {
-        @apply border-2 border-dashed border-gray-500/50 bg-gray-500/30;
+        @apply bg-secondary-500/20;
+        
+        --border-color: rgb(var(--accent-500));
+
+        background-image: linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
+            linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
+            linear-gradient(0deg, var(--border-color) 50%, transparent 50%),
+            linear-gradient(0deg, var(--border-color) 50%, transparent 50%);
+        background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+
+        background-size:
+            15px 2px,
+            15px 2px,
+            2px 15px,
+            2px 15px;
+        background-position:
+            left top,
+            right bottom,
+            left bottom,
+            right top;
+        animation: border-dance 1s infinite linear;
+    }
+
+    @keyframes border-dance {
+        0% {
+            background-position:
+                left top,
+                right bottom,
+                left bottom,
+                right top;
+        }
+        100% {
+            background-position:
+                left 15px top,
+                right 15px bottom,
+                left bottom 15px,
+                right top 15px;
+        }
     }
 </style>
