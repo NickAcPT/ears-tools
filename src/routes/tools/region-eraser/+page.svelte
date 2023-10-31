@@ -7,6 +7,8 @@
 
     import Selecto from "svelte-selecto";
     import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
+    import saveAs from "file-saver";
+
     import RequiresJs from "../../../components/RequiresJs.svelte";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
 
@@ -49,13 +51,19 @@
     }
 
     function handleBeforeResizeEvent(e: OnBeforeResize) {
-        const width = roundToPixelWidth(e.boundingWidth);
-        const height = roundToPixelHeight(e.boundingHeight);
+        let width = roundToPixelWidth(e.boundingWidth) / getImagePixelHeight();
+        let height = roundToPixelHeight(e.boundingHeight) / getImagePixelHeight();
 
-        e.setSize([width, height]);
+        width = Math.max(1, width);
+        height = Math.max(1, height);
+        
+        width = Math.min(32, width);
+        height = Math.min(32, height);
+        
+        e.setSize([width * getImagePixelWidth(), height * getImagePixelHeight()]);
 
-        e.target.setAttribute("data-width", (width / getImagePixelWidth()).toString());
-        e.target.setAttribute("data-height", (height / getImagePixelHeight()).toString());
+        e.target.setAttribute("data-width", width.toString());
+        e.target.setAttribute("data-height", height.toString());
     }
 
     function handleResizeEvent(e: OnResize) {
@@ -99,18 +107,20 @@
 
         const changed =
             existingRegions.length != $regions.length ||
-            existingRegions.map((region, i) => {
-                const newRegion = $regions[i];
+            existingRegions
+                .map((region, i) => {
+                    const newRegion = $regions[i];
 
-                const differentX = region.x != newRegion.x;
-                const differentY = region.y != newRegion.y;
-                const differentWidth = region.width != newRegion.width;
-                const differentHeight = region.height != newRegion.height;
+                    const differentX = region.x != newRegion.x;
+                    const differentY = region.y != newRegion.y;
+                    const differentWidth = region.width != newRegion.width;
+                    const differentHeight = region.height != newRegion.height;
 
-                region.free?.();
+                    region.free?.();
 
-                return differentX || differentY || differentWidth || differentHeight;
-            }).includes(true);
+                    return differentX || differentY || differentWidth || differentHeight;
+                })
+                .includes(true);
 
         if (!changed) return;
 
@@ -171,9 +181,9 @@
 
     function addRegion(x: number, y: number, w: number, h: number) {
         if (!$workspace) return;
-        
+
         $regions = [...$regions, { x, y, width: w, height: h }];
-        
+
         updateSkinFile();
     }
 
@@ -192,9 +202,17 @@
             });
 
             targets = [];
-            
+
             updateSkinFile();
         }
+    }
+
+
+    function saveImage() {
+        if (!imgCanvas) return;
+        
+        const src = imgCanvas.src;
+        saveAs(src, "skin.png");
     }
 </script>
 
@@ -210,9 +228,39 @@
     {/await}
 </RequiresJs>
 
-<div class="container grid grid-cols-[auto_auto]">
+<div class="container grid grid-rows-[auto_auto] gap-2 md:grid-cols-[auto_auto]">
     <div class="flex flex-col">
         <SkinDropZone on:files={handleSkinFiles} />
+
+        <!--
+            Instructions:
+            - Drag and drop a skin file
+            - `Double click` to add a region
+            - `Click` to select a region
+            - `Shift + Click` to add a region to the selection
+            - `Delete` to delete the selected regions
+            - <Save image> or right click on the image and `Save image as...` to save the skin
+          -->
+        <div>
+            <p>Instructions:</p>
+            <ul class="list-disc list-inside flex flex-col gap-1 pl-4">
+                <li>Drag and drop a skin file</li>
+                <li>
+                    <kbd>Double click</kbd> to add a region
+                </li>
+                <li>
+                    <kbd>Click</kbd> to select a region
+                </li>
+                <li>
+                    <kbd>Shift + Click</kbd> to add a region to the selection
+                </li>
+                <li>
+                    <kbd>Delete</kbd> to delete the selected regions
+                </li>
+                <li>
+                    <button on:click={saveImage}>Save image</button> or right click on the image and <kbd>Save image as...</kbd> to save the skin
+                </li>
+        </div>
     </div>
     <div>
         {#if imgCanvas}
@@ -334,5 +382,9 @@
                 left bottom 15px,
                 right top 15px;
         }
+    }
+    
+    kbd {
+        @apply bg-secondary-500/20 p-1 rounded;
     }
 </style>
