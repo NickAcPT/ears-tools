@@ -2,6 +2,12 @@ import type { PageLoad } from './$types';
 
 export const load = (async () => {
     return {
-        title: "Ears Region Eraser"
+        /* 
+        title: "Blockbench Model Generator",
+        description: "To generate a Blockbench from a Minecraft skin, pick your settings, then drag your skin file to the upload region.",
+        ogdescription: "Tool to generate a Blockbench model from a Minecraft skin, including Ears mod features."*/
+        title: "Ears Region Eraser",
+        description: "To manage the ears erase regions, drag your skin file to the upload region.",
+        ogdescription: "Tool to edit Ears erase regions."
     };
 }) satisfies PageLoad;

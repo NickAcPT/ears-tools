@@ -1,6 +1,6 @@
 <script lang="ts">
     import { writable } from "svelte/store";
-    import DropZone from "../DropZone.svelte";
+    import DropZone from "./DropZone.svelte";
     import { createEventDispatcher } from "svelte";
 
     let dispatch = createEventDispatcher();
@@ -15,13 +15,14 @@
     function handleInput() {
         if (filePicker.files && filePicker.files.length > 0) {
             dispatch("files", filePicker.files);
+            filePicker.value = "";
         }
     }
 </script>
 
 <DropZone hovered={pickerHovered} on:files>
     <div
-        class="flex w-full max-w-2xl flex-col justify-around gap-5 rounded-2xl border-2 border-dashed border-accent-500 p-10 {$pickerHovered
+        class="flex h-fit w-full max-w-2xl flex-col justify-around gap-5 rounded-2xl border-2 border-dashed border-accent-500 p-10 {$pickerHovered
             ? 'bg-secondary-200'
             : 'bg-secondary-50'} items-center"
     >

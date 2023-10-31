@@ -5,20 +5,29 @@
 @tailwind utilities;
 
 
-button {
-    @apply text-text bg-primary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
     button {
-        @apply text-background;
+        @apply text-text bg-primary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        button {
+            @apply text-background;
+        }
+    }
+    
+    hr {
+        @apply my-4 border-0 border-t border-secondary-500;
+    }
+    
+    div.container {
+        @apply mx-auto max-w-[95%] lg:max-w-[85%];
     }
 }
 
-hr {
-    @apply my-4 border-0 border-t border-secondary-500;
+@layer components {
+    img.pixelated {
+        image-rendering: pixelated;
+    }
 }
 
-div.container {
-    @apply mx-auto max-w-[95%] lg:max-w-[85%];
-}

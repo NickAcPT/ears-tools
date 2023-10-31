@@ -4,7 +4,7 @@
     import init, { WasmPlayerModel, generate_blockbench_model } from "../../../tools/bbmodel-generator/bbmodel-generator_wasm";
     import { saveAs } from "file-saver";
     import { browser } from "$app/environment";
-    import SkinDropZone from "../../../components/bbmodel-generator/SkinDropZone.svelte";
+    import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import RequiresJs from "../../../components/RequiresJs.svelte";
 
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));

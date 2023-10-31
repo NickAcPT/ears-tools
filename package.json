@@ -34,6 +34,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"file-saver": "^2.0.5"
+		"file-saver": "^2.0.5",
+		"svelte-moveable": "^0.44.0",
+		"svelte-selecto": "^1.26.0"
 	}
 }

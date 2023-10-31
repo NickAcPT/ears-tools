@@ -47,9 +47,6 @@ export default {
                 },
             }
         },
-        container: {
-            center: true,
-        },
         fontSize: {
             sm: '0.750rem',
             base: '1rem',

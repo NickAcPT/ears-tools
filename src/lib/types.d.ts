@@ -7,3 +7,10 @@ interface Tool {
     url?: string;
     ghost?: boolean;
 }
+
+interface EarsEraseRegion {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
