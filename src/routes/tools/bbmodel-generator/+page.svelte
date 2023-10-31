@@ -67,21 +67,21 @@
     {#await initWasm()}
         <p class="text-center">Loading...</p>
     {:catch error}
-        <div class="relative left-0 border-y-2 w-full border-gray-400 bg-red-500/10 flex flex-col items-center gap-2 my-5 p-2">
-            <p class="text-xl p-2 text-center">It seems like your browser doesn't support WebAssembly</p>
+        <div class="relative left-0 my-5 flex w-full flex-col items-center gap-2 border-y-2 border-gray-400 bg-red-500/10 p-2">
+            <p class="p-2 text-center text-xl">It seems like your browser doesn't support WebAssembly</p>
             <p>Please check if you have a recent version of your browser, and if you do, please contact @nickacpt on Discord.</p>
             <p>Error: {error.message}</p>
         </div>
     {/await}
 </RequiresJs>
 
-<div class="grid md:grid-cols-2 container">
-    <div class="flex flex-col items-center w-full">
-        <h2 class="text-2xl text-center">Settings</h2>
-        <div class="flex flex-col justify-evenly max-w-fit h-full gap-y-2">
+<div class="container grid md:grid-cols-2">
+    <div class="flex w-full flex-col items-center">
+        <h2 class="text-center text-2xl">Settings</h2>
+        <div class="flex h-full max-w-fit flex-col justify-evenly gap-y-2">
             <div>
                 <label for="skin-model">Skin model:</label>
-                <select class="border-accent-500 bg-secondary-50 border-2 rounded py-2 px-20" name="skin-model" bind:value={$skinModel}>
+                <select class="rounded border-2 border-accent-500 bg-secondary-50 px-20 py-2" name="skin-model" bind:value={$skinModel}>
                     {#each models as model (model[1])}
                         <option value={model[1]}>{model[0]}</option>
                     {/each}
@@ -97,7 +97,7 @@
     </div>
 
     <div class="flex flex-col items-center">
-        <h2 class="text-2xl max-w-fit text-center">Input</h2>
+        <h2 class="max-w-fit text-center text-2xl">Input</h2>
         <SkinDropZone on:files={handleSkinFiles} />
     </div>
 </div>

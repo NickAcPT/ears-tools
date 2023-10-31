@@ -32,7 +32,7 @@
     ];
 </script>
 
-<div class="mx-auto flex flex-col p-4 gap-20 container">
+<div class="container mx-auto flex flex-col gap-20 p-4">
     <div class="text-center text-xl">
         <h1 class="text-3xl">Welcome to Ears Tools</h1>
         <p class="inline">Created by</p>
@@ -41,11 +41,11 @@
     </div>
 
     <div class="flex flex-col gap-5">
-        <h2 class="text-2xl text-center">Tools</h2>
+        <h2 class="text-center text-2xl">Tools</h2>
         {#if tools.length === 0}
-            <p class="text-center w-full">No tools exist yet..</p>
+            <p class="w-full text-center">No tools exist yet..</p>
         {:else}
-            <div class="grid justify-items-stretch gap-4 grid-cols-1 md:grid-cols-3">
+            <div class="grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-3">
                 {#each tools as tool}
                     {#if tool.url}
                         <a href="{base}/tools/{tool.url}">

@@ -11,19 +11,16 @@
     {:else}
         <title>Ears Tools by NickAc</title>
     {/if}
-    
-    <meta property="og:title" content="{$page.data.title ?? "Ears Tools"}" />
-    <meta property="og:description" content="{$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."}" />
+
+    <meta property="og:title" content={$page.data.title ?? "Ears Tools"} />
     <meta
-        name="description"
-        content="{$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."}"
+        property="og:description"
+        content={$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."}
     />
+    <meta name="description" content={$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."} />
     <meta property="og:site_name" content="Ears Tools by NickAc" />
     <meta name="keywords" content="NickAc, NickAcPT, nmsr, minecraft, skin, renderer, render, avatar" />
-    <meta
-        property="og:image"
-        content="{base}/favicon.png"
-    />
+    <meta property="og:image" content="{base}/favicon.png" />
     <meta name="theme-color" content="#0FCFF5" />
     <meta name="color-scheme" content="light dark" />
 </svelte:head>
