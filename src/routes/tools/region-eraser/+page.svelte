@@ -89,6 +89,7 @@
 
     async function handleFile(file: File) {
         $workspace?.free();
+        $workspace = undefined;
         $lastSkin = file;
     }
 
@@ -119,6 +120,7 @@
         } catch (error) {
             alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
             $lastSkin = undefined;
+            $workspace?.free();
             $workspace = undefined;
             $regions = [];
             console.error(error);
@@ -365,7 +367,7 @@
         useResizeObserver
         useMutationObserver
         origin={false}
-        target={$selectedRegionIndex != null ? `.region[data-region-id="${$selectedRegionIndex}"]` : undefined}
+        target={$selectedRegionIndex != null ? `.region[data-region-id="${$selectedRegionIndex}"]` : ""}
     />
 
     <Selecto
@@ -405,13 +407,13 @@
                 moveable.waitToChangeTarget().then(() => {
                     moveable.dragStart(e.inputEvent);
                 });
+            }
 
-                if (e.selected.length == 0) {
-                    $selectedRegionIndex = null;
-                } else {
-                    let regionId = e.selected[0]?.getAttribute("data-region-id");
-                    $selectedRegionIndex = regionId ? parseInt(regionId) : null;
-                }
+            if (e.selected.length == 0) {
+                $selectedRegionIndex = null;
+            } else {
+                let regionId = e.selected[0]?.getAttribute("data-region-id");
+                $selectedRegionIndex = regionId ? parseInt(regionId) : null;
             }
         }}
     />
