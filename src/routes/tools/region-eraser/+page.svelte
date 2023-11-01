@@ -21,13 +21,8 @@
     }
 
     let moveable: Moveable;
-    let selectedTargetIndex: Writable<number | null> = writable(null);
+    let selectedRegionIndex: Writable<number | null> = writable(null);
 
-    //$: moveable && $selectedTargetIndex && moveable.updateSelectors();
-    
-    // @ts-ignore
-    $: moveable && (()=>{window.moveable = moveable;})();
-    
     let imgCanvas: HTMLImageElement;
 
     async function initWasm() {
@@ -47,6 +42,8 @@
     }
 
     function handleDragEvent(e: OnDrag) {
+        if (!isFinite(getImagePixelWidth()) || !isFinite(getImagePixelHeight())) return;
+
         const left = roundToPixelWidth(e.translate[0]);
         const top = roundToPixelHeight(e.translate[1]);
         e.target.style.transform = "translate(" + left + "px, " + roundToPixelHeight(top) + "px)";
@@ -68,7 +65,7 @@
         height = Math.min(32, height);
 
         e.setSize([width * getImagePixelWidth(), height * getImagePixelHeight()]);
-        
+
         updateRegion(e.target, (r) => {
             r.width = width;
             r.height = height;
@@ -97,10 +94,10 @@
 
     function removeRegion(index: number) {
         $regions = $regions.filter((_, i) => i != index);
-        
-        if ($selectedTargetIndex == index) {
-            $selectedTargetIndex = null;
-        }   
+
+        if ($selectedRegionIndex == index) {
+            $selectedRegionIndex = null;
+        }
     }
 
     $: imageSource =
@@ -108,6 +105,13 @@
 
     async function onImageLoad() {
         if (!imgCanvas || !$lastSkin) return;
+
+        try {
+            $workspace?.free();
+            $workspace = undefined;
+        } catch (error) {
+            console.error("Failed to free previous workspace", error);
+        }
 
         try {
             $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
@@ -152,12 +156,8 @@
 
         if (!changed) return;
 
-        console.log("Before Regions updated", $workspace);
         $workspace.set_regions($regions);
-        console.log("Regions updated", $workspace);
-
         const newImage = encode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()), $workspace);
-        $workspace = undefined;
 
         $lastSkin = new File([newImage], $lastSkin.name, { type: $lastSkin.type });
     }
@@ -197,52 +197,37 @@
         const targetIndex = parseInt(target.getAttribute("data-region-id") ?? "0");
         const region = $regions.find((_, i) => i == targetIndex);
         if (!region) return;
-        
+
         block(region);
-        
+
         sanitizeRegion(region);
-        addRegion(region.x, region.y, region.width, region.height, targetIndex);
     }
-    
-    /* function notifyRegionUpdate(element: HTMLElement | SVGElement) {
-        let regionIdData = element.getAttribute("data-region-id");
-        if (!regionIdData) return;
 
-        let regionId = parseInt(regionIdData);
-        let x = parseInt(element.getAttribute("data-x") ?? "0");
-        let y = parseInt(element.getAttribute("data-y") ?? "0");
-        let width = parseInt(element.getAttribute("data-width") ?? "1");
-        let height = parseInt(element.getAttribute("data-height") ?? "1");
-
-        addRegion(x, y, width, height, regionId);
-        updateSkinFile();
-    } */
-    
     function sanitizeRegion(region: EraseRegion): EraseRegion {
         let x = region.x;
         let y = region.y;
         let width = region.width;
         let height = region.height;
-        
-        // If we have a region that comes from Rust, just free it and allocate a new one in JS
-        region.free?.();
-        
+
         // Make sure we don't have negative values for x and y
         x = Math.max(0, x);
         y = Math.max(0, y);
-        
+
         // Oh, and don't forget to make sure the values are valid u8 values
         x = Math.min(x, /* u8 max */ 255);
         y = Math.min(y, /* u8 max */ 255);
-        
-        // Next, make sure the size is at least 1 
+
+        // Next, make sure the size is at least 1
         width = Math.max(1, width);
         height = Math.max(1, height);
 
         // Regions can be at most 32x32
         width = Math.min(32, width);
         height = Math.min(32, height);
-        
+
+        // If we have a region that comes from Rust, just free it and allocate a new one in JS
+        region.free?.();
+
         return { x, y, width, height };
     }
 
@@ -250,9 +235,10 @@
         if (!$workspace) return;
 
         let newRegion = sanitizeRegion({ x, y, width: w, height: h });
-        
+
         if (index == null) {
             $regions = [...$regions, newRegion];
+            $selectedRegionIndex = $regions.length - 1;
         } else {
             $regions[index] = newRegion;
         }
@@ -267,15 +253,15 @@
     }
 
     async function handleDelete() {
-        let index = $selectedTargetIndex;
+        let index = $selectedRegionIndex;
         if (index == null) return;
-        
+
         let region = $regions[index];
         region?.free?.();
 
         removeRegion(index);
-        
-        $selectedTargetIndex = null;
+
+        $selectedRegionIndex = null;
 
         await updateSkinFile();
     }
@@ -286,7 +272,6 @@
         const src = imgCanvas.src;
         saveAs(src, "skin.png");
     }
-
 </script>
 
 <RequiresJs>
@@ -337,7 +322,7 @@
                 </li>
             </ul>
         </div>
-        
+
         <div>
             {#each $regions as region, i (i)}
                 <p>{region.x}, {region.y}, {region.width}, {region.height}</p>
@@ -349,7 +334,7 @@
             {#each $regions as region, i (i)}
                 <div
                     class="region absolute block"
-                    class:selected={$selectedTargetIndex == i}
+                    class:selected={$selectedRegionIndex == i}
                     style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
                     style:width="{getImagePixelWidth() * region.width}px"
                     style:height="{getImagePixelHeight() * region.height}px"
@@ -372,22 +357,21 @@
 </div>
 
 {#if browser}
-    <!-- on:dragEnd={({ detail: e }) => notifyRegionUpdate(e.target)} -->
-    <!-- on:resizeEnd={({ detail: e }) => notifyRegionUpdate(e.target)} -->
     <Moveable
         bind:this={moveable}
         bounds={imgCanvasBounds}
         on:drag={({ detail: e }) => handleDragEvent(e)}
         on:beforeResize={({ detail: e }) => handleBeforeResizeEvent(e)}
         on:resize={({ detail: e }) => handleResizeEvent(e)}
-        
+        on:dragEnd={updateSkinFile}
+        on:resizeEnd={updateSkinFile}
         snappable
         draggable
         resizable
         useResizeObserver
         useMutationObserver
         origin={false}
-        target={($selectedTargetIndex ? `.region[data-region-id="${$selectedTargetIndex}"]`: undefined)}
+        target={$selectedRegionIndex != null ? `.region[data-region-id="${$selectedRegionIndex}"]` : undefined}
     />
 
     <Selecto
@@ -397,8 +381,10 @@
         selectableTargets={[".region"]}
         boundContainer={imgCanvas}
         dragCondition={(e) => {
-            const withinX = e.inputEvent.clientX >= imgCanvasBounds.left && e.inputEvent.clientX <= imgCanvasBounds.right;
-            const withinY = e.inputEvent.clientY >= imgCanvasBounds.top && e.inputEvent.clientY <= imgCanvasBounds.bottom;
+            const offset = 10;
+            
+            const withinX = e.inputEvent.clientX >= imgCanvasBounds.left - offset && e.inputEvent.clientX <= imgCanvasBounds.right + offset;
+            const withinY = e.inputEvent.clientY >= imgCanvasBounds.top - offset && e.inputEvent.clientY <= imgCanvasBounds.bottom + offset;
 
             return withinX && withinY;
         }}
@@ -425,15 +411,12 @@
                 moveable.waitToChangeTarget().then(() => {
                     moveable.dragStart(e.inputEvent);
                 });
-                
+
                 if (e.selected.length == 0) {
-                    console.log("No regions selected");
-                    $selectedTargetIndex = null;
+                    $selectedRegionIndex = null;
                 } else {
                     let regionId = e.selected[0]?.getAttribute("data-region-id");
-                    console.log("Selected region", regionId);
-                    
-                    $selectedTargetIndex = regionId ? parseInt(regionId) : null;
+                    $selectedRegionIndex = regionId ? parseInt(regionId) : null;
                 }
             }
         }}

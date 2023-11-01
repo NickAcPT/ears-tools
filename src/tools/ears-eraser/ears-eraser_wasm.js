@@ -240,8 +240,7 @@ export function encode_ears_image(skin_bytes, workspace) {
         const ptr0 = passArray8ToWasm0(skin_bytes, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         _assertClass(workspace, WasmEarsEraseWorkspace);
-        var ptr1 = workspace.__destroy_into_raw();
-        wasm.encode_ears_image(retptr, ptr0, len0, ptr1);
+        wasm.encode_ears_image(retptr, ptr0, len0, workspace.__wbg_ptr);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var r2 = getInt32Memory0()[retptr / 4 + 2];
@@ -249,9 +248,9 @@ export function encode_ears_image(skin_bytes, workspace) {
         if (r3) {
             throw takeObject(r2);
         }
-        var v3 = getArrayU8FromWasm0(r0, r1).slice();
+        var v2 = getArrayU8FromWasm0(r0, r1).slice();
         wasm.__wbindgen_free(r0, r1 * 1);
-        return v3;
+        return v2;
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
