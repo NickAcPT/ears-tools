@@ -203,7 +203,7 @@
                 removeRegion(regionId);
             });
             
-            //targets = [];
+            targets = [];
 
             updateSkinFile();
         }
