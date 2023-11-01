@@ -2,7 +2,7 @@
     import { writable, type Writable } from "svelte/store";
     import { browser } from "$app/environment";
 
-    import type { WasmEarsEraseWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import type { WasmEarsEraseWorkspace } from "../../../tools/ears-eraser/ears-eraser_wasm";
     import init, { decode_ears_image, encode_ears_image } from "../../../tools/ears-eraser/ears-eraser_wasm";
 
     import Selecto from "svelte-selecto";
