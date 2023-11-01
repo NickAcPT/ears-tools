@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
+    import { writable, type Writable } from "svelte/store";
     import { browser } from "$app/environment";
 
     import type { WasmEarsEraseWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
@@ -21,8 +21,13 @@
     }
 
     let moveable: Moveable;
-    let target: (HTMLElement | SVGElement) | null = null;
+    let selectedTargetIndex: Writable<number | null> = writable(null);
 
+    //$: moveable && $selectedTargetIndex && moveable.updateSelectors();
+    
+    // @ts-ignore
+    $: moveable && (()=>{window.moveable = moveable;})();
+    
     let imgCanvas: HTMLImageElement;
 
     async function initWasm() {
@@ -46,8 +51,10 @@
         const top = roundToPixelHeight(e.translate[1]);
         e.target.style.transform = "translate(" + left + "px, " + roundToPixelHeight(top) + "px)";
 
-        e.target.setAttribute("data-x", (left / getImagePixelWidth()).toString());
-        e.target.setAttribute("data-y", (top / getImagePixelHeight()).toString());
+        updateRegion(e.target, (r) => {
+            r.x = left / getImagePixelWidth();
+            r.y = top / getImagePixelHeight();
+        });
     }
 
     function handleBeforeResizeEvent(e: OnBeforeResize) {
@@ -61,9 +68,11 @@
         height = Math.min(32, height);
 
         e.setSize([width * getImagePixelWidth(), height * getImagePixelHeight()]);
-
-        e.target.setAttribute("data-width", width.toString());
-        e.target.setAttribute("data-height", height.toString());
+        
+        updateRegion(e.target, (r) => {
+            r.width = width;
+            r.height = height;
+        });
     }
 
     function handleResizeEvent(e: OnResize) {
@@ -89,9 +98,9 @@
     function removeRegion(index: number) {
         $regions = $regions.filter((_, i) => i != index);
         
-        if (target?.getAttribute("data-region-id") == index.toString()) {
-            target = null;
-        }
+        if ($selectedTargetIndex == index) {
+            $selectedTargetIndex = null;
+        }   
     }
 
     $: imageSource =
@@ -143,7 +152,9 @@
 
         if (!changed) return;
 
+        console.log("Before Regions updated", $workspace);
         $workspace.set_regions($regions);
+        console.log("Regions updated", $workspace);
 
         const newImage = encode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()), $workspace);
         $workspace = undefined;
@@ -182,7 +193,18 @@
         return Math.round(value / getImagePixelHeight()) * getImagePixelHeight();
     }
 
-    function notifyRegionUpdate(element: HTMLElement | SVGElement) {
+    function updateRegion(target: HTMLElement | SVGElement, block: (r: EraseRegion) => void) {
+        const targetIndex = parseInt(target.getAttribute("data-region-id") ?? "0");
+        const region = $regions.find((_, i) => i == targetIndex);
+        if (!region) return;
+        
+        block(region);
+        
+        sanitizeRegion(region);
+        addRegion(region.x, region.y, region.width, region.height, targetIndex);
+    }
+    
+    /* function notifyRegionUpdate(element: HTMLElement | SVGElement) {
         let regionIdData = element.getAttribute("data-region-id");
         if (!regionIdData) return;
 
@@ -194,55 +216,68 @@
 
         addRegion(x, y, width, height, regionId);
         updateSkinFile();
-    }
-
-    function addRegion(x: number, y: number, w: number, h: number, index: number | null = null) {
-        if (!$workspace) return;
-
+    } */
+    
+    function sanitizeRegion(region: EraseRegion): EraseRegion {
+        let x = region.x;
+        let y = region.y;
+        let width = region.width;
+        let height = region.height;
+        
+        // If we have a region that comes from Rust, just free it and allocate a new one in JS
+        region.free?.();
+        
+        // Make sure we don't have negative values for x and y
         x = Math.max(0, x);
         y = Math.max(0, y);
-
-        w = Math.max(1, w);
-        h = Math.max(1, h);
-
-        w = Math.min(32, w);
-        h = Math.min(32, h);
-
+        
+        // Oh, and don't forget to make sure the values are valid u8 values
         x = Math.min(x, /* u8 max */ 255);
         y = Math.min(y, /* u8 max */ 255);
-        w = Math.min(w, /* u8 max */ 255);
-        h = Math.min(h, /* u8 max */ 255);
+        
+        // Next, make sure the size is at least 1 
+        width = Math.max(1, width);
+        height = Math.max(1, height);
 
-        console.log(x, y, w, h, index);
+        // Regions can be at most 32x32
+        width = Math.min(32, width);
+        height = Math.min(32, height);
+        
+        return { x, y, width, height };
+    }
+
+    async function addRegion(x: number, y: number, w: number, h: number, index: number | null = null) {
+        if (!$workspace) return;
+
+        let newRegion = sanitizeRegion({ x, y, width: w, height: h });
+        
         if (index == null) {
-            $regions = [...$regions, { x, y, width: w, height: h }];
+            $regions = [...$regions, newRegion];
         } else {
-            $regions[index] = { x, y, width: w, height: h };
+            $regions[index] = newRegion;
         }
 
-        updateSkinFile();
+        await updateSkinFile();
     }
 
-    function handleKeyPress(event: KeyboardEvent) {
+    async function handleKeyPress(event: KeyboardEvent) {
         if (event.key == "Delete") {
-            handleDelete();
+            await handleDelete();
         }
     }
 
-    function handleDelete() {
-        let regionIdData = target?.getAttribute("data-region-id");
-        if (!regionIdData) return;
-
-        let regionId = parseInt(regionIdData);
-        let region = $regions[regionId];
-
+    async function handleDelete() {
+        let index = $selectedTargetIndex;
+        if (index == null) return;
+        
+        let region = $regions[index];
         region?.free?.();
 
-        removeRegion(regionId);
+        removeRegion(index);
         
-        target = null;
+        $selectedTargetIndex = null;
 
-        updateSkinFile();
+        await updateSkinFile();
     }
 
     function saveImage() {
@@ -251,6 +286,7 @@
         const src = imgCanvas.src;
         saveAs(src, "skin.png");
     }
+
 </script>
 
 <RequiresJs>
@@ -301,20 +337,23 @@
                 </li>
             </ul>
         </div>
+        
+        <div>
+            {#each $regions as region, i (i)}
+                <p>{region.x}, {region.y}, {region.width}, {region.height}</p>
+            {/each}
+        </div>
     </div>
     <div>
         {#if imgCanvas}
             {#each $regions as region, i (i)}
                 <div
                     class="region absolute block"
+                    class:selected={$selectedTargetIndex == i}
                     style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
                     style:width="{getImagePixelWidth() * region.width}px"
                     style:height="{getImagePixelHeight() * region.height}px"
                     data-region-id={i}
-                    data-x={region.x}
-                    data-y={region.y}
-                    data-width={region.width}
-                    data-height={region.height}
                 ></div>
             {/each}
         {/if}
@@ -333,21 +372,22 @@
 </div>
 
 {#if browser}
+    <!-- on:dragEnd={({ detail: e }) => notifyRegionUpdate(e.target)} -->
+    <!-- on:resizeEnd={({ detail: e }) => notifyRegionUpdate(e.target)} -->
     <Moveable
         bind:this={moveable}
         bounds={imgCanvasBounds}
         on:drag={({ detail: e }) => handleDragEvent(e)}
         on:beforeResize={({ detail: e }) => handleBeforeResizeEvent(e)}
         on:resize={({ detail: e }) => handleResizeEvent(e)}
-        on:dragEnd={({ detail: e }) => notifyRegionUpdate(e.target)}
-        on:resizeEnd={({ detail: e }) => notifyRegionUpdate(e.target)}
+        
         snappable
         draggable
         resizable
         useResizeObserver
         useMutationObserver
         origin={false}
-        target={target}
+        target={($selectedTargetIndex ? `.region[data-region-id="${$selectedTargetIndex}"]`: undefined)}
     />
 
     <Selecto
@@ -362,7 +402,7 @@
 
             return withinX && withinY;
         }}
-        on:dragEnd={({ detail: e }) => {
+        on:dragEnd={async ({ detail: e }) => {
             if (!e.isSelect) return;
 
             let eventX = e.rect.left - imgCanvasBounds.left;
@@ -377,7 +417,7 @@
                 return;
             }
 
-            addRegion(Math.max(0, x), Math.max(0, y), Math.max(1, width), Math.max(1, height));
+            await addRegion(Math.max(0, x), Math.max(0, y), Math.max(1, width), Math.max(1, height));
         }}
         on:selectEnd={({ detail: e }) => {
             if (e.isDragStart) {
@@ -388,10 +428,12 @@
                 
                 if (e.selected.length == 0) {
                     console.log("No regions selected");
-                    target = null;
+                    $selectedTargetIndex = null;
                 } else {
-                    console.log("Selected region", e.selected[0]);
-                    target = e.selected[0];
+                    let regionId = e.selected[0]?.getAttribute("data-region-id");
+                    console.log("Selected region", regionId);
+                    
+                    $selectedTargetIndex = regionId ? parseInt(regionId) : null;
                 }
             }
         }}
