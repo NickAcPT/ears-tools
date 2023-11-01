@@ -2,8 +2,8 @@
     import { writable } from "svelte/store";
     import { browser } from "$app/environment";
 
-    import type { EarsImageWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
-    import init, { decode_ears_image, encode_ears_image, get_regions, set_regions } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import type { WasmEarsEraseWorkspace, WasmEraseRegion } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import init, { decode_ears_image, encode_ears_image } from "../../../tools/ears-eraser/ears-eraser_wasm";
 
     import Selecto from "svelte-selecto";
     import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
@@ -21,7 +21,7 @@
     }
 
     let moveable: Moveable;
-    let targets: (HTMLElement | SVGElement)[] = [];
+    let target: (HTMLElement | SVGElement) | null = null;
 
     let imgCanvas: HTMLImageElement;
 
@@ -77,7 +77,7 @@
         e.target.style.transform = e.transform;
     }
 
-    let workspace = writable<EarsImageWorkspace | undefined>(undefined);
+    let workspace = writable<WasmEarsEraseWorkspace | undefined>(undefined);
     let regions = writable<EraseRegion[]>([]);
     let lastSkin = writable<File | undefined>(undefined);
 
@@ -88,6 +88,10 @@
 
     function removeRegion(index: number) {
         $regions = $regions.filter((_, i) => i != index);
+        
+        if (target?.getAttribute("data-region-id") == index.toString()) {
+            target = null;
+        }
     }
 
     $: imageSource =
@@ -95,10 +99,10 @@
 
     async function onImageLoad() {
         if (!imgCanvas || !$lastSkin) return;
-        
+
         try {
             $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
-            $regions = get_regions($workspace);
+            $regions = $workspace.get_regions();
         } catch (error) {
             alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
             $lastSkin = undefined;
@@ -107,7 +111,7 @@
             console.error(error);
         }
     }
-    
+
     async function onImageError() {
         alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
         $lastSkin = undefined;
@@ -118,7 +122,7 @@
     async function updateSkinFile() {
         if (!$workspace || !$lastSkin) return;
 
-        const existingRegions: EraseRegion[] = get_regions($workspace);
+        const existingRegions: EraseRegion[] = $workspace.get_regions();
 
         const changed =
             existingRegions.length != $regions.length ||
@@ -139,9 +143,10 @@
 
         if (!changed) return;
 
-        set_regions($workspace, $regions);
+        $workspace.set_regions($regions);
 
         const newImage = encode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()), $workspace);
+        $workspace = undefined;
 
         $lastSkin = new File([newImage], $lastSkin.name, { type: $lastSkin.type });
     }
@@ -187,12 +192,11 @@
         let width = parseInt(element.getAttribute("data-width") ?? "1");
         let height = parseInt(element.getAttribute("data-height") ?? "1");
 
-        $regions[regionId] = { x, y, width, height };
-
+        addRegion(x, y, width, height, regionId);
         updateSkinFile();
     }
 
-    function addRegion(x: number, y: number, w: number, h: number) {
+    function addRegion(x: number, y: number, w: number, h: number, index: number | null = null) {
         if (!$workspace) return;
 
         x = Math.max(0, x);
@@ -204,7 +208,17 @@
         w = Math.min(32, w);
         h = Math.min(32, h);
 
-        $regions = [...$regions, { x, y, width: w, height: h }];
+        x = Math.min(x, /* u8 max */ 255);
+        y = Math.min(y, /* u8 max */ 255);
+        w = Math.min(w, /* u8 max */ 255);
+        h = Math.min(h, /* u8 max */ 255);
+
+        console.log(x, y, w, h, index);
+        if (index == null) {
+            $regions = [...$regions, { x, y, width: w, height: h }];
+        } else {
+            $regions[index] = { x, y, width: w, height: h };
+        }
 
         updateSkinFile();
     }
@@ -216,19 +230,17 @@
     }
 
     function handleDelete() {
-        targets.toReversed().forEach((target) => {
-            let regionIdData = target.getAttribute("data-region-id");
-            if (!regionIdData) return;
+        let regionIdData = target?.getAttribute("data-region-id");
+        if (!regionIdData) return;
 
-            let regionId = parseInt(regionIdData);
-            let region = $regions[regionId];
+        let regionId = parseInt(regionIdData);
+        let region = $regions[regionId];
 
-            region?.free?.();
+        region?.free?.();
 
-            removeRegion(regionId);
-        });
-
-        targets = [];
+        removeRegion(regionId);
+        
+        target = null;
 
         updateSkinFile();
     }
@@ -256,7 +268,6 @@
 <div class="container grid grid-rows-[auto_auto] gap-2 md:grid-cols-[auto_auto]">
     <div class="flex flex-col">
         <SkinDropZone on:files={handleSkinFiles} />
-
         <!--
             Instructions:
             - Drag and drop a skin file
@@ -336,7 +347,7 @@
         useResizeObserver
         useMutationObserver
         origin={false}
-        target={targets}
+        target={target}
     />
 
     <Selecto
@@ -374,7 +385,14 @@
                 moveable.waitToChangeTarget().then(() => {
                     moveable.dragStart(e.inputEvent);
                 });
-                targets = e.selected;
+                
+                if (e.selected.length == 0) {
+                    console.log("No regions selected");
+                    target = null;
+                } else {
+                    console.log("Selected region", e.selected[0]);
+                    target = e.selected[0];
+                }
             }
         }}
     />

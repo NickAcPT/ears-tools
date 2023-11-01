@@ -2,29 +2,28 @@
 /* eslint-disable */
 /**
 * @param {Uint8Array} skin_bytes
-* @returns {EarsImageWorkspace}
+* @returns {WasmEarsEraseWorkspace}
 */
-export function decode_ears_image(skin_bytes: Uint8Array): EarsImageWorkspace;
+export function decode_ears_image(skin_bytes: Uint8Array): WasmEarsEraseWorkspace;
 /**
+* NOTE: `workspace` is consumed here.
 * @param {Uint8Array} skin_bytes
-* @param {EarsImageWorkspace} workspace
+* @param {WasmEarsEraseWorkspace} workspace
 * @returns {Uint8Array}
 */
-export function encode_ears_image(skin_bytes: Uint8Array, workspace: EarsImageWorkspace): Uint8Array;
+export function encode_ears_image(skin_bytes: Uint8Array, workspace: WasmEarsEraseWorkspace): Uint8Array;
 /**
-* @param {EarsImageWorkspace} decoded
+*/
+export class WasmEarsEraseWorkspace {
+  free(): void;
+/**
 * @returns {any}
 */
-export function get_regions(decoded: EarsImageWorkspace): any;
+  get_regions(): any;
 /**
-* @param {EarsImageWorkspace} decoded
 * @param {any} regions
 */
-export function set_regions(decoded: EarsImageWorkspace, regions: any): void;
-/**
-*/
-export class EarsImageWorkspace {
-  free(): void;
+  set_regions(regions: any): void;
 }
 /**
 */
@@ -57,11 +56,11 @@ export interface InitOutput {
   readonly __wbg_set_wasmeraseregion_width: (a: number, b: number) => void;
   readonly __wbg_get_wasmeraseregion_height: (a: number) => number;
   readonly __wbg_set_wasmeraseregion_height: (a: number, b: number) => void;
-  readonly __wbg_earsimageworkspace_free: (a: number) => void;
-  readonly decode_ears_image: (a: number, b: number) => number;
+  readonly __wbg_wasmearseraseworkspace_free: (a: number) => void;
+  readonly wasmearseraseworkspace_get_regions: (a: number, b: number) => void;
+  readonly wasmearseraseworkspace_set_regions: (a: number, b: number, c: number) => void;
+  readonly decode_ears_image: (a: number, b: number, c: number) => void;
   readonly encode_ears_image: (a: number, b: number, c: number, d: number) => void;
-  readonly get_regions: (a: number) => number;
-  readonly set_regions: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;

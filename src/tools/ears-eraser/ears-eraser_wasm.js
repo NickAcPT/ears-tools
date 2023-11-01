@@ -197,13 +197,24 @@ function passArray8ToWasm0(arg, malloc) {
 }
 /**
 * @param {Uint8Array} skin_bytes
-* @returns {EarsImageWorkspace}
+* @returns {WasmEarsEraseWorkspace}
 */
 export function decode_ears_image(skin_bytes) {
-    const ptr0 = passArray8ToWasm0(skin_bytes, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.decode_ears_image(ptr0, len0);
-    return EarsImageWorkspace.__wrap(ret);
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passArray8ToWasm0(skin_bytes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.decode_ears_image(retptr, ptr0, len0);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        var r2 = getInt32Memory0()[retptr / 4 + 2];
+        if (r2) {
+            throw takeObject(r1);
+        }
+        return WasmEarsEraseWorkspace.__wrap(r0);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+    }
 }
 
 function _assertClass(instance, klass) {
@@ -218,8 +229,9 @@ function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
 /**
+* NOTE: `workspace` is consumed here.
 * @param {Uint8Array} skin_bytes
-* @param {EarsImageWorkspace} workspace
+* @param {WasmEarsEraseWorkspace} workspace
 * @returns {Uint8Array}
 */
 export function encode_ears_image(skin_bytes, workspace) {
@@ -227,36 +239,22 @@ export function encode_ears_image(skin_bytes, workspace) {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(skin_bytes, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        _assertClass(workspace, EarsImageWorkspace);
+        _assertClass(workspace, WasmEarsEraseWorkspace);
         var ptr1 = workspace.__destroy_into_raw();
         wasm.encode_ears_image(retptr, ptr0, len0, ptr1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
+        var r2 = getInt32Memory0()[retptr / 4 + 2];
+        var r3 = getInt32Memory0()[retptr / 4 + 3];
+        if (r3) {
+            throw takeObject(r2);
+        }
         var v3 = getArrayU8FromWasm0(r0, r1).slice();
         wasm.__wbindgen_free(r0, r1 * 1);
         return v3;
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
-}
-
-/**
-* @param {EarsImageWorkspace} decoded
-* @returns {any}
-*/
-export function get_regions(decoded) {
-    _assertClass(decoded, EarsImageWorkspace);
-    const ret = wasm.get_regions(decoded.__wbg_ptr);
-    return takeObject(ret);
-}
-
-/**
-* @param {EarsImageWorkspace} decoded
-* @param {any} regions
-*/
-export function set_regions(decoded, regions) {
-    _assertClass(decoded, EarsImageWorkspace);
-    wasm.set_regions(decoded.__wbg_ptr, addHeapObject(regions));
 }
 
 function handleError(f, args) {
@@ -268,11 +266,11 @@ function handleError(f, args) {
 }
 /**
 */
-export class EarsImageWorkspace {
+export class WasmEarsEraseWorkspace {
 
     static __wrap(ptr) {
         ptr = ptr >>> 0;
-        const obj = Object.create(EarsImageWorkspace.prototype);
+        const obj = Object.create(WasmEarsEraseWorkspace.prototype);
         obj.__wbg_ptr = ptr;
 
         return obj;
@@ -287,7 +285,41 @@ export class EarsImageWorkspace {
 
     free() {
         const ptr = this.__destroy_into_raw();
-        wasm.__wbg_earsimageworkspace_free(ptr);
+        wasm.__wbg_wasmearseraseworkspace_free(ptr);
+    }
+    /**
+    * @returns {any}
+    */
+    get_regions() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.wasmearseraseworkspace_get_regions(retptr, this.__wbg_ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            var r2 = getInt32Memory0()[retptr / 4 + 2];
+            if (r2) {
+                throw takeObject(r1);
+            }
+            return takeObject(r0);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+        }
+    }
+    /**
+    * @param {any} regions
+    */
+    set_regions(regions) {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.wasmearseraseworkspace_set_regions(retptr, this.__wbg_ptr, addHeapObject(regions));
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            if (r1) {
+                throw takeObject(r0);
+            }
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+        }
     }
 }
 /**
@@ -413,6 +445,10 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        const ret = getStringFromWasm0(arg0, arg1);
+        return addHeapObject(ret);
+    };
     imports.wbg.__wbindgen_jsval_loose_eq = function(arg0, arg1) {
         const ret = getObject(arg0) == getObject(arg1);
         return ret;
@@ -436,16 +472,19 @@ function __wbg_get_imports() {
         getInt32Memory0()[arg0 / 4 + 1] = len1;
         getInt32Memory0()[arg0 / 4 + 0] = ptr1;
     };
+    imports.wbg.__wbg_String_917f38a1211cf44b = function(arg0, arg1) {
+        const ret = String(getObject(arg1));
+        const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getInt32Memory0()[arg0 / 4 + 1] = len1;
+        getInt32Memory0()[arg0 / 4 + 0] = ptr1;
+    };
     imports.wbg.__wbindgen_number_new = function(arg0) {
         const ret = arg0;
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
         const ret = getObject(arg0);
-        return addHeapObject(ret);
-    };
-    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
-        const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_getwithrefkey_3b3c46ba20582127 = function(arg0, arg1) {
