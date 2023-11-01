@@ -77,9 +77,9 @@
         e.target.style.transform = e.transform;
     }
 
-    let workspace = writable<EarsImageWorkspace | undefined>(undefined); // @hmr:keep
-    let regions = writable<EraseRegion[]>([]); // @hmr:keep
-    let lastSkin = writable<File | undefined>(undefined); // @hmr:keep
+    let workspace = writable<EarsImageWorkspace | undefined>(undefined);
+    let regions = writable<EraseRegion[]>([]);
+    let lastSkin = writable<File | undefined>(undefined);
 
     async function handleFile(file: File) {
         $workspace?.free();
@@ -95,9 +95,24 @@
 
     async function onImageLoad() {
         if (!imgCanvas || !$lastSkin) return;
-
-        $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
-        $regions = get_regions($workspace);
+        
+        try {
+            $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
+            $regions = get_regions($workspace);
+        } catch (error) {
+            alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
+            $lastSkin = undefined;
+            $workspace = undefined;
+            $regions = [];
+            console.error(error);
+        }
+    }
+    
+    async function onImageError() {
+        alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
+        $lastSkin = undefined;
+        $workspace = undefined;
+        $regions = [];
     }
 
     async function updateSkinFile() {
@@ -123,8 +138,6 @@
                 .includes(true);
 
         if (!changed) return;
-
-        console.log("Changed skin file");
 
         set_regions($workspace, $regions);
 
@@ -298,6 +311,7 @@
         <img
             on:dragstart|preventDefault={() => false}
             on:load={onImageLoad}
+            on:error={onImageError}
             class="pixelated render aspect-square flex-1"
             width="100%"
             src={imageSource}
