@@ -322,12 +322,6 @@
                 </li>
             </ul>
         </div>
-
-        <div>
-            {#each $regions as region, i (i)}
-                <p>{region.x}, {region.y}, {region.width}, {region.height}</p>
-            {/each}
-        </div>
     </div>
     <div>
         {#if imgCanvas}
