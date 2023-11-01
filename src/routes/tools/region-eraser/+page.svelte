@@ -250,7 +250,7 @@
             - `Double click` to add a region
             - `Click` to select a region
             - `Shift + Click` to add a region to the selection
-            - `Delete` to delete the selected regions
+            - <Delete> to delete the selected regions
             - <Save image> or right click on the image and `Save image as...` to save the skin
           -->
         <div>
@@ -258,7 +258,7 @@
             <ul class="flex list-inside list-disc flex-col gap-1 pl-4">
                 <li>Drag and drop a skin file</li>
                 <li>
-                    <kbd>Double click</kbd>
+                    <kbd>Click and Drag</kbd>
                     to add a region
                 </li>
                 <li>
@@ -266,12 +266,8 @@
                     to select a region
                 </li>
                 <li>
-                    <kbd>Shift + Click</kbd>
-                    to add a region to the selection
-                </li>
-                <li>
-                    <kbd>Delete</kbd>
-                    to delete the selected regions
+                    <button on:click={handleDelete}>Delete</button>
+                    to delete the selected region
                 </li>
                 <li>
                     <button on:click={saveImage}>Save image</button>
@@ -331,7 +327,7 @@
 
     <Selecto
         hitRate={40}
-        selectByClick={true}
+        selectByClick
         selectFromInside={false}
         selectableTargets={[".region"]}
         boundContainer={imgCanvas}
