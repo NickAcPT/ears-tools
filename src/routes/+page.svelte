@@ -26,7 +26,7 @@
             // @ts-ignore I don't know how to type this lol
             icon: PlusIcon,
             name: "Your tool idea here..",
-            description: ["Got a useful tool idea that could help with using the Ears mod?", "Contact @nickacpt on Discord."],
+            description: ["Got a useful tool idea that could help with using the Ears mod?", "Contact @nickac on Discord."],
             ghost: true,
         },
     ];
