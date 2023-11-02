@@ -25,7 +25,7 @@
     <meta name="color-scheme" content="light dark" />
 </svelte:head>
 
-<Navbar class="mx-auto max-w-[95%] lg:max-w-[85%]" />
+<Navbar />
 
 <article>
     <slot />
