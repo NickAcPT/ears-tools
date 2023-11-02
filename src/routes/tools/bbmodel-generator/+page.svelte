@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable } from "svelte/store";
 
-    import init, { WasmPlayerModel, generate_blockbench_model } from "../../../tools/bbmodel-generator/bbmodel-generator_wasm";
+    import init, { WasmPlayerModel, generate_blockbench_model } from "../../../tools/bbmodel-generator/bbmodel_generator";
     import { saveAs } from "file-saver";
     import { browser } from "$app/environment";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
@@ -22,21 +22,19 @@
     async function handleSkinFile(file: File) {
         let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, $hasLayers);
 
-        let model = result.value();
-        let error = result.is_error();
+        try {
+            let model = result;
+            let blob = new Blob([JSON.stringify(model, replacer)], { type: "application/json" });
 
-        if (error) {
-            alert(model);
-            return;
+            let fileName = file.name.split(".");
+            fileName.pop();
+            fileName.push("bbmodel");
+
+            saveAs(blob, fileName.join("."));
+        } catch (error) {
+            alert("An error occurred while generating the model. Please notify @nickac on Discord.");
+            console.error(error);
         }
-
-        let blob = new Blob([JSON.stringify(model, replacer)], { type: "application/json" });
-
-        let fileName = file.name.split(".");
-        fileName.pop();
-        fileName.push("bbmodel");
-
-        saveAs(blob, fileName.join("."));
     }
 
     function handleSkinFiles(event: CustomEvent<FileList>) {

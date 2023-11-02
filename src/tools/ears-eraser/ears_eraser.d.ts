@@ -2,19 +2,18 @@
 /* eslint-disable */
 /**
 * @param {Uint8Array} skin_bytes
-* @returns {WasmEarsEraseWorkspace}
+* @returns {EarsImageWorkspace}
 */
-export function decode_ears_image(skin_bytes: Uint8Array): WasmEarsEraseWorkspace;
+export function decode_ears_image(skin_bytes: Uint8Array): EarsImageWorkspace;
 /**
-* NOTE: `workspace` is consumed here.
 * @param {Uint8Array} skin_bytes
-* @param {WasmEarsEraseWorkspace} workspace
+* @param {EarsImageWorkspace} workspace
 * @returns {Uint8Array}
 */
-export function encode_ears_image(skin_bytes: Uint8Array, workspace: WasmEarsEraseWorkspace): Uint8Array;
+export function encode_ears_image(skin_bytes: Uint8Array, workspace: EarsImageWorkspace): Uint8Array;
 /**
 */
-export class WasmEarsEraseWorkspace {
+export class EarsImageWorkspace {
   free(): void;
 /**
 * @returns {any}
@@ -56,16 +55,16 @@ export interface InitOutput {
   readonly __wbg_set_wasmeraseregion_width: (a: number, b: number) => void;
   readonly __wbg_get_wasmeraseregion_height: (a: number) => number;
   readonly __wbg_set_wasmeraseregion_height: (a: number, b: number) => void;
-  readonly __wbg_wasmearseraseworkspace_free: (a: number) => void;
-  readonly wasmearseraseworkspace_get_regions: (a: number, b: number) => void;
-  readonly wasmearseraseworkspace_set_regions: (a: number, b: number, c: number) => void;
+  readonly __wbg_earsimageworkspace_free: (a: number) => void;
+  readonly earsimageworkspace_get_regions: (a: number, b: number) => void;
+  readonly earsimageworkspace_set_regions: (a: number, b: number, c: number) => void;
   readonly decode_ears_image: (a: number, b: number, c: number) => void;
   readonly encode_ears_image: (a: number, b: number, c: number, d: number) => void;
-  readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_export_0: (a: number, b: number) => number;
+  readonly __wbindgen_export_1: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __wbindgen_export_2: (a: number, b: number, c: number) => void;
+  readonly __wbindgen_export_3: (a: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

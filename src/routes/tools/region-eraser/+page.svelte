@@ -2,8 +2,7 @@
     import { writable, type Writable } from "svelte/store";
     import { browser } from "$app/environment";
 
-    import type { WasmEarsEraseWorkspace } from "../../../tools/ears-eraser/ears-eraser_wasm";
-    import init, { decode_ears_image, encode_ears_image } from "../../../tools/ears-eraser/ears-eraser_wasm";
+    import init, { decode_ears_image, EarsImageWorkspace, encode_ears_image } from "../../../tools/ears-eraser/ears_eraser";
 
     import Selecto from "svelte-selecto";
     import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
@@ -83,7 +82,7 @@
         e.target.style.transform = e.transform;
     }
 
-    let workspace = writable<WasmEarsEraseWorkspace | undefined>(undefined);
+    let workspace = writable<EarsImageWorkspace | undefined>(undefined);
     let regions = writable<EraseRegion[]>([]);
     let lastSkin = writable<File | undefined>(undefined);
 
@@ -378,7 +377,7 @@
         boundContainer={imgCanvas}
         dragCondition={(e) => {
             const offset = 10;
-            
+
             const withinX = e.inputEvent.clientX >= imgCanvasBounds.left - offset && e.inputEvent.clientX <= imgCanvasBounds.right + offset;
             const withinY = e.inputEvent.clientY >= imgCanvasBounds.top - offset && e.inputEvent.clientY <= imgCanvasBounds.bottom + offset;
 

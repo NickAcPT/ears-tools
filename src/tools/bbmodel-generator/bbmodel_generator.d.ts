@@ -2,43 +2,27 @@
 /* eslint-disable */
 /**
 * @param {Uint8Array} skin_bytes
-* @param {number} model
+* @param {WasmPlayerModel} model
 * @param {boolean} layers
-* @returns {ConversionResult}
+* @returns {any}
 */
-export function generate_blockbench_model(skin_bytes: Uint8Array, model: number, layers: boolean): ConversionResult;
+export function generate_blockbench_model(skin_bytes: Uint8Array, model: WasmPlayerModel, layers: boolean): any;
 /**
 */
 export enum WasmPlayerModel {
   Steve = 0,
   Alex = 1,
 }
-/**
-*/
-export class ConversionResult {
-  free(): void;
-/**
-* @returns {any}
-*/
-  value(): any;
-/**
-* @returns {boolean}
-*/
-  is_error(): boolean;
-}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_conversionresult_free: (a: number) => void;
-  readonly conversionresult_value: (a: number) => number;
-  readonly conversionresult_is_error: (a: number) => number;
-  readonly generate_blockbench_model: (a: number, b: number, c: number, d: number) => number;
+  readonly generate_blockbench_model: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_export_0: (a: number, b: number) => number;
-  readonly __wbindgen_export_1: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_export_2: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbindgen_export_3: (a: number) => void;
+  readonly __wbindgen_export_1: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_export_2: (a: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
