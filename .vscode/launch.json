@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:5173/tools/region-eraser",
+            "url": "http://localhost:5174/tools/region-eraser",
             "webRoot": "${workspaceFolder}",
             "pathMapping": {
                 "C:\\": "/mnt/c/",

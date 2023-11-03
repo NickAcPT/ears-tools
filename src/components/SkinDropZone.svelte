@@ -2,6 +2,7 @@
     import { writable } from "svelte/store";
     import DropZone from "./DropZone.svelte";
     import { createEventDispatcher } from "svelte";
+    import demoSkin from "$lib/assets/demo-skin.png";
 
     let dispatch = createEventDispatcher();
 
@@ -18,7 +19,26 @@
             filePicker.value = "";
         }
     }
+
+    function handlePaste(e: ClipboardEvent) {
+        if (e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
+            dispatch("files", e.clipboardData.files);
+        }
+    }
+
+    async function selectDemoSkin() {
+        let skin = await fetch(demoSkin);
+        let data = await skin.arrayBuffer();
+
+        let list = new DataTransfer();
+        let file = new File([data], "demo-skin.png");
+        list.items.add(file);
+        
+        dispatch("files", list.files);
+    }
 </script>
+
+<svelte:window on:paste={handlePaste} />
 
 <DropZone hovered={pickerHovered} on:files>
     <div
@@ -28,8 +48,11 @@
     >
         <p>Drop your skin file here or paste it in this page.</p>
         <hr class="m-0 w-full" />
-        <div class="flex items-baseline">
-            <p class="inline">Or alternatively,</p>
+        <div class="flex items-baseline gap-1">
+            <p class="inline">Or alternatively, </p>
+            <p class="inline">you can try a</p>
+            <button class="link" on:click={selectDemoSkin}>demo skin</button>
+            <p class="inline">or</p>
             <button on:click={pickFile}>Pick a file instead</button>
             <p class="inline">.</p>
         </div>

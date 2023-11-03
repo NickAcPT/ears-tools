@@ -6,11 +6,15 @@
 
 
 @layer base {
-    button {
+    button.link {
+        @apply underline text-text;
+    }
+    
+    button:not(.link) {
         @apply text-text bg-primary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
     }
     
-    button.secondary {
+    button.secondary:not(.link) {
         @apply text-text bg-secondary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
     }
     

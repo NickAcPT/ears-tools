@@ -51,15 +51,7 @@
             return value;
         }
     }
-
-    function handlePaste(e: ClipboardEvent) {
-        if (e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
-            handleSkinFile(e.clipboardData.files[0]);
-        }
-    }
 </script>
-
-<svelte:window on:paste={handlePaste} />
 
 <RequiresJs>
     {#await initWasm()}
