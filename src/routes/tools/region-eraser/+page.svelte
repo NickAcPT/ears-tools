@@ -294,7 +294,7 @@
 
 <div class="container grid grid-rows-[auto_auto] gap-2 md:grid-cols-[auto_auto]">
     <div class="flex flex-col">
-        <SkinDropZone on:files={handleSkinFiles} />
+        <SkinDropZone bind:this={skinDropZone} on:files={handleSkinFiles} />
         <!--
             Instructions:
             - Drag and drop a skin file
