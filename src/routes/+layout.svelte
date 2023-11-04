@@ -30,3 +30,11 @@
 <article>
     <slot />
 </article>
+
+<style>
+    article {
+        /* Just in case the dvh unit is not supported */
+        height: calc(100vh - var(--navbar-height));
+        height: calc(100dvh - var(--navbar-height));
+    }
+</style>

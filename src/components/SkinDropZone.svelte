@@ -26,7 +26,7 @@
         }
     }
 
-    async function selectDemoSkin() {
+    export async function selectDemoSkin() {
         let skin = await fetch(demoSkin);
         let data = await skin.arrayBuffer();
 
@@ -48,7 +48,7 @@
     >
         <p>Drop your skin file here or paste it in this page.</p>
         <hr class="m-0 w-full" />
-        <div class="flex items-baseline gap-1">
+        <div class="text-center">
             <p class="inline">Or alternatively, </p>
             <p class="inline">you can try a</p>
             <button class="link" on:click={selectDemoSkin}>demo skin</button>

@@ -85,3 +85,9 @@
         }
     }
 }
+
+@layer components {
+    :root {
+        --navbar-height: 4.5em;
+    }
+}
