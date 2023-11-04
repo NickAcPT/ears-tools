@@ -2,5 +2,4 @@
     "yaml.schemas": {
         "https://json.schemastore.org/github-workflow.json": "file:///home/nickac/IdeaProjects/ears-tools/.github/workflows/deploy.yml"
     },
-    "editor.fontSize": 16
 }
