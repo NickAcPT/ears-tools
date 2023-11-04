@@ -19,7 +19,7 @@
     />
     <meta name="description" content={$page.data.ogdescription ?? "Ears Tools is a set of small useful tools created for the Ears mod."} />
     <meta property="og:site_name" content="Ears Tools by NickAc" />
-    <meta name="keywords" content="NickAc, NickAcPT, nmsr, minecraft, skin, renderer, render, avatar" />
+    <meta name="keywords" content="NickAc, NickAcPT, nmsr, minecraft, skin, render, avatar, blockbench, ears, mod, erase, region, model, generator" />
     <meta property="og:image" content="{base}/favicon.png" />
     <meta name="theme-color" content="#0FCFF5" />
     <meta name="color-scheme" content="light dark" />
