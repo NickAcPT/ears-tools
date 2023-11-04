@@ -1,6 +1,6 @@
 <script lang="ts">
     import { writable, type Writable } from "svelte/store";
-    import { browser } from "$app/environment";
+    import { browser, dev } from "$app/environment";
 
     import init, { decode_ears_image, EarsImageWorkspace, encode_ears_image } from "../../../tools/ears-eraser/ears_eraser";
 
@@ -23,6 +23,7 @@
     let selectedRegionIndex: Writable<number | null> = writable(null);
 
     let imgCanvas: HTMLImageElement;
+    let skinDropZone: SkinDropZone;
 
     async function initWasm() {
         if (!browser) {
@@ -30,6 +31,10 @@
         }
 
         await init();
+
+        if (dev) {
+            await skinDropZone.selectDemoSkin();
+        }
     }
 
     async function handleSkinFiles(event: CustomEvent<FileList>) {
