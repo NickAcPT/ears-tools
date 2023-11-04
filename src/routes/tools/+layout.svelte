@@ -2,12 +2,14 @@
     import { page } from "$app/stores";
 </script>
 
-<div class="pb-10">
-    <h1 class="text-center text-3xl">{$page.data.title}</h1>
-    {#if $page.data.description}
-        <h2 class="text-center">{$page.data.description}</h2>
-    {/if}
-</div>
+{#if !$page.data.noDescription}
+    <div class="pb-10">
+        <h1 class="text-center text-3xl">{$page.data.title}</h1>
+        {#if $page.data.description}
+            <h2 class="text-center">{$page.data.description}</h2>
+        {/if}
+    </div>
+{/if}
 
 <noscript>
     <div class="relative left-0 my-5 flex w-full flex-col items-center gap-2 border-y-2 border-gray-400 bg-red-500/10 p-2">
