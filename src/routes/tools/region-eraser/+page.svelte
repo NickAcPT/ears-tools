@@ -10,6 +10,8 @@
 
     import RequiresJs from "../../../components/RequiresJs.svelte";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
+    import { page } from "$app/stores";
+    import { onMount } from "svelte";
 
     interface EraseRegion {
         x: number;
@@ -23,6 +25,7 @@
     let selectedRegionIndex: Writable<number | null> = writable(null);
 
     let imgCanvas: HTMLImageElement;
+    let imgContainer: HTMLDivElement;
     let skinDropZone: SkinDropZone;
 
     async function initWasm() {
@@ -50,7 +53,7 @@
 
         const left = roundToPixelWidth(e.translate[0]);
         const top = roundToPixelHeight(e.translate[1]);
-        e.target.style.transform = "translate(" + left + "px, " + roundToPixelHeight(top) + "px)";
+        e.target.style.transform = "translate(" + left + "px, " + top + "px)";
 
         updateRegion(e.target, (r) => {
             r.x = left / getImagePixelWidth();
@@ -108,6 +111,11 @@
     $: imageSource =
         ($lastSkin && URL.createObjectURL($lastSkin)) ?? "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
 
+    $: moveable &&
+        (() => {
+            window.moveable = moveable;
+        })();
+
     async function onImageLoad() {
         if (!imgCanvas || !$lastSkin) return;
 
@@ -142,6 +150,10 @@
         if (!$workspace || !$lastSkin) return;
 
         const existingRegions: EraseRegion[] = $workspace.get_regions();
+        
+        document.querySelectorAll(".region.overlapping").forEach((element) => {
+            element.classList.remove("overlapping");
+        });
 
         const changed =
             existingRegions.length != $regions.length ||
@@ -170,16 +182,16 @@
 
     let imgCanvasBounds = {
         get top(): number {
-            return imgCanvas?.getBoundingClientRect().top ?? 0;
+            return (imgCanvas?.getBoundingClientRect().top ?? 0) + window.scrollY;
         },
         get left(): number {
-            return imgCanvas?.getBoundingClientRect().left ?? 0;
+            return imgCanvas?.getBoundingClientRect().left ?? 0 + window.scrollX;
         },
         get right(): number {
-            return imgCanvas?.getBoundingClientRect().right ?? 0;
+            return imgCanvas?.getBoundingClientRect().right ?? 0 + window.scrollX;
         },
         get bottom(): number {
-            return imgCanvas?.getBoundingClientRect().bottom ?? 0;
+            return this.top + imgCanvas.clientHeight;
         },
     };
 
@@ -199,42 +211,34 @@
         return Math.round(value / getImagePixelHeight()) * getImagePixelHeight();
     }
 
-    function updateRegion(target: HTMLElement | SVGElement, block: (r: EraseRegion) => void) {
+    function updateRegion(target: HTMLElement | SVGElement, block: (r: EraseRegion, index: number) => void) {
         const targetIndex = parseInt(target.getAttribute("data-region-id") ?? "0");
         const region = $regions.find((_, i) => i == targetIndex);
         if (!region) return;
 
-        block(region);
+        block(region, targetIndex);
 
         sanitizeRegion(region);
     }
 
     function sanitizeRegion(region: EraseRegion): EraseRegion {
-        let x = region.x;
-        let y = region.y;
-        let width = region.width;
-        let height = region.height;
-
         // Make sure we don't have negative values for x and y
-        x = Math.max(0, x);
-        y = Math.max(0, y);
+        region.x = Math.max(0, region.x);
+        region.y = Math.max(0, region.y);
 
         // Oh, and don't forget to make sure the values are valid u8 values
-        x = Math.min(x, /* u8 max */ 255);
-        y = Math.min(y, /* u8 max */ 255);
+        region.x = Math.min(region.x, /* u8 max */ 255);
+        region.y = Math.min(region.y, /* u8 max */ 255);
 
         // Next, make sure the size is at least 1
-        width = Math.max(1, width);
-        height = Math.max(1, height);
+        region.width = Math.max(1, region.width);
+        region.height = Math.max(1, region.height);
 
         // Regions can be at most 32x32
-        width = Math.min(32, width);
-        height = Math.min(32, height);
+        region.width = Math.min(32, region.width);
+        region.height = Math.min(32, region.height);
 
-        // If we have a region that comes from Rust, just free it and allocate a new one in JS
-        region.free?.();
-
-        return { x, y, width, height };
+        return region;
     }
 
     async function addRegion(x: number, y: number, w: number, h: number, index: number | null = null) {
@@ -278,6 +282,11 @@
         const src = imgCanvas.src;
         saveAs(src, "skin.png");
     }
+
+    let lastResize = Date.now();
+
+    $: imgWidthStyle = lastResize && imgContainer?.clientHeight > imgContainer?.clientWidth ? "100%" : "auto";
+    $: imgHeightStyle = imgWidthStyle == "auto" ? "100%" : "auto";
 </script>
 
 <RequiresJs>
@@ -292,8 +301,15 @@
     {/await}
 </RequiresJs>
 
-<div class="container grid grid-rows-[auto_auto] gap-2 md:grid-cols-[auto_auto]">
+<div class="container grid h-full grid-rows-[auto_auto] gap-5 md:grid-cols-[1fr_1fr] md:grid-rows-none">
     <div class="flex flex-col">
+        <div class="pb-10">
+            <h1 class="text-center text-3xl">{$page.data.title}</h1>
+            {#if $page.data.description}
+                <h2 class="text-center">{$page.data.description}</h2>
+            {/if}
+        </div>
+
         <SkinDropZone bind:this={skinDropZone} on:files={handleSkinFiles} />
         <!--
             Instructions:
@@ -329,7 +345,7 @@
             </ul>
         </div>
     </div>
-    <div>
+    <div class="aspect-square flex-1 md:aspect-[unset]" bind:this={imgContainer}>
         {#if imgCanvas}
             {#each $regions as region, i (i)}
                 <div
@@ -343,12 +359,14 @@
             {/each}
         {/if}
 
+        <!-- Make sure image either stays square or fits in the container. If container is taller, set height to 100%, if it's wider, set width to 100% -->
         <img
+            style:width={imgWidthStyle}
+            style:height={imgHeightStyle}
+            class="pixelated render aspect-square"
             on:dragstart|preventDefault={() => false}
             on:load={onImageLoad}
             on:error={onImageError}
-            class="pixelated render aspect-square flex-1"
-            width="100%"
             src={imageSource}
             bind:this={imgCanvas}
             alt="Minecraft Skin"
@@ -382,9 +400,13 @@
         boundContainer={imgCanvas}
         dragCondition={(e) => {
             const offset = 10;
+            const left = imgCanvasBounds.left - offset - window.scrollX;
+            const top = imgCanvasBounds.top - offset - window.scrollY;
+            const right = imgCanvasBounds.right + offset - window.scrollX;
+            const bottom = imgCanvasBounds.bottom + offset - window.scrollY;
 
-            const withinX = e.inputEvent.clientX >= imgCanvasBounds.left - offset && e.inputEvent.clientX <= imgCanvasBounds.right + offset;
-            const withinY = e.inputEvent.clientY >= imgCanvasBounds.top - offset && e.inputEvent.clientY <= imgCanvasBounds.bottom + offset;
+            const withinX = e.inputEvent.clientX >= left && e.inputEvent.clientX <= right;
+            const withinY = e.inputEvent.clientY >= top && e.inputEvent.clientY <= bottom;
 
             return withinX && withinY;
         }}
@@ -426,15 +448,18 @@
 <svelte:window
     on:resize={() => {
         $regions = $regions;
+        lastResize = Date.now();
     }}
 />
 <svelte:document on:keyup={handleKeyPress} />
 
 <style lang="postcss">
+    
     .region {
-        @apply bg-secondary-500/20;
-
         --border-color: rgb(var(--accent-500));
+        --background-color: theme("colors.secondary.500/20%");
+        
+        background-color: var(--background-color);
 
         background-image: linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
             linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
