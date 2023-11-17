@@ -12,6 +12,7 @@
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import { page } from "$app/stores";
     import { onMount } from "svelte";
+    import SkinCanvas from "../../../components/SkinCanvas.svelte";
 
     interface EraseRegion {
         x: number;
@@ -110,11 +111,6 @@
 
     $: imageSource =
         ($lastSkin && URL.createObjectURL($lastSkin)) ?? "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
-
-    $: moveable &&
-        (() => {
-            window.moveable = moveable;
-        })();
 
     async function onImageLoad() {
         if (!imgCanvas || !$lastSkin) return;
@@ -301,7 +297,7 @@
     {/await}
 </RequiresJs>
 
-<div class="container grid h-full grid-rows-[auto_auto] gap-5 md:grid-cols-[1fr_1fr] md:grid-rows-none">
+<div class="container grid h-full grid-rows-[auto_auto_auto] gap-5 md:grid-cols-[1fr_1fr_1fr] md:grid-rows-none">
     <div class="flex flex-col">
         <div class="pb-10">
             <h1 class="text-center text-3xl">{$page.data.title}</h1>
@@ -371,6 +367,10 @@
             bind:this={imgCanvas}
             alt="Minecraft Skin"
         />
+    </div>
+    
+    <div>
+        <SkinCanvas skin={$lastSkin}/>
     </div>
 </div>
 
