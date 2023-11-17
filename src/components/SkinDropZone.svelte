@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
+    import { writable, type Writable } from "svelte/store";
     import DropZone from "./DropZone.svelte";
     import { createEventDispatcher } from "svelte";
     import demoSkin from "$lib/assets/demo-skin.png";
@@ -8,6 +8,7 @@
 
     let pickerHovered = writable<boolean>(false);
     let filePicker: HTMLInputElement;
+    export let slimArms: Writable<boolean> | undefined;
 
     function pickFile() {
         filePicker.click();
@@ -34,6 +35,7 @@
         let file = new File([data], "demo-skin.png");
         list.items.add(file);
         
+        $slimArms = true;
         dispatch("files", list.files);
     }
 </script>

@@ -29,6 +29,8 @@
     let imgContainer: HTMLDivElement;
     let skinDropZone: SkinDropZone;
 
+    let demoUsesSlimSkin = writable(false);
+
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
@@ -146,7 +148,7 @@
         if (!$workspace || !$lastSkin) return;
 
         const existingRegions: EraseRegion[] = $workspace.get_regions();
-        
+
         document.querySelectorAll(".region.overlapping").forEach((element) => {
             element.classList.remove("overlapping");
         });
@@ -306,7 +308,13 @@
             {/if}
         </div>
 
-        <SkinDropZone bind:this={skinDropZone} on:files={handleSkinFiles} />
+        <SkinDropZone bind:this={skinDropZone} slimArms={demoUsesSlimSkin} on:files={handleSkinFiles} />
+
+        <div class="flex gap-2">
+            <label for="slim-skin">Use slim skin</label>
+            <input type="checkbox" id="slim-skin" bind:checked={$demoUsesSlimSkin} />
+        </div>
+
         <!--
             Instructions:
             - Drag and drop a skin file
@@ -368,9 +376,9 @@
             alt="Minecraft Skin"
         />
     </div>
-    
+
     <div>
-        <SkinCanvas skin={$lastSkin}/>
+        <SkinCanvas skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
     </div>
 </div>
 
@@ -454,11 +462,10 @@
 <svelte:document on:keyup={handleKeyPress} />
 
 <style lang="postcss">
-    
     .region {
         --border-color: rgb(var(--accent-500));
         --background-color: theme("colors.secondary.500/20%");
-        
+
         background-color: var(--background-color);
 
         background-image: linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
