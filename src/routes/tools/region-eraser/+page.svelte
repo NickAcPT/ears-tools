@@ -303,8 +303,8 @@
 
 <RequiresWasm init={initWasm} />
 
-<div class="container flex h-[calc(100dvh-var(--navbar-height))] overflow-y-hidden gap-5">
-    <div class="flex-shrink">
+<div class="container flex portrait:flex-col landscape:h-[calc(100dvh-var(--navbar-height))] gap-5">
+    <div class="flex flex-col flex-shrink gap-5">
         <div>
             <h1 class="text-center text-3xl">{$page.data.title}</h1>
             {#if $page.data.description}
@@ -346,36 +346,36 @@
             </div>
             
             <div class="flex flex-1 flex-col items-center">
-                <SkinCanvas width={131} height={224} on:loaded={updateSkinFile} class="flex-1 object-contain" skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
+                <SkinCanvas width={150} height={256} on:loaded={updateSkinFile} class="flex-1 object-contain" skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
             </div>
         </div>
     </div>
     
-        <div class="flex-1" bind:this={imgContainer}>
-            {#if imgCanvas}
-                {#each $regions as region, i (i)}
-                    <div
-                        class="region absolute block"
-                        class:selected={$selectedRegionIndex == i}
-                        style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
-                        style:width="{getImagePixelWidth() * region.width}px"
-                        style:height="{getImagePixelHeight() * region.height}px"
-                        data-region-id={i}
-                    ></div>
-                {/each}
-            {/if}
-    
-            <img
-                style:width={imgWidthStyle}
-                style:height={imgHeightStyle}
-                class="pixelated render aspect-square"
-                on:dragstart|preventDefault={() => false}
-                on:load={onImageLoad}
-                on:error={onImageError}
-                src={imageSource}
-                bind:this={imgCanvas}
-                alt="Minecraft Skin"
-            />
+    <div class="flex-1 portrait:aspect-square portrait:w-full" bind:this={imgContainer}>
+        {#if imgCanvas}
+            {#each $regions as region, i (i)}
+                <div
+                    class="region absolute block"
+                    class:selected={$selectedRegionIndex == i}
+                    style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
+                    style:width="{getImagePixelWidth() * region.width}px"
+                    style:height="{getImagePixelHeight() * region.height}px"
+                    data-region-id={i}
+                ></div>
+            {/each}
+        {/if}
+
+        <img
+            style:width={imgWidthStyle}
+            style:height={imgHeightStyle}
+            class="pixelated render aspect-square"
+            on:dragstart|preventDefault={() => false}
+            on:load={onImageLoad}
+            on:error={onImageError}
+            src={imageSource}
+            bind:this={imgCanvas}
+            alt="Minecraft Skin"
+        />
     </div>
 </div>
 
