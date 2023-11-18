@@ -145,12 +145,14 @@
         return vec2(width, height);
     }
 
-    async function handlePointerDown() {
+    async function handlePointerDown(e: PointerEvent) {
+        canvas.setPointerCapture(e.pointerId);
         if (module == null || !isInitialized) return;
         await module.notify_mouse_down();
     }
 
-    async function handlePointerUp() {
+    async function handlePointerUp(e: PointerEvent) {
+        canvas.releasePointerCapture(e.pointerId);
         if (module == null || !isInitialized) return;
         await module.notify_mouse_up();
     }

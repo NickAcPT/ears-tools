@@ -303,7 +303,7 @@
 
 <RequiresWasm init={initWasm} />
 
-<div class="flex h-[calc(100dvh-var(--navbar-height))] overflow-y-hidde gap-5">
+<div class="container flex h-[calc(100dvh-var(--navbar-height))] overflow-y-hidden gap-5">
     <div class="flex-shrink">
         <div>
             <h1 class="text-center text-3xl">{$page.data.title}</h1>
@@ -319,70 +319,63 @@
             <input type="checkbox" id="slim-skin" bind:checked={$demoUsesSlimSkin} />
         </div>
 
-        <!--
-            Instructions:
-            - Drag and drop a skin file
-            - `Double click` to add a region
-            - `Click` to select a region
-            - `Shift + Click` to add a region to the selection
-            - <Delete> to delete the selected regions
-            - <Save image> or right click on the image and `Save image as...` to save the skin
-          -->
-        <div>
-            <p>Instructions:</p>
-            <ul class="flex list-inside list-disc flex-col gap-1 pl-4">
-                <li>Drag and drop a skin file</li>
-                <li>
-                    <kbd>Click and Drag</kbd>
-                    to add a region
-                </li>
-                <li>
-                    <kbd>Click</kbd>
-                    to select a region
-                </li>
-                <li>
-                    <button on:click={handleDelete}>Delete</button>
-                    to delete the selected region
-                </li>
-                <li>
-                    <button on:click={saveImage}>Save image</button>
-                    or right click on the image and
-                    <kbd>Save image as...</kbd>
-                    to save the skin
-                </li>
-            </ul>
+        <div class="flex flex-1 items-center">
+            <div class="max-w-[20em]">
+                <p class="w-fit">Instructions:</p>
+                <ul class="flex list-inside list-disc flex-col gap-1 pl-4 w-fit">
+                    <li class="w-fit">Drag and drop a skin file</li>
+                    <li class="w-fit">
+                        <kbd>Click and Drag</kbd>
+                        to add a region
+                    </li>
+                    <li class="w-fit">
+                        <kbd>Click</kbd>
+                        to select a region
+                    </li>
+                    <li class="w-fit">
+                        <button on:click={handleDelete}>Delete</button>
+                        to delete the selected region
+                    </li>
+                    <li class="w-fit">
+                        <button on:click={saveImage}>Save image</button>
+                        or right click on the image and
+                        <kbd>Save image as...</kbd>
+                        to save the skin
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="flex flex-1 flex-col items-center">
+                <SkinCanvas width={131} height={224} on:loaded={updateSkinFile} class="flex-1 object-contain" skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
+            </div>
         </div>
     </div>
-    <div class="flex-1" bind:this={imgContainer}>
-        {#if imgCanvas}
-            {#each $regions as region, i (i)}
-                <div
-                    class="region absolute block"
-                    class:selected={$selectedRegionIndex == i}
-                    style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
-                    style:width="{getImagePixelWidth() * region.width}px"
-                    style:height="{getImagePixelHeight() * region.height}px"
-                    data-region-id={i}
-                ></div>
-            {/each}
-        {/if}
-
-        <!-- Make sure image either stays square or fits in the container. If container is taller, set height to 100%, if it's wider, set width to 100% -->
-        <img
-            style:width={imgWidthStyle}
-            style:height={imgHeightStyle}
-            class="pixelated render aspect-square"
-            on:dragstart|preventDefault={() => false}
-            on:load={onImageLoad}
-            on:error={onImageError}
-            src={imageSource}
-            bind:this={imgCanvas}
-            alt="Minecraft Skin"
-        />
-    </div>
-
-    <div class="flex">
-        <SkinCanvas on:loaded={updateSkinFile} class="flex-1 object-contain" skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
+    
+        <div class="flex-1" bind:this={imgContainer}>
+            {#if imgCanvas}
+                {#each $regions as region, i (i)}
+                    <div
+                        class="region absolute block"
+                        class:selected={$selectedRegionIndex == i}
+                        style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
+                        style:width="{getImagePixelWidth() * region.width}px"
+                        style:height="{getImagePixelHeight() * region.height}px"
+                        data-region-id={i}
+                    ></div>
+                {/each}
+            {/if}
+    
+            <img
+                style:width={imgWidthStyle}
+                style:height={imgHeightStyle}
+                class="pixelated render aspect-square"
+                on:dragstart|preventDefault={() => false}
+                on:load={onImageLoad}
+                on:error={onImageError}
+                src={imageSource}
+                bind:this={imgCanvas}
+                alt="Minecraft Skin"
+            />
     </div>
 </div>
 
