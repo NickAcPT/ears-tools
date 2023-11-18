@@ -23,11 +23,28 @@ export function get_sun(): SceneLightingSettings;
 */
 export function set_camera_rotation(yaw: number, pitch: number, roll: number): void;
 /**
-* @param {HTMLCanvasElement} canvas
-* @param {WasmVec2} size
 * @returns {Promise<void>}
 */
-export function run_event_loop(canvas: HTMLCanvasElement, size: WasmVec2): Promise<void>;
+export function notify_mouse_down(): Promise<void>;
+/**
+* @returns {Promise<void>}
+*/
+export function notify_mouse_up(): Promise<void>;
+/**
+* @param {number} x
+* @param {number} y
+* @returns {Promise<void>}
+*/
+export function notify_mouse_move(x: number, y: number): Promise<void>;
+/**
+* @param {number} delta
+* @returns {Promise<void>}
+*/
+export function notify_mouse_scroll(delta: number): Promise<void>;
+/**
+* @returns {Promise<void>}
+*/
+export function render_frame(): Promise<void>;
 /**
 * @param {HTMLCanvasElement} canvas
 * @param {number} width
@@ -179,7 +196,11 @@ export interface InitOutput {
   readonly setup_scene: (a: number, b: number, c: number, d: number, e: number) => number;
   readonly get_camera: () => number;
   readonly get_sun: () => number;
-  readonly run_event_loop: (a: number, b: number) => number;
+  readonly notify_mouse_down: () => number;
+  readonly notify_mouse_up: () => number;
+  readonly notify_mouse_move: (a: number, b: number) => number;
+  readonly notify_mouse_scroll: (a: number) => number;
+  readonly render_frame: () => number;
   readonly initialize: (a: number, b: number, c: number) => number;
   readonly __wbg_set_wasmvec3_0: (a: number, b: number) => void;
   readonly __wbg_set_wasmvec3_1: (a: number, b: number) => void;
@@ -238,10 +259,7 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly wasm_bindgen__convert__closures__invoke1_mut__h042feed1ef6b947b: (a: number, b: number, c: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke0_mut__hf32a38aa99206169: (a: number, b: number) => void;
   readonly wasm_bindgen__convert__closures__invoke1_mut__h1d744d890e1b408e: (a: number, b: number, c: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke1_mut__h5381c57265804c70: (a: number, b: number, c: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly wasm_bindgen__convert__closures__invoke2_mut__h93dddc09c5782875: (a: number, b: number, c: number, d: number) => void;

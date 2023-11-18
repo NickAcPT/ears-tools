@@ -1,8 +1,7 @@
 <script lang="ts">
     import { browser } from "$app/environment";
     import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/types";
-    import { writable, type Writable } from "svelte/store";
-    import RequiresJs from "./RequiresJs.svelte";
+    import RequiresWasm from "./RequiresWasm.svelte";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer_wasm.js");
 
@@ -13,21 +12,21 @@
     export let renderLayers = true;
     export let renderEars = true;
     export let attemptToUseWebGpu = true;
-    
+
     export let camera: SkinCanvasCameraSettings = {
-         rotation: [20, 10, 0],
-         distance: 45,
-         look_at: [0, 16.5, 0]
-     }
-     
-     export let sun: SkinCanvasSunSettings = {
-         direction: [0.0, 1.0, 1.0],
-         renderShading: true,
-         intensity: 2.0
-     }
-    
+        rotation: [20, 10, 0],
+        distance: 45,
+        look_at: [0, 16.5, 0],
+    };
+
+    export let sun: SkinCanvasSunSettings = {
+        direction: [0.0, 1.0, 1.0],
+        renderShading: true,
+        intensity: 2.0,
+    };
+
     export let skin: File | null = null;
-    
+
     let isLoadedAlready = false;
     let isInitialized = false;
 
@@ -58,7 +57,6 @@
 
         let init = module?.default;
         let initialize = module?.initialize;
-        let run_event_loop = module?.run_event_loop;
 
         if (init && initialize) {
             await init();
@@ -66,12 +64,18 @@
             await initialize(canvas, width, height);
             isInitialized = true;
 
-            setTimeout(function () {
-                if (run_event_loop) {
-                    run_event_loop(canvas, canvasSize());
-                }
-            }, 1);
+            window.requestAnimationFrame(renderSkin);
         }
+    }
+
+    async function renderSkin() {
+        if (module == null) throw new Error("Module is null");
+
+        let { render_frame } = module;
+
+        await render_frame();
+
+        window.requestAnimationFrame(renderSkin);
     }
 
     function vec2(x: number, y: number) {
@@ -83,15 +87,23 @@
         if (module == null) throw new Error("Module is null");
         return new module.WasmVec3(x, y, z);
     }
-    
-    async function setupScene(skinFile: File, camera: SkinCanvasCameraSettings, sun: SkinCanvasSunSettings, renderEars: boolean, renderLayers: boolean, slimArms: boolean, showCape: boolean = false) {
+
+    async function setupScene(
+        skinFile: File,
+        camera: SkinCanvasCameraSettings,
+        sun: SkinCanvasSunSettings,
+        renderEars: boolean,
+        renderLayers: boolean,
+        slimArms: boolean,
+        showCape: boolean = false
+    ) {
         console.log(skinFile, camera, sun, renderEars, renderLayers, slimArms);
-        
+
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
         if (module == null) throw new Error("Module is null");
-        
-        let {SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, setup_scene, get_camera, get_sun} = module;
-        
+
+        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, setup_scene, get_camera, get_sun } = module;
+
         if (isLoadedAlready) {
             let cameraSettings = get_camera();
             let sunSettings = get_sun();
@@ -132,20 +144,77 @@
     function canvasSize() {
         return vec2(width, height);
     }
-    
+
+    async function handlePointerDown() {
+        if (module == null || !isInitialized) return;
+        await module.notify_mouse_down();
+    }
+
+    async function handlePointerUp() {
+        if (module == null || !isInitialized) return;
+        await module.notify_mouse_up();
+    }
+
+    async function handlePointerMove(e: PointerEvent) {
+        if (module == null || !isInitialized) return;
+        await module.notify_mouse_move(e.clientX, e.clientY);
+    }
+
+    async function handleScroll(e: WheelEvent) {
+        if (module == null || !isInitialized) return;
+        await module.notify_mouse_scroll(-e.deltaY / 20);
+    }
+
+    async function handleTouchStart(e: TouchEvent) {
+        await handlePointerDown();
+    }
+
+    async function handleTouchEnd(e: TouchEvent) {
+        await handlePointerUp();
+    }
+
+    let lastDist: number | undefined = undefined;
+    async function handleTouchMove(e: TouchEvent) {
+        if (module == null) throw new Error("Module is null");
+
+        // Convert zoom to scroll
+        if (e.touches.length > 1) {
+            let touch1 = e.touches[0];
+            let touch2 = e.touches[1];
+
+            let dist = Math.sqrt(Math.pow(touch1.clientX - touch2.clientX, 2) + Math.pow(touch1.clientY - touch2.clientY, 2));
+
+            if (lastDist) {
+                await module.notify_mouse_scroll(-(lastDist - dist) / 20);
+            }
+
+            lastDist = dist;
+        } else if (e.touches.length == 1) {
+            let touch = e.touches[0];
+            await module.notify_mouse_move(touch.clientX / 4, touch.clientY / 4);
+        }
+    }
+
     $: isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms);
 </script>
 
-<RequiresJs>
-    {#await initWasm()}
-        <p class="text-center">Loading...</p>
-    {:catch error}
-        <div class="relative left-0 my-5 flex w-full flex-col items-center gap-2 border-y-2 border-gray-400 bg-red-500/10 p-2">
-            <p class="p-2 text-center text-xl">It seems like your browser doesn't support WebAssembly</p>
-            <p>Please check if you have a recent version of your browser, and if you do, please contact @nickac on Discord.</p>
-            <p>Error: {error.message}</p>
-        </div>
-    {/await}
-</RequiresJs>
+<RequiresWasm init={initWasm} />
 
-<canvas bind:this={canvas}></canvas>
+<canvas
+    style:display={isInitialized ? "block" : "none"}
+    bind:this={canvas}
+    {...$$restProps}
+    on:touchstart|preventDefault={handleTouchStart}
+    on:touchend|preventDefault={handleTouchEnd}
+    on:touchmove|preventDefault={handleTouchMove}
+    on:pointerdown={handlePointerDown}
+    on:pointerup={handlePointerUp}
+    on:pointermove={handlePointerMove}
+    on:wheel={handleScroll}
+></canvas>
+
+<style lang="postcss">
+    canvas {
+        width: auto;
+    }
+</style>

@@ -6,6 +6,7 @@
     import { browser } from "$app/environment";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import RequiresJs from "../../../components/RequiresJs.svelte";
+    import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));
 
@@ -53,17 +54,7 @@
     }
 </script>
 
-<RequiresJs>
-    {#await initWasm()}
-        <p class="text-center">Loading...</p>
-    {:catch error}
-        <div class="relative left-0 my-5 flex w-full flex-col items-center gap-2 border-y-2 border-gray-400 bg-red-500/10 p-2">
-            <p class="p-2 text-center text-xl">It seems like your browser doesn't support WebAssembly</p>
-            <p>Please check if you have a recent version of your browser, and if you do, please contact @nickac on Discord.</p>
-            <p>Error: {error.message}</p>
-        </div>
-    {/await}
-</RequiresJs>
+<RequiresWasm init={initWasm} />
 
 <div class="container grid md:grid-cols-2">
     <div class="flex w-full flex-col items-center">

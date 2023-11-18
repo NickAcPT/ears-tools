@@ -13,6 +13,7 @@
     import { page } from "$app/stores";
     import { onMount } from "svelte";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
+    import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     interface EraseRegion {
         x: number;
@@ -21,6 +22,18 @@
         height: number;
         free?: () => void;
     }
+    
+    onMount(() => {
+        let resizeObserver = new ResizeObserver(() => {
+            $regions = $regions;
+        });
+        
+        resizeObserver.observe(imgCanvas);
+        
+        return () => {
+            resizeObserver.disconnect();
+        };
+    })
 
     let moveable: Moveable;
     let selectedRegionIndex: Writable<number | null> = writable(null);
@@ -145,6 +158,7 @@
     }
 
     async function updateSkinFile() {
+        console.log("updateSkinFile");
         if (!$workspace || !$lastSkin) return;
 
         const existingRegions: EraseRegion[] = $workspace.get_regions();
@@ -287,21 +301,11 @@
     $: imgHeightStyle = imgWidthStyle == "auto" ? "100%" : "auto";
 </script>
 
-<RequiresJs>
-    {#await initWasm()}
-        <p class="text-center">Loading...</p>
-    {:catch error}
-        <div class="relative left-0 my-5 flex w-full flex-col items-center gap-2 border-y-2 border-gray-400 bg-red-500/10 p-2">
-            <p class="p-2 text-center text-xl">It seems like your browser doesn't support WebAssembly</p>
-            <p>Please check if you have a recent version of your browser, and if you do, please contact @nickac on Discord.</p>
-            <p>Error: {error.message}</p>
-        </div>
-    {/await}
-</RequiresJs>
+<RequiresWasm init={initWasm} />
 
-<div class="container grid h-full grid-rows-[auto_auto_auto] gap-5 md:grid-cols-[1fr_1fr_1fr] md:grid-rows-none">
-    <div class="flex flex-col">
-        <div class="pb-10">
+<div class="flex h-[calc(100dvh-var(--navbar-height))] overflow-y-hidde gap-5">
+    <div class="flex-shrink">
+        <div>
             <h1 class="text-center text-3xl">{$page.data.title}</h1>
             {#if $page.data.description}
                 <h2 class="text-center">{$page.data.description}</h2>
@@ -349,7 +353,7 @@
             </ul>
         </div>
     </div>
-    <div class="aspect-square flex-1 md:aspect-[unset]" bind:this={imgContainer}>
+    <div class="flex-1" bind:this={imgContainer}>
         {#if imgCanvas}
             {#each $regions as region, i (i)}
                 <div
@@ -377,8 +381,8 @@
         />
     </div>
 
-    <div>
-        <SkinCanvas skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
+    <div class="flex">
+        <SkinCanvas on:loaded={updateSkinFile} class="flex-1 object-contain" skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
     </div>
 </div>
 
