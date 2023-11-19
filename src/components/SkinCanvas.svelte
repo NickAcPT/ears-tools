@@ -168,11 +168,11 @@
     }
 
     async function handleTouchStart(e: TouchEvent) {
-        await handlePointerDown();
+        await handlePointerDown(new PointerEvent("pointerdown", e));
     }
 
     async function handleTouchEnd(e: TouchEvent) {
-        await handlePointerUp();
+        await handlePointerUp(new PointerEvent("pointerup", e));
     }
 
     let lastDist: number | undefined = undefined;

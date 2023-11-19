@@ -1,5 +1,5 @@
 import { vitePreprocess } from '@sveltejs/kit/vite';
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-cloudflare';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     preprocess: vitePreprocess(),
@@ -9,7 +9,12 @@ const config = {
     },
 	
     kit: {
-        adapter: adapter(),
+        adapter: adapter({
+			routes: {
+				include: ['/*'],
+				exclude: ['<all>']
+			}
+		}),
         paths: {
             base: process.argv.includes('dev') ? '' : process.env.BASE_PATH,
         },

@@ -8,7 +8,7 @@
 
     let pickerHovered = writable<boolean>(false);
     let filePicker: HTMLInputElement;
-    export let slimArms: Writable<boolean> | undefined;
+    export let slimArms: Writable<boolean> | undefined = undefined;
 
     function pickFile() {
         filePicker.click();
