@@ -9,7 +9,7 @@
 
 <div
     class:ghost
-    class="flex h-full min-h-[10em] flex-col items-center justify-around rounded-lg bg-primary-500 p-4 text-background shadow-md hover:bg-primary-800 hover:shadow-lg"
+    class="flex h-full min-h-[10em] flex-col items-center justify-around rounded-lg bg-primary-500 p-4 shadow-md text-text-on-primary hover:text-text-on-primary-inverse hover:bg-primary-800 hover:shadow-lg"
 >
     <div class="flex items-center gap-2">
         <svelte:component this={icon} class="h-10" />

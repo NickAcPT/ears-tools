@@ -5,6 +5,8 @@ export default {
         extend: {
             colors: {
                 'text': 'rgb(var(--text) / <alpha-value>)',
+                'text-on-primary': 'rgb(var(--text-on-primary) / <alpha-value>)',
+                'text-on-primary-inverse': 'rgb(var(--text-on-primary-inverse) / <alpha-value>)',
                 'background': 'rgb(var(--background) / <alpha-value>)',
                 'primary': {
                     50: 'rgb(var(--primary-50) / <alpha-value>)',
