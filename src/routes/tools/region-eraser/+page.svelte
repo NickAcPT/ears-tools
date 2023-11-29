@@ -51,9 +51,7 @@
 
         await init();
 
-        if (dev) {
-            await skinDropZone.selectDemoSkin();
-        }
+        await skinDropZone.selectDemoSkin();
     }
 
     async function handleSkinFiles(event: CustomEvent<FileList>) {
