@@ -1,11 +1,14 @@
 <script lang="ts">
+    import { readable, type Readable } from "svelte/store";
     import RequiresJs from "./RequiresJs.svelte";
 
     export let init: () => Promise<void>;
+    
+    export let updateReceiver: Readable<any> = readable(false);
 </script>
 
 <RequiresJs>
-    {#await init()}
+    {#await $updateReceiver != undefined && init()}
         <p class="text-center">Loading...</p>
     {:then}
         <slot />

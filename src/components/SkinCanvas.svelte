@@ -1,9 +1,11 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
+    import { browser, dev } from "$app/environment";
+    import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib";
     import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/types";
+    import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
 
-    type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer_wasm.js");
+    type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
     export let width = 512;
     export let height = 832;
@@ -11,7 +13,7 @@
     export let slimArms = false;
     export let renderLayers = true;
     export let renderEars = true;
-    export let attemptToUseWebGpu = true;
+    export let currentRenderingSupport: Readable<RenderingSupport>;
 
     export let camera: SkinCanvasCameraSettings = {
         rotation: [20, 10, 0],
@@ -34,42 +36,55 @@
 
     let module: SkinRendererModule | null = null;
 
-    function hasWebGpu(): boolean {
-        let hasWebGpu = false;
-        try {
-            let tempCanvas = document.createElement("canvas");
-
-            hasWebGpu = tempCanvas.getContext("webgpu") != null && attemptToUseWebGpu != false;
-        } catch (e) {
-            // No-op
-        }
-
-        return hasWebGpu;
-    }
-
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
         }
+        isLoadedAlready = false;
+        isInitialized = false;
 
-        let name = hasWebGpu() ? "skin-renderer_wasm" : "skin-renderer-webgl_wasm";
-        module = await import(`../tools/skin-renderer/${name}.js`);
+        try {
+            let renderers = import.meta.glob("./../tools/skin-renderer/*.js");
+            let name = "";
+            switch ($currentRenderingSupport) {
+                case RenderingSupport.WebGPU:
+                    name = "skin-renderer-webgpu_wasm";
+                    break;
+                case RenderingSupport.WebGL:
+                    name = "skin-renderer-webgl_wasm";
+                    break;
+                case RenderingSupport.SoftwareRendering:
+                    name = "skin-renderer-software_wasm";
+                    break;
+            }
 
-        let init = module?.default;
-        let initialize = module?.initialize;
+            module = <SkinRendererModule>await renderers[`../tools/skin-renderer/${name}.js`]();
 
-        if (init && initialize) {
-            await init();
+            let init = module?.default;
+            let initialize = module?.initialize;
 
-            await initialize(canvas, width, height);
-            isInitialized = true;
+            if (init && initialize) {
+                const handleError = (e: any) => {
+                    console.log("An error occurred while initializing the skin renderer module, falling back", e);
+                    fallbackRenderingSupport();
+                };
+                await init().catch(handleError);
 
-            window.requestAnimationFrame(renderSkin);
+                await initialize(canvas, width, height).catch(handleError);
+                canvas.width = width;
+                canvas.height = height;
+                isInitialized = true;
+
+                window.requestAnimationFrame(renderSkin);
+            }
+        } catch (e) {
+            console.log("An error occurred while setting up the skin renderer module, falling back", e);
+            fallbackRenderingSupport();
         }
     }
 
     async function renderSkin() {
-        if (module == null) throw new Error("Module is null");
+        if (module == null || !isInitialized) return;
 
         let { render_frame } = module;
 
@@ -197,23 +212,30 @@
         }
     }
 
-    $: isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms);
+    $: canvas && isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms);
 </script>
 
-<RequiresWasm init={initWasm} />
+{#if dev}
+    <button on:click={() => fallbackRenderingSupport()}>Fallback Rendering Support</button>
+    <p>Current: {RenderingSupport[$currentRenderingSupport]}</p>
+{/if}
 
-<canvas
-    style:display={isInitialized ? "block" : "none"}
-    bind:this={canvas}
-    {...$$restProps}
-    on:touchstart|preventDefault={handleTouchStart}
-    on:touchend|preventDefault={handleTouchEnd}
-    on:touchmove|preventDefault={handleTouchMove}
-    on:pointerdown={handlePointerDown}
-    on:pointerup={handlePointerUp}
-    on:pointermove={handlePointerMove}
-    on:wheel={handleScroll}
-></canvas>
+{#key $currentRenderingSupport}
+    <RequiresWasm updateReceiver={currentRenderingSupport} init={initWasm} />
+
+    <canvas
+        style:display={isInitialized ? "block" : "none"}
+        bind:this={canvas}
+        {...$$restProps}
+        on:touchstart|preventDefault={handleTouchStart}
+        on:touchend|preventDefault={handleTouchEnd}
+        on:touchmove|preventDefault={handleTouchMove}
+        on:pointerdown={handlePointerDown}
+        on:pointerup={handlePointerUp}
+        on:pointermove={handlePointerMove}
+        on:wheel={handleScroll}
+    ></canvas>
+{/key}
 
 <style lang="postcss">
     canvas {

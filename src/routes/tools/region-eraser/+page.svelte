@@ -8,12 +8,12 @@
     import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
     import saveAs from "file-saver";
 
-    import RequiresJs from "../../../components/RequiresJs.svelte";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import { page } from "$app/stores";
     import { onMount } from "svelte";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
+    import { RenderingSupport, renderingSupport } from "$lib";
 
     interface EraseRegion {
         x: number;
@@ -22,18 +22,18 @@
         height: number;
         free?: () => void;
     }
-    
+
     onMount(() => {
         let resizeObserver = new ResizeObserver(() => {
             $regions = $regions;
         });
-        
+
         resizeObserver.observe(imgCanvas);
-        
+
         return () => {
             resizeObserver.disconnect();
         };
-    })
+    });
 
     let moveable: Moveable;
     let selectedRegionIndex: Writable<number | null> = writable(null);
@@ -249,6 +249,14 @@
         // Regions can be at most 32x32
         region.width = Math.min(32, region.width);
         region.height = Math.min(32, region.height);
+        
+        // Regions can't be outside of the image
+        if (region.x + region.width > 64) {
+            region.width = 64 - region.x;
+        }
+        if (region.y + region.height > 64) {
+            region.height = 64 - region.y;
+        }
 
         return region;
     }
@@ -303,8 +311,8 @@
 
 <RequiresWasm init={initWasm} />
 
-<div class="container flex portrait:flex-col landscape:h-[calc(100dvh-var(--navbar-height))] gap-5">
-    <div class="flex flex-col flex-shrink gap-5">
+<div class="container flex gap-5 portrait:flex-col landscape:h-[calc(100dvh-var(--navbar-height))]">
+    <div class="flex flex-shrink flex-col gap-5">
         <div>
             <h1 class="text-center text-3xl">{$page.data.title}</h1>
             {#if $page.data.description}
@@ -314,15 +322,23 @@
 
         <SkinDropZone bind:this={skinDropZone} slimArms={demoUsesSlimSkin} on:files={handleSkinFiles} />
 
-        <div class="flex gap-2">
-            <label for="slim-skin">Use slim skin</label>
-            <input type="checkbox" id="slim-skin" bind:checked={$demoUsesSlimSkin} />
+        <div class="flex flex-col gap-2">
+            <div class="flex gap-2">
+                <label for="slim-skin">Use slim skin</label>
+                <input type="checkbox" id="slim-skin" bind:checked={$demoUsesSlimSkin} />
+            </div>
+            {#if $renderingSupport == RenderingSupport.SoftwareRendering}
+                <div class="min-w-none w-full break-words">
+                    <p>Warning: Software rendering enabled for the skin preview.</p>
+                    <p>Performance might suffer.</p>
+                </div>
+            {/if}
         </div>
 
         <div class="flex flex-1 items-center">
             <div class="max-w-[20em]">
                 <p class="w-fit">Instructions:</p>
-                <ul class="flex list-inside list-disc flex-col gap-1 pl-4 w-fit">
+                <ul class="flex w-fit list-inside list-disc flex-col gap-1 pl-4">
                     <li class="w-fit">Drag and drop a skin file</li>
                     <li class="w-fit">
                         <kbd>Click and Drag</kbd>
@@ -344,13 +360,21 @@
                     </li>
                 </ul>
             </div>
-            
+
             <div class="flex flex-1 flex-col items-center">
-                <SkinCanvas width={150} height={256} on:loaded={updateSkinFile} class="flex-1 object-contain" skin={$lastSkin} slimArms={$demoUsesSlimSkin} />
+                <SkinCanvas
+                    currentRenderingSupport={renderingSupport}
+                    width={150}
+                    height={256}
+                    on:loaded={updateSkinFile}
+                    class="flex-1 object-contain"
+                    skin={$lastSkin}
+                    slimArms={$demoUsesSlimSkin}
+                />
             </div>
         </div>
     </div>
-    
+
     <div class="flex-1 portrait:aspect-square portrait:w-full" bind:this={imgContainer}>
         {#if imgCanvas}
             {#each $regions as region, i (i)}
