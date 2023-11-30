@@ -10,6 +10,8 @@
     export let width = 512;
     export let height = 832;
 
+    export let showDevInfo = true;
+    export let showCape = true;
     export let slimArms = false;
     export let renderLayers = true;
     export let renderEars = true;
@@ -110,7 +112,7 @@
         renderEars: boolean,
         renderLayers: boolean,
         slimArms: boolean,
-        showCape: boolean = false
+        showCape: boolean
     ) {
         console.log(skinFile, camera, sun, renderEars, renderLayers, slimArms);
 
@@ -212,10 +214,10 @@
         }
     }
 
-    $: canvas && isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms);
+    $: canvas && isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms, showCape);
 </script>
 
-{#if dev}
+{#if dev && showDevInfo}
     <button on:click={() => fallbackRenderingSupport()}>Fallback Rendering Support</button>
     <p>Current: {RenderingSupport[$currentRenderingSupport]}</p>
 {/if}
