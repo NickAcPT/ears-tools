@@ -5,6 +5,7 @@
     import ToolBox from "../components/homepage/ToolBox.svelte";
     import CubeScanIcon from "../components/icons/CubeScanIcon.svelte";
     import EraserIcon from "../components/icons/EraserIcon.svelte";
+    import MirrorIcon from "../components/icons/MirrorIcon.svelte";
     import PlusIcon from "../components/icons/PlusIcon.svelte";
 
     const tools: Tool[] = [
@@ -21,6 +22,13 @@
             name: "Blockbench Model Generator",
             url: "bbmodel-generator",
             description: ["Generate a Blockbench model from a Minecraft skin, including Ears mod features."],
+        },
+        {
+            // @ts-ignore I don't know how to type this lol
+            icon: MirrorIcon,
+            name: "Skin Preview",
+            url: "skin-preview",
+            description: ["Preview your Minecraft skin, with or without Ears mod features."],
         },
         {
             // @ts-ignore I don't know how to type this lol

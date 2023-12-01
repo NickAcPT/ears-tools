@@ -4,30 +4,29 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
     button.link {
-        @apply underline text-text;
+        @apply text-text underline;
     }
-    
+
     button:not(.link) {
-        @apply text-text bg-primary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
+        @apply rounded-md bg-primary-500 px-4 py-2 text-text shadow-md hover:bg-secondary-300;
     }
-    
+
     button.secondary:not(.link) {
-        @apply text-text bg-secondary-500 px-4 py-2 rounded-md shadow-md hover:bg-secondary-300;
+        @apply rounded-md bg-secondary-500 px-4 py-2 text-text shadow-md hover:bg-secondary-300;
     }
-    
+
     @media (prefers-color-scheme: dark) {
         button:not(.link) {
             @apply text-background;
         }
     }
-    
+
     hr {
         @apply my-4 border-0 border-t border-secondary-500;
     }
-    
+
     div.container {
         @apply mx-auto max-w-[95%] lg:max-w-[85%];
     }
@@ -37,5 +36,11 @@
     img.pixelated {
         image-rendering: pixelated;
     }
-}
 
+    input[type="checkbox"] {
+        @apply h-5 w-5 appearance-none rounded-sm border-2 border-secondary-500 checked:border-transparent checked:bg-secondary-500;
+        @apply checked:ring-2 checked:ring-secondary-500;
+        @apply before:flex before:items-center before:justify-center;
+        @apply checked:before:align-middle checked:before:text-sm checked:before:font-bold checked:before:text-text-on-primary checked:before:content-['✓'];
+    }
+}
