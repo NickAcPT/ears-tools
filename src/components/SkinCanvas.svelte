@@ -45,7 +45,6 @@
         
         // @ts-expect-error gpu is available in browser when using webgpu
         if (!navigator.gpu) {
-            fallbackRenderingSupport();
             return false;
         }
         
@@ -57,8 +56,8 @@
                 if (!canvas.getContext("webgpu")) {
                     throw new Error("WebGPU is supported, but no context could be created");
                 }
+                return true;
             } catch (error) {
-                fallbackRenderingSupport();
                 return false;
             }
         }
@@ -72,10 +71,6 @@
         }
         isLoadedAlready = false;
         isInitialized = false;
-        
-        if (!checkWebGpuSupport()) {
-            return Promise.resolve();
-        }
 
         try {
             let renderers = import.meta.glob("./../tools/skin-renderer/*.js");
@@ -92,6 +87,10 @@
                     break;
             }
 
+            if (!checkWebGpuSupport()) {
+                throw new Error("WebGPU is not supported - Performing fallback");
+            }
+            
             module = <SkinRendererModule>await renderers[`../tools/skin-renderer/${name}.js`]();
 
             let init = module?.default;
