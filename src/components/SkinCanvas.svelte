@@ -38,12 +38,44 @@
 
     let module: SkinRendererModule | null = null;
 
+    function checkWebGpuSupport(): boolean {
+        if (!browser || $currentRenderingSupport !== RenderingSupport.WebGPU) {
+            return true;
+        }
+        
+        // @ts-expect-error gpu is available in browser when using webgpu
+        if (!navigator.gpu) {
+            fallbackRenderingSupport();
+            return false;
+        }
+        
+        // @ts-expect-error gpu is available in browser when using webgpu
+        if (browser && navigator.gpu) {
+            // Try to get a canvas context
+            try {
+                const canvas = document.createElement("canvas");
+                if (!canvas.getContext("webgpu")) {
+                    throw new Error("WebGPU is supported, but no context could be created");
+                }
+            } catch (error) {
+                fallbackRenderingSupport();
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
         }
         isLoadedAlready = false;
         isInitialized = false;
+        
+        if (!checkWebGpuSupport()) {
+            return Promise.resolve();
+        }
 
         try {
             let renderers = import.meta.glob("./../tools/skin-renderer/*.js");

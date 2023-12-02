@@ -1,4 +1,6 @@
-import { writable } from "svelte/store";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { browser } from "$app/environment";
+import { derived, writable } from "svelte/store";
 
 export enum RenderingSupport {
     WebGPU,
