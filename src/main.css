@@ -46,8 +46,8 @@
 
     @media (prefers-color-scheme: dark) {
         :root {
-            --text: 233 240 242;
-            --background: 15 24 26;
+            --text: 255 255 255;
+            --background: 12 12 12;
             
             --text-on-primary: var(--background);
             --text-on-primary-inverse: var(--background);

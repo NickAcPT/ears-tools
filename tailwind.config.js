@@ -1,3 +1,5 @@
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: ['./src/**/*.{html,js,svelte,ts}'],
@@ -47,7 +49,10 @@ export default {
                     900: 'rgb(var(--accent-900) / <alpha-value>)',
                     950: 'rgb(var(--accent-950) / <alpha-value>)',
                 },
-            }
+            },
+            fontFamily: {
+                'sans': ['"Noto Sans"', ...defaultTheme.fontFamily.sans],
+            },
         },
         fontSize: {
             sm: '0.750rem',
@@ -57,10 +62,6 @@ export default {
             '3xl': '2.369rem',
             '4xl': '3.158rem',
             '5xl': '4.210rem',
-        },
-        fontFamily: {
-            heading: 'Inter Bold',
-            body: 'Inter',
         },
         fontWeight: {
             normal: '400',

@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @layer base {
+    body {
+        @apply bg-background text-text font-sans;
+    }
+    
     button.link {
         @apply text-text underline;
     }
