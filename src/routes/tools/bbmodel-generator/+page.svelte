@@ -69,7 +69,7 @@
                 </select>
             </div>
             <div>
-                <div>
+                <div class="flex gap-2 items-center">
                     <label for="has-layers">Has layers:</label>
                     <input type="checkbox" name="has-layers" id="has-layers" bind:checked={$hasLayers} />
                 </div>
@@ -79,6 +79,6 @@
 
     <div class="flex flex-col items-center">
         <h2 class="max-w-fit text-center text-2xl">Input</h2>
-        <SkinDropZone on:files={handleSkinFiles} />
+        <SkinDropZone slimArms={hasLayers} on:files={handleSkinFiles} />
     </div>
 </div>

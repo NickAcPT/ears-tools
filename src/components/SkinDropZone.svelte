@@ -35,7 +35,9 @@
         let file = new File([data], "demo-skin.png");
         list.items.add(file);
         
-        $slimArms = true;
+        if (slimArms) {
+            $slimArms = true;
+        }
         dispatch("files", list.files);
     }
 </script>
