@@ -14,6 +14,7 @@
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
+    import { earsRegionEditorCurrentFile } from "$lib/stores";
 
     interface EraseRegion {
         x: number;
@@ -51,7 +52,11 @@
 
         await init();
 
-        await skinDropZone.selectDemoSkin();
+        if (!$earsRegionEditorCurrentFile) {
+            await skinDropZone.selectDemoSkin();
+        } else {
+            await handleFile($earsRegionEditorCurrentFile);
+        }
     }
 
     async function handleSkinFiles(event: CustomEvent<FileList>) {

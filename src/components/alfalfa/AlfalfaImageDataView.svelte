@@ -2,6 +2,8 @@
     import type { AlfalfaImageEntryData } from "$lib/alfalfa-inspector";
 
     export let data: AlfalfaImageEntryData;
+    
+    $: blob = new Blob([data.value], { type: "image/png" });
 </script>
 
-<p>Image data</p>
+<img src={URL.createObjectURL(blob)} alt="Stored data" class="h-20 pixelated" />

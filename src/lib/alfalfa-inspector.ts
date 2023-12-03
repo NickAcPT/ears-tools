@@ -29,7 +29,7 @@ export type AlfalfaEntry = {
 };
 
 export class AlfalfaData {
-    constructor(public version: number, public data: Record<AlfalfaKey, AlfalfaEntryData>) {
+    constructor(public data: Record<AlfalfaKey, AlfalfaEntryData>) {
     }
 
     get(key: AlfalfaKey): AlfalfaEntryData | undefined {
@@ -45,6 +45,8 @@ export class AlfalfaData {
     }
     
     entries(): AlfalfaEntry[] {
-        return Object.entries(this.data).map(([key, value]) => ({key, value}));
+        const values = Object.entries(this.data).map(([key, value]) => ({key, value}));
+        values.sort((a, b) => a.key.localeCompare(b.key));
+        return values;
     }
 }

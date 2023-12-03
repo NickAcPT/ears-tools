@@ -5,33 +5,34 @@
     import UploadIcon from "../icons/UploadIcon.svelte";
     import DeleteIcon from "../icons/DeleteIcon.svelte";
     import AlfalfaDataView from "./AlfalfaDataView.svelte";
+    import EraserIcon from "../icons/EraserIcon.svelte";
 
     export let entry: AlfalfaEntry;
-    
+
     let dispatcher = createEventDispatcher();
-    
 </script>
 
-<div class="entry">
-    <p>{entry.key}</p>
+<div class="grid grid-cols-3 items-center justify-center">
     <div>
+        <p>{entry.key}</p>
+    </div>
+    <div class="flex items-center justify-center">
         <AlfalfaDataView data={entry.value} />
     </div>
 
-    <div class="flex gap-2">
-        <button on:click={() => dispatcher("download", entry)}><DownloadIcon class="h-5" /></button>
-        <button on:click={() => dispatcher("upload", entry)}><UploadIcon class="h-5" /></button>
-        <button on:click={() => dispatcher("delete", entry)}><DeleteIcon class="h-5" /></button>
+    <div class="flex items-center gap-2">
+        {#if entry.value.type !== "erase"}
+            <button on:click={() => dispatcher("download", entry)}><DownloadIcon class="h-5" />Download</button>
+            <button on:click={() => dispatcher("upload", entry)}><UploadIcon class="h-5" />Upload</button>
+        {:else}
+            <button on:click={() => dispatcher("eraser-tool", entry)}><EraserIcon class="h-5" />Open in Eraser Tool</button>
+        {/if}
+        <button on:click={() => dispatcher("delete", entry)}><DeleteIcon class="h-5" /> Delete</button>
     </div>
 </div>
 
-
 <style lang="postcss">
-    .entry {
-        @apply contents;
-    }
-    
     button {
-        @apply flex-1 flex justify-center;
+        @apply flex flex-1 items-center justify-center h-full;
     }
 </style>
