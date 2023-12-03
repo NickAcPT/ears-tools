@@ -5,6 +5,7 @@
     import ToolBox from "../components/homepage/ToolBox.svelte";
     import CubeScanIcon from "../components/icons/CubeScanIcon.svelte";
     import EraserIcon from "../components/icons/EraserIcon.svelte";
+    import ImageEditIcon from "../components/icons/ImageEditIcon.svelte";
     import MirrorIcon from "../components/icons/MirrorIcon.svelte";
     import PlusIcon from "../components/icons/PlusIcon.svelte";
 
@@ -29,6 +30,13 @@
             name: "Skin Preview",
             url: "skin-preview",
             description: ["Preview your Minecraft skin, with or without Ears mod features."],
+        },
+        {
+            // @ts-ignore I don't know how to type this lol
+            icon: ImageEditIcon,
+            name: "Alfalfa Inspector",
+            description: ["Inspect and Edit low-level Alfalfa data stored in an Ears skin."],
+            url: "alfalfa-inspector"
         },
         {
             // @ts-ignore I don't know how to type this lol
