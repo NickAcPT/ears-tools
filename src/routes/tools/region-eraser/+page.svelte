@@ -1,6 +1,6 @@
 <script lang="ts">
     import { writable, type Writable } from "svelte/store";
-    import { browser, dev } from "$app/environment";
+    import { browser } from "$app/environment";
 
     import init, { decode_ears_image, EarsImageWorkspace, encode_ears_image } from "../../../tools/ears-eraser/ears_eraser";
 
@@ -13,7 +13,7 @@
     import { onMount } from "svelte";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
-    import { RenderingSupport, renderingSupport } from "$lib";
+    import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
 
     interface EraseRegion {
         x: number;
@@ -247,7 +247,7 @@
         // Regions can be at most 32x32
         region.width = Math.min(32, region.width);
         region.height = Math.min(32, region.height);
-        
+
         // Regions can't be outside of the image
         if (region.x + region.width > 64) {
             region.width = 64 - region.x;

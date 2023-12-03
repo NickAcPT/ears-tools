@@ -5,7 +5,6 @@
     import { saveAs } from "file-saver";
     import { browser } from "$app/environment";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
-    import RequiresJs from "../../../components/RequiresJs.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));

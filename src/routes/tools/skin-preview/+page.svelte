@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { writable, type Writable } from "svelte/store";
-    import { browser, dev } from "$app/environment";
+    import { writable } from "svelte/store";
 
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import { page } from "$app/stores";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
-    import { RenderingSupport, renderingSupport } from "$lib";
+    import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
 
     let skinDropZone: SkinDropZone;
 

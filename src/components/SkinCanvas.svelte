@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser, dev } from "$app/environment";
-    import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib";
-    import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/types";
+    import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
+    import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/skin-canvas";
     import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
 
@@ -42,12 +42,12 @@
         if (!browser || $currentRenderingSupport !== RenderingSupport.WebGPU) {
             return true;
         }
-        
+
         // @ts-expect-error gpu is available in browser when using webgpu
         if (!navigator.gpu) {
             return false;
         }
-        
+
         // @ts-expect-error gpu is available in browser when using webgpu
         if (browser && navigator.gpu) {
             // Try to get a canvas context
@@ -61,10 +61,10 @@
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
@@ -90,7 +90,7 @@
             if (!checkWebGpuSupport()) {
                 throw new Error("WebGPU is not supported - Performing fallback");
             }
-            
+
             module = <SkinRendererModule>await renderers[`../tools/skin-renderer/${name}.js`]();
 
             let init = module?.default;
