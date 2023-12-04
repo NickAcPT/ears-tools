@@ -7,9 +7,8 @@
     let protrusions = writable([] as Protrusion[]);
 </script>
 
-<h1>Page 3</h1>
 <div>
-    <h2 class="text-xl">Tail</h2>
+    <h2 class="text-2xl">Tail Mode</h2>
     <ManipulatorEnumPicker let:element elements={TailMode} kind="tail-mode" value={tailMode} class="px-10 py-5">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
@@ -17,15 +16,15 @@
 </div>
 
 <div>
-    <h2 class="text-xl">Protrusions</h2>
+    <h2 class="text-2xl">Protrusions</h2>
     <ManipulatorEnumPicker let:element elements={Protrusion} kind="protrusion" value={protrusions} class="py-5">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
 </div>
 
-<p>{TailMode[$tailMode]}</p>
-<p>{$protrusions}</p>
+<p>Mode: {TailMode[$tailMode]}</p>
+<p>Protrusions: {$protrusions.map((p) => Protrusion[p]).join(", ")}</p>
 
 <style lang="postcss">
     canvas {

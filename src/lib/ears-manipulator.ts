@@ -17,6 +17,11 @@ export interface TailSettings {
     bends: number[];
 }
 
+export enum SnoutStatus {
+    Disabled,
+    Enabled,
+}
+
 export interface SnoutSettings {
     width: number;
     height: number;

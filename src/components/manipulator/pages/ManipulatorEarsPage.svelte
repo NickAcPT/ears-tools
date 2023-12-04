@@ -7,8 +7,6 @@
     let earsMode = writable(EarsMode.None);
 </script>
 
-<h1>Page 2</h1>
-
 <h1 class="text-2xl">Ears</h1>
 <div>
     <h2 class="text-xl">Anchor</h2>
@@ -16,15 +14,15 @@
 </div>
 
 <div>
-    <h2 class="text-xl">Anchor</h2>
+    <h2 class="text-xl">Mode</h2>
     <ManipulatorEnumPicker let:element elements={EarsMode} kind="ears-mode" value={earsMode} class="py-4">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
 </div>
 
-<p>{EarsAnchor[$earsAnchor]}</p>
-<p>{EarsMode[$earsMode]}</p>
+<p>Anchor: {EarsAnchor[$earsAnchor]}</p>
+<p>Mode: {EarsMode[$earsMode]}</p>
 
 <style lang="postcss">
     canvas {

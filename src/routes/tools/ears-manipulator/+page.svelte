@@ -1,12 +1,13 @@
 <script lang="ts">
     import ManipulatorEarsPage from "../../../components/manipulator/pages/ManipulatorEarsPage.svelte";
-    import ManipulatorPage3 from "../../../components/manipulator/pages/ManipulatorPage3.svelte";
-    import ManipulatorPage4 from "../../../components/manipulator/pages/ManipulatorPage4.svelte";
+    import ManipulatorTailAndProtrusionsPage from "../../../components/manipulator/pages/ManipulatorTailAndProtrusionsPage.svelte";
+    import ManipulatorSnoutPage from "../../../components/manipulator/pages/ManipulatorSnoutPage.svelte";
     import ManipulatorWelcomePage from "../../../components/manipulator/pages/ManipulatorWelcomePage.svelte";
+    import ManipulatorPage5 from "../../../components/manipulator/pages/ManipulatorPage5.svelte";
 
     let currentPage = 0;
 
-    const pages = [ManipulatorWelcomePage, ManipulatorEarsPage, ManipulatorPage3, ManipulatorPage4];
+    const pages = [ManipulatorWelcomePage, ManipulatorEarsPage, ManipulatorTailAndProtrusionsPage, ManipulatorSnoutPage, ManipulatorPage5];
 
     function nextPage() {
         currentPage = Math.min(currentPage + 1, pages.length - 1);
