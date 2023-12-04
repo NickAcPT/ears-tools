@@ -8,6 +8,7 @@
     import AlphaMagnifierIcon from "../components/icons/AlphaMagnifierIcon.svelte";
     import MirrorIcon from "../components/icons/MirrorIcon.svelte";
     import PlusIcon from "../components/icons/PlusIcon.svelte";
+    import FlaskIcon from "../components/icons/FlaskIcon.svelte";
 
     const tools: Tool[] = [
         {
@@ -36,7 +37,17 @@
             icon: AlphaMagnifierIcon,
             name: "Alfalfa Inspector",
             description: ["Inspect and Edit low-level Alfalfa data stored in an Ears skin."],
-            url: "alfalfa-inspector"
+            url: "alfalfa-inspector",
+        },
+        {
+            // @ts-ignore I don't know how to type this lol
+            icon: FlaskIcon,
+            name: "Ears Manipulator",
+            description: [
+                "Create your own Ears-compatible skin following a step-by-step wizard.",
+                "Just like a science experiment, this might go wrong.",
+            ],
+            url: "ears-manipulator",
         },
         {
             // @ts-ignore I don't know how to type this lol
@@ -61,7 +72,7 @@
         {#if tools.length === 0}
             <p class="w-full text-center">No tools exist yet..</p>
         {:else}
-            <div class="grid grid-cols-1 3xl justify-items-stretch gap-4 md:grid-cols-2">
+            <div class="3xl grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-2">
                 {#each tools as tool}
                     {#if tool.url}
                         <a href="{base}/tools/{tool.url}">

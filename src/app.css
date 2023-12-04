@@ -14,7 +14,7 @@
     }
 
     button:not(.link) {
-        @apply rounded-md bg-primary-500 px-4 py-2 text-text shadow-md hover:bg-secondary-300;
+        @apply rounded-md bg-primary-500 px-4 py-2 text-text shadow-md hover:bg-primary-800 hover:text-text-on-primary;
     }
 
     button.secondary:not(.link) {
