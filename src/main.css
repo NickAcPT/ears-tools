@@ -1,7 +1,7 @@
 @layer base {
     :root {
         --text: 13 20 22;
-        --background: 229 238 240;
+        --background: 240 240 240;
         
         --text-on-primary: var(--text);
         --text-on-primary-inverse: var(--background);

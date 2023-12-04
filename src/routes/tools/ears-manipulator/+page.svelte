@@ -18,7 +18,7 @@
 </script>
 
 <div class="container flex h-full flex-col gap-2 py-5">
-    <div class="flex-1 bg-gray-800">
+    <div class="flex-1">
         <svelte:component this={pages[currentPage]} />
     </div>
 

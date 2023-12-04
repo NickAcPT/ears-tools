@@ -7,7 +7,7 @@
     export let ghost: boolean = false;
 </script>
 
-<div class="toolbox-outer" class:ghost>
+<div class="toolbox-outer button" class:ghost>
     <div class="flex items-center gap-2">
         <svelte:component this={icon} class="h-10" />
         <h2 class="pb-1 text-left text-xl font-medium">{name}</h2>
@@ -25,9 +25,6 @@
     }
 
     .toolbox-outer {
-        @apply flex h-full min-h-[10em] flex-col items-center justify-around;
-        @apply rounded-lg bg-primary-500 p-4;
-        @apply text-text-on-primary hover:bg-primary-800 hover:text-text-on-primary-inverse;
-        @apply shadow-md transition-shadow hover:shadow-lg;
+        @apply flex h-full min-h-[10em] flex-col items-center justify-around p-4;
     }
 </style>

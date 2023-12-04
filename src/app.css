@@ -9,12 +9,14 @@
         @apply bg-background text-text font-sans;
     }
     
-    button.link:not(.appearance-none) {
+    button.link:not(.appearance-none), .button.link:not(.appearance-none) {
         @apply text-text underline;
     }
 
-    button:not(.link):not(.appearance-none) {
-        @apply rounded-md bg-primary-500 px-4 py-2 text-text shadow-md hover:bg-primary-800 hover:text-text-on-primary;
+    button:not(.link):not(.appearance-none), .button:not(.link) {
+        @apply rounded-lg bg-primary-500 px-4 py-2; 
+        @apply text-text-on-primary hover:bg-primary-800 hover:text-text-on-primary-inverse;
+        @apply shadow-md transition-shadow hover:shadow-lg;
     }
 
     button.secondary:not(.link) {

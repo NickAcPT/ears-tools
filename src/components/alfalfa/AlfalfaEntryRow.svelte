@@ -20,7 +20,7 @@
         <AlfalfaDataView data={entry.value} />
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] items-center gap-2">
         {#if entry.value.type !== "erase"}
             <button on:click={() => dispatcher("download", entry)}><DownloadIcon class="h-5" />Download</button>
             <button on:click={() => dispatcher("upload", entry)}><UploadIcon class="h-5" />Upload</button>

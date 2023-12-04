@@ -16,7 +16,7 @@
             {:else}<input class="peer hidden" id="{kind}-{element}" type="checkbox" value={elements[element]} bind:group={$value} />
             {/if}
             <!-- prettier-ignore -->
-            <span class="cursor-pointer w-fit rounded-xl bg-primary-500 peer-hover:bg-primary-600 peer-checked:!bg-primary-800 text-text-on-primary flex-1 flex flex-col justify-center items-center {$$restProps["class"] ?? ""}">
+            <span class="cursor-pointer w-fit button peer-checked:!bg-primary-700 dark:peer-checked:!bg-primary-800 peer-checked:!text-text-on-primary-inverse flex-1 flex flex-col justify-center items-center {$$restProps["class"] ?? ""}">
             <slot {element}>
                 {element}
             </slot>

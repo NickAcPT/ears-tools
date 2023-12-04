@@ -10,7 +10,7 @@
 <h1>Page 3</h1>
 <div>
     <h2 class="text-xl">Tail</h2>
-    <ManipulatorEnumPicker let:element elements={TailMode} kind="tail-mode" value={tailMode} class=" px-10 py-4">
+    <ManipulatorEnumPicker let:element elements={TailMode} kind="tail-mode" value={tailMode} class="px-10 py-5">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
@@ -18,8 +18,7 @@
 
 <div>
     <h2 class="text-xl">Protrusions</h2>
-    <ManipulatorEnumPicker let:element elements={Protrusion} kind="protrusion" value={protrusions} class="py-4">
-        
+    <ManipulatorEnumPicker let:element elements={Protrusion} kind="protrusion" value={protrusions} class="py-5">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
