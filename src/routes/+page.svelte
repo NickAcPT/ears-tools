@@ -42,7 +42,8 @@
             description: ["Inspect and Edit low-level Alfalfa data stored in an Ears skin."],
             url: "alfalfa-inspector",
         },
-        {
+        // @ts-ignore I don't know how to type this lol
+        ...dev ? [{
             // @ts-ignore I don't know how to type this lol
             icon: FlaskIcon,
             name: "Ears Manipulator",
@@ -51,7 +52,7 @@
                 "Just like a science experiment, this might go wrong.",
             ],
             url: "ears-manipulator",
-        },
+        }] : [],
         {
             // @ts-ignore I don't know how to type this lol
             icon: PlusIcon,
@@ -77,7 +78,7 @@
         {:else}
             <div class="3xl grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-2">
                 {#each tools as tool}
-                    {#if tool.url && (!wipTools.includes(tool.url) || dev)}
+                    {#if tool.url}
                         <a href="{base}/tools/{tool.url}">
                             <ToolBox {...tool} />
                         </a>
