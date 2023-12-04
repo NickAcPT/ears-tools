@@ -9,7 +9,10 @@
     import MirrorIcon from "../components/icons/MirrorIcon.svelte";
     import PlusIcon from "../components/icons/PlusIcon.svelte";
     import FlaskIcon from "../components/icons/FlaskIcon.svelte";
+    import { dev } from "$app/environment";
 
+    const wipTools = ["ears-manipulator"];
+    
     const tools: Tool[] = [
         {
             // @ts-ignore I don't know how to type this lol
@@ -74,7 +77,7 @@
         {:else}
             <div class="3xl grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-2">
                 {#each tools as tool}
-                    {#if tool.url}
+                    {#if tool.url && (!wipTools.includes(tool.url) || dev)}
                         <a href="{base}/tools/{tool.url}">
                             <ToolBox {...tool} />
                         </a>
