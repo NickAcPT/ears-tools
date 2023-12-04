@@ -2,7 +2,7 @@ export interface EarsFeatures {
     ears: EarsSettings;
     protrusions: Set<Protrusion>;
     tail: TailSettings;
-    snout: SnoutSettings;
+    snout?: SnoutSettings;
     wings: WingSettings;
 }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
     import ManipulatorEarsPage from "../../../components/manipulator/pages/ManipulatorEarsPage.svelte";
     import ManipulatorTailAndProtrusionsPage from "../../../components/manipulator/pages/ManipulatorTailAndProtrusionsPage.svelte";
-    import ManipulatorSnoutPage from "../../../components/manipulator/pages/ManipulatorSnoutPage.svelte";
+    import ManipulatorSnoutPage from "../../../components/manipulator/pages/ManipulatorSnoutAndWingsPage.svelte";
     import ManipulatorWelcomePage from "../../../components/manipulator/pages/ManipulatorWelcomePage.svelte";
     import ManipulatorPage5 from "../../../components/manipulator/pages/ManipulatorPage5.svelte";
 
