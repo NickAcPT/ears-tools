@@ -9,11 +9,11 @@
         @apply bg-background text-text font-sans;
     }
     
-    button.link {
+    button.link:not(.appearance-none) {
         @apply text-text underline;
     }
 
-    button:not(.link) {
+    button:not(.link):not(.appearance-none) {
         @apply rounded-md bg-primary-500 px-4 py-2 text-text shadow-md hover:bg-primary-800 hover:text-text-on-primary;
     }
 
@@ -22,7 +22,7 @@
     }
 
     @media (prefers-color-scheme: dark) {
-        button:not(.link) {
+        button:not(.link):not(.appearance-none) {
             @apply text-background;
         }
     }

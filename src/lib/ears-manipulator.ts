@@ -1,13 +1,13 @@
 export interface EarsFeatures {
     ears: EarsSettings;
-    protrusions: Set<Protrusions>;
+    protrusions: Set<Protrusion>;
     tail: TailSettings;
     snout: SnoutSettings;
     wings: WingSettings;
 }
 
 export interface EarsSettings {
-    type: EarsType;
+    mode: EarsMode;
     anchor: EarsAnchor;
 }
 
@@ -29,7 +29,7 @@ export interface WingSettings {
     animations: WingsAnimations;
 }
 
-export enum EarsType {
+export enum EarsMode {
     None,
     Above,
     Sides,
@@ -43,12 +43,12 @@ export enum EarsType {
 }
 
 export enum EarsAnchor {
-    Front,
     Center,
+    Front,
     Back
 }
 
-export enum Protrusions {
+export enum Protrusion {
     Claws,
     Horns
 }

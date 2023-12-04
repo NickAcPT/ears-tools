@@ -1,6 +1,6 @@
 <script lang="ts">
-    import SkinDropZone from "../SkinDropZone.svelte";
-    import NickAc from "../homepage/NickAc.svelte";
+    import SkinDropZone from "../../SkinDropZone.svelte";
+    import NickAc from "../../homepage/NickAc.svelte";
 </script>
 
 <div class="flex flex-col items-center justify-center gap-10 h-full">

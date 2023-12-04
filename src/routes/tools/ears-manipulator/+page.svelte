@@ -1,12 +1,12 @@
 <script lang="ts">
-    import ManipulatorPage2 from "../../../components/manipulator/ManipulatorPage2.svelte";
-    import ManipulatorPage3 from "../../../components/manipulator/ManipulatorPage3.svelte";
-    import ManipulatorPage4 from "../../../components/manipulator/ManipulatorPage4.svelte";
-    import ManipulatorWelcomePage from "../../../components/manipulator/ManipulatorWelcomePage.svelte";
+    import ManipulatorEarsPage from "../../../components/manipulator/pages/ManipulatorEarsPage.svelte";
+    import ManipulatorPage3 from "../../../components/manipulator/pages/ManipulatorPage3.svelte";
+    import ManipulatorPage4 from "../../../components/manipulator/pages/ManipulatorPage4.svelte";
+    import ManipulatorWelcomePage from "../../../components/manipulator/pages/ManipulatorWelcomePage.svelte";
 
     let currentPage = 0;
 
-    const pages = [ManipulatorWelcomePage, ManipulatorPage2, ManipulatorPage3, ManipulatorPage4];
+    const pages = [ManipulatorWelcomePage, ManipulatorEarsPage, ManipulatorPage3, ManipulatorPage4];
 
     function nextPage() {
         currentPage = Math.min(currentPage + 1, pages.length - 1);
@@ -23,7 +23,21 @@
     </div>
 
     <div class="flex justify-end gap-2">
+        <!-- prettier-ignore -->
+        <ol class="flex items-center justify-center gap-1">
+            {#each pages as _, i}
+                <button class="appearance-none bullet text-3xl h-5 flex items-center" title="Go to page {i + 1}" class:active={currentPage === i} on:click={() => (currentPage = i)}>
+                    •
+                </button>
+            {/each}
+        </ol>
         <button on:click={previousPage}>Previous page</button>
         <button on:click={nextPage}>Next page</button>
     </div>
 </div>
+
+<style lang="postcss">
+    .bullet.active {
+        @apply text-accent-500;
+    }
+</style>
