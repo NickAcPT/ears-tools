@@ -34,14 +34,14 @@
     $: currentPage != undefined && ($manipulatorWizardPageTitle = null);
 
     resetManipulatorEarsFeatures();
-
     $: canvasScale = renderingSupport != undefined && $renderingSupport === RenderingSupport.SoftwareRendering ? 0.2 : 1;
 </script>
 
 <div class="container flex h-full justify-between gap-5 py-5">
     <div class:hidden={currentPage === 0} class="flex h-full flex-col gap-4">
         <SkinCanvas
-            style="image-rendering: pixelated;"
+            showDevInfo={false}
+            style="image-rendering: pixelated; aspect-ratio: 512 / 832;"
             class="min-h-0 flex-1 object-contain"
             width={512 * canvasScale}
             height={832 * canvasScale}
@@ -66,7 +66,7 @@
         <div class="flex-1">
             <h1 class="text-2xl">{$manipulatorWizardPageTitle ?? ""}</h1>
             <div class="manipulator-page contents">
-                <svelte:component this={pages[currentPage]} />
+                <svelte:component this={pages[currentPage]} on:next="{() => currentPage++}" />
             </div>
         </div>
 
@@ -79,8 +79,8 @@
                 </button>
                 {/each}
             </ol>
-            <button on:click={previousPage}>Previous page</button>
-            <button on:click={nextPage}>Next page</button>
+            <button on:click={previousPage}>Previous step</button>
+            <button on:click={nextPage}>Next step</button>
         </div>
     </div>
 </div>

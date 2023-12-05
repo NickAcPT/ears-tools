@@ -1,7 +1,10 @@
 <script lang="ts">
     import { manipulatorSkinFile, manipulatorSkinSlimModel } from "$lib/stores";
+    import { createEventDispatcher } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
+    
+    const dispatcher = createEventDispatcher();
 
     function handleFiles(e: CustomEvent<FileList>): void {
         const list = e.detail;
@@ -13,6 +16,7 @@
         
         const file = list[0];
         $manipulatorSkinFile = file;
+        dispatcher("next");
     }
 
 </script>

@@ -256,18 +256,21 @@
 {#key $currentRenderingSupport}
     <RequiresWasm updateReceiver={currentRenderingSupport} init={initWasm} />
 
-    <canvas
+    <div class="flex min-h-0 max-h-full">
+        <canvas
+        style:width="100%"
         style:display={isInitialized ? "block" : "none"}
         bind:this={canvas}
         {...$$restProps}
         on:touchstart|preventDefault={handleTouchStart}
         on:touchend|preventDefault={handleTouchEnd}
         on:touchmove|preventDefault={handleTouchMove}
-        on:pointerdown={handlePointerDown}
-        on:pointerup={handlePointerUp}
-        on:pointermove={handlePointerMove}
-        on:wheel={handleScroll}
+        on:pointerdown|preventDefault={handlePointerDown}
+        on:pointerup|preventDefault={handlePointerUp}
+        on:pointermove|preventDefault={handlePointerMove}
+        on:wheel|preventDefault={handleScroll}
     ></canvas>
+    </div>
 {/key}
 
 <style lang="postcss">
