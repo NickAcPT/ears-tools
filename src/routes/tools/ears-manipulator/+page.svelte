@@ -37,8 +37,12 @@
     $: canvasScale = renderingSupport != undefined && $renderingSupport === RenderingSupport.SoftwareRendering ? 0.2 : 1;
 </script>
 
-<div class="container flex h-full justify-between gap-5 py-5">
-    <div class:hidden={currentPage === 0} class="flex h-full flex-col gap-4">
+<div class="container h-full flex justify-between gap-5 py-5"
+    class:landscape:grid-cols-[1fr_3fr]={currentPage !== 0}
+    class:portrait:grid-rows-[1fr_3fr]={currentPage !== 0}
+    class:grid={currentPage !== 0}
+>
+    <div class:hidden={currentPage === 0} class="flex justify-center h-full flex-col gap-4 portrait:order-1">
         <SkinCanvas
             showDevInfo={false}
             style="image-rendering: pixelated; aspect-ratio: 512 / 832;"

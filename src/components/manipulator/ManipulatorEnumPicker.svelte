@@ -8,7 +8,7 @@
     export let value: Writable<number | number[]>;
 </script>
 
-<div class="grid grid-cols-[repeat(auto-fit,minmax(0,250px))] gap-2">
+<div class="keys-grid">
     {#each enumKeys(elements) as element}
         <label for="{kind}-{element}" class="flex items-center justify-center">
             {#if typeof $value === "number"}
@@ -24,3 +24,27 @@
         </label>
     {/each}
 </div>
+
+<style lang="postcss">
+    :root {
+        --keys-grid-size: 100px;
+    }
+    
+    @media screen("lg") {
+        :root {
+            --keys-grid-size: 200px;
+        }
+    }
+    @media screen("2xl") {
+        :root {
+            --keys-grid-size: 250px;
+        }
+    }
+    
+    .keys-grid {
+        @apply grid gap-2;
+        grid-template-columns: repeat(auto-fill,minmax(min-content, var(--keys-grid-size)));
+    }
+    
+    
+</style>
