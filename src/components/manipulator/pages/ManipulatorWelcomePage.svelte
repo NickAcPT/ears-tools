@@ -1,12 +1,26 @@
 <script lang="ts">
+    import { manipulatorSkinFile, manipulatorSkinSlimModel } from "$lib/stores";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
+
+    function handleFiles(e: CustomEvent<FileList>): void {
+        const list = e.detail;
+        
+        if (list.length !== 1) {
+            console.error("Only one file can be uploaded at a time.");
+            return;
+        }
+        
+        const file = list[0];
+        $manipulatorSkinFile = file;
+    }
+
 </script>
 
-<div class="flex flex-col items-center justify-center gap-10 h-full">
+<div class="flex flex-col items-center gap-10 h-full">
     <h1 class="text-3xl">Welcome to <NickAc />'s Ears Manipulator!</h1>
-    <div>
-        <p>Start by selecting your skin file or a template skin.</p>
-        <SkinDropZone />
+    <div class="flex flex-col justify-center gap-4">
+        <p>Let's get started by selecting a skin or picking a template skin.</p>
+        <SkinDropZone on:files={handleFiles} slimArms={manipulatorSkinSlimModel} />
     </div>
 </div>

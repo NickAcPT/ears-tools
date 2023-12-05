@@ -21,10 +21,6 @@
     </ManipulatorEnumPicker>
 </div>
 
-<p>Wings Mode: {WingsMode[$wingsMode]}</p>
-<p>Wings Animations: {WingsAnimations[$wingsAnimations]}</p>
-
-
 <style lang="postcss">
     canvas {
         background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEVmZmaZmZmoZ+Z2AAAAD0lEQVQIW2PkZ4TADxAIABIoBAXF3RsYAAAAAElFTkSuQmCC");

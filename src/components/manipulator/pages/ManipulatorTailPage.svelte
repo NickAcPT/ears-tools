@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { Protrusion, TailMode } from "$lib/ears-manipulator";
+    import { TailMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { tailMode, protrusions, tailBends, tailSegments } from "$lib/stores";
+    import { tailMode, tailBends, tailSegments, manipulatorWizardPageTitle } from "$lib/stores";
+    
+    $manipulatorWizardPageTitle = "Tail";
 </script>
 
-<h2 class="text-2xl">Tail</h2>
 <div>
     <h3 class="text-xl">Mode</h3>
     <ManipulatorEnumPicker let:element elements={TailMode} kind="tail-mode" value={tailMode} class="px-10 py-5">
@@ -29,17 +30,6 @@
         {/each}
     </div>
 </div>
-
-<div>
-    <h2 class="text-2xl">Protrusions</h2>
-    <ManipulatorEnumPicker let:element elements={Protrusion} kind="protrusion" value={protrusions} class="py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
-    </ManipulatorEnumPicker>
-</div>
-
-<p>Mode: {TailMode[$tailMode]}</p>
-<p>Protrusions: {$protrusions.map((p) => Protrusion[p]).join(", ")}</p>
 
 <style lang="postcss">
     canvas {

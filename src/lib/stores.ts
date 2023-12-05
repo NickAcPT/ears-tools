@@ -21,6 +21,11 @@ const WINGS_ANIMATIONS_DEFAULT = WingsAnimations.Normal;
 
 const PROTRUSIONS_DEFAULT: Protrusion[] = [];
 
+export const manipulatorWizardPageTitle = writable<string | null>(null);
+
+export const manipulatorSkinFile = writable<File | null>(null);
+export const manipulatorSkinSlimModel = writable<boolean>(false);
+
 export const snout = writable(SNOUT_DEFAULT);
 export const snoutWidth = writable(SNOUT_WIDTH_DEFAULT);
 export const snoutHeight = writable(SNOUT_HEIGHT_DEFAULT);
@@ -65,6 +70,8 @@ export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegment
 }));
 
 export function resetManipulatorEarsFeatures() {
+    manipulatorSkinFile.set(null);
+    manipulatorSkinSlimModel.set(false);
     earsMode.set(EARS_MODE_DEFAULT);
     earsAnchor.set(EARS_ANCHOR_DEFAULT);
     tailMode.set(TAIL_MODE_DEFAULT);

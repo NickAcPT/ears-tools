@@ -11,8 +11,6 @@
     import FlaskIcon from "../components/icons/FlaskIcon.svelte";
     import { dev } from "$app/environment";
 
-    const wipTools = ["ears-manipulator"];
-    
     const tools: Tool[] = [
         {
             // @ts-ignore I don't know how to type this lol

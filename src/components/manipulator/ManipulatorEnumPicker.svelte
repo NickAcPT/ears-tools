@@ -8,7 +8,7 @@
     export let value: Writable<number | number[]>;
 </script>
 
-<div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(0,250px))] gap-2">
     {#each enumKeys(elements) as element}
         <label for="{kind}-{element}" class="flex items-center justify-center">
             {#if typeof $value === "number"}
