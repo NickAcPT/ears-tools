@@ -32,7 +32,7 @@
         let data = await skin.arrayBuffer();
 
         let list = new DataTransfer();
-        let file = new File([data], "demo-skin.png");
+        let file = new File([data], "demo-skin.png", { type: "image/png" });
         list.items.add(file);
         
         if (slimArms) {

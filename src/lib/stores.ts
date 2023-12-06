@@ -44,6 +44,7 @@ export const wingsAnimations = writable(WINGS_ANIMATIONS_DEFAULT);
 
 export const protrusions = writable(PROTRUSIONS_DEFAULT.slice());
 
+export const lastEarsFeatures = writable<unknown>(null);
 export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, protrusions], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $protrusions]) => ({
     ears: {
         mode: $ears,
