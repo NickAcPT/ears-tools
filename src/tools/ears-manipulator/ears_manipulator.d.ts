@@ -2,6 +2,11 @@
 /* eslint-disable */
 /**
 * @param {Uint8Array} skin_data
+* @returns {any}
+*/
+export function get_ears_features(skin_data: Uint8Array): any;
+/**
+* @param {Uint8Array} skin_data
 * @param {any} features
 * @returns {Uint8Array}
 */
@@ -11,6 +16,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly get_ears_features: (a: number, b: number, c: number) => void;
   readonly apply_features: (a: number, b: number, c: number, d: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

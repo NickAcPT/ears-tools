@@ -1,6 +1,6 @@
 export interface EarsFeatures {
     ears: EarsSettings;
-    protrusions: Set<Protrusion>;
+    protrusions: Protrusion[];
     tail: TailSettings;
     snout?: SnoutSettings;
     wings: WingSettings;

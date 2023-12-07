@@ -31,7 +31,7 @@
 
 <style lang="postcss">
     :root {
-        --keys-grid-size: 100px;
+        --keys-grid-size: 145px;
     }
 
     @media screen("lg") {
@@ -47,6 +47,6 @@
 
     .keys-grid {
         @apply grid gap-2;
-        grid-template-columns: repeat(auto-fill, minmax(min-content, var(--keys-grid-size)));
+        grid-template-columns: repeat(auto-fill, minmax(var(--keys-grid-size), 1fr));
     }
 </style>

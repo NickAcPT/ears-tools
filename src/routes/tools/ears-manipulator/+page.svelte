@@ -8,15 +8,24 @@
     import ManipulatorWingsPage from "../../../components/manipulator/pages/ManipulatorWingsPage.svelte";
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
-    import { earsFeatures, lastEarsFeatures, manipulatorSkinFile, manipulatorSkinSlimModel, manipulatorWizardPageTitle, resetManipulatorEarsFeatures } from "$lib/stores";
+    import {
+        earsFeatures,
+        lastEarsFeatures,
+        lastManipulatorSkinFile,
+        manipulatorSkinFile,
+        manipulatorSkinSlimModel,
+        manipulatorWizardPageTitle,
+        resetManipulatorEarsFeatures,
+        setEarsFeatures,
+    } from "$lib/stores";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
-    import init from "../../../tools/ears-manipulator/ears_manipulator";
+    import init, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     import { apply_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import { tick } from "svelte";
-    
+
     let currentPage = 0;
     let manipulatorInitialized = false;
 
@@ -41,23 +50,26 @@
 
     $: currentPage != undefined && ($manipulatorWizardPageTitle = null);
     $: canvasScale = renderingSupport != undefined && $renderingSupport === RenderingSupport.SoftwareRendering ? 0.75 : 1;
-    
+
     $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
-    
+
     resetManipulatorEarsFeatures(true);
-    
+
     async function updateFeatures() {
         if (!$manipulatorSkinFile || !manipulatorInitialized) {
             console.log(!$manipulatorSkinFile, !manipulatorInitialized);
             return;
         }
-        
+
         $lastEarsFeatures = $earsFeatures;
         console.log("Updating features");
-        
+
         const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $earsFeatures);
-        
-        $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, { type: $manipulatorSkinFile.type, lastModified: new Date().getTime() });
+
+        $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
+            type: $manipulatorSkinFile.type,
+            lastModified: new Date().getTime(),
+        });
     }
 
     async function initWasm() {
@@ -69,7 +81,7 @@
 <RequiresWasm init={initWasm} />
 
 <div
-    class="container flex h-full justify-between gap-5 py-5"
+    class="container portrait:!flex portrait:flex-col h-full justify-between gap-5 py-5"
     class:landscape:grid-cols-[1fr_3fr]={currentPage !== 0}
     class:portrait:grid-rows-[1fr_3fr]={currentPage !== 0}
     class:grid={currentPage !== 0}
