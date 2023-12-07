@@ -4,6 +4,14 @@ export interface EarsFeatures {
     tail: TailSettings;
     snout?: SnoutSettings;
     wings: WingSettings;
+    cape?: Uint8Array;
+    chestSize: number;
+    alfalfa?: AlfalfaData;
+}
+
+export interface AlfalfaData {
+    version: number;
+    data: Record<string, Uint8Array>;
 }
 
 export interface EarsSettings {
@@ -32,6 +40,7 @@ export interface SnoutSettings {
 export interface WingSettings {
     mode: WingsMode;
     animations: WingsAnimations;
+    wings?: Uint8Array;
 }
 
 export enum EarsMode {

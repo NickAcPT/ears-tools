@@ -1,5 +1,5 @@
 import { derived, writable, type Readable, type Writable } from "svelte/store";
-import { EarsAnchor, EarsMode, Protrusion, FeatureStatus, TailMode, WingsAnimations, WingsMode, type EarsFeatures } from "./ears-manipulator";
+import { EarsAnchor, EarsMode, Protrusion, FeatureStatus, TailMode, WingsAnimations, WingsMode, type EarsFeatures, type AlfalfaData } from "./ears-manipulator";
 
 export const earsRegionEditorCurrentFile = writable<File | null>(null);
 
@@ -19,9 +19,11 @@ const TAIL_BENDS_DEFAULT = [0, 0, 0, 0];
 const WINGS_MODE_DEFAULT = WingsMode.None;
 const WINGS_ANIMATIONS_DEFAULT = WingsAnimations.Normal;
 
-export const manipulatorWizardPageTitle = writable<string | null>(null);
+const CHEST_SIZE_DEFAULT = 0;
 
-export const lastManipulatorSkinFile = writable<File | null>(null);
+export const manipulatorWizardPageTitle = writable<string | null>(null);
+export const manipulatorShowCape = writable<boolean>(true);
+
 export const manipulatorSkinFile = writable<File | null>(null);
 export const manipulatorSkinSlimModel = writable<boolean>(false);
 
@@ -44,8 +46,15 @@ export const tailBends = writable(TAIL_BENDS_DEFAULT.slice());
 export const wingsMode = writable(WINGS_MODE_DEFAULT);
 export const wingsAnimations = writable(WINGS_ANIMATIONS_DEFAULT);
 
-export const lastEarsFeatures = writable<EarsFeatures | null>(null);
-export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn]) => ({
+export const chestSize = writable(CHEST_SIZE_DEFAULT);
+
+export const wingsImage = writable<Uint8Array | undefined>(undefined);
+export const capeImage = writable<Uint8Array | undefined>(undefined);
+
+export const alfalfaData = writable<AlfalfaData | undefined>(undefined);
+
+export const lastEarsFeatures = writable<EarsFeatures | undefined>(undefined);
+export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn, capeImage, wingsImage, chestSize, alfalfaData], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn, $capeImage, $wingsFile, $chestSize, $alfalfaData]) => ({
     ears: {
         mode: $ears,
         anchor: $earsAnchor
@@ -65,12 +74,16 @@ export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAncho
     } : {}),
     wings: {
         mode: $wings,
-        animations: $wingsAnimations
+        animations: $wingsAnimations,
+        wings: $wingsFile,
     },
     protrusions: [
         ...($claws === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
         ...($horn === FeatureStatus.Enabled ? [Protrusion.Horns] : [])
-    ]
+    ],
+    chestSize: $chestSize,
+    cape: $capeImage,
+    alfalfa: $alfalfaData
 }));
 
 export function setEarsFeatures(features: EarsFeatures | null) {
@@ -78,25 +91,31 @@ export function setEarsFeatures(features: EarsFeatures | null) {
         resetManipulatorEarsFeatures();
         return;
     }
-    
+
     earsMode.set(features.ears.mode);
     earsAnchor.set(features.ears.anchor);
-    
+
     tailMode.set(features.tail.mode);
     tailSegments.set(features.tail.segments);
     tailBends.set(features.tail.bends);
-    
+
     snout.set(features.snout ? FeatureStatus.Enabled : FeatureStatus.Disabled);
     snoutWidth.set(features.snout?.width ?? SNOUT_WIDTH_DEFAULT);
     snoutHeight.set(features.snout?.height ?? SNOUT_HEIGHT_DEFAULT);
     snoutOffset.set(features.snout?.offset ?? SNOUT_OFFSET_DEFAULT);
     snoutLength.set(features.snout?.length ?? SNOUT_LENGTH_DEFAULT);
-    
+
     wingsMode.set(features.wings.mode);
     wingsAnimations.set(features.wings.animations);
-    
+    wingsImage.set(features.wings.wings);
+
     claws.set(features.protrusions.includes(Protrusion.Claws) ? FeatureStatus.Enabled : FeatureStatus.Disabled);
     horn.set(features.protrusions.includes(Protrusion.Horns) ? FeatureStatus.Enabled : FeatureStatus.Disabled);
+    
+    chestSize.set(features.chestSize);
+    capeImage.set(features.cape);
+    
+    alfalfaData.set(features.alfalfa);
 }
 
 export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
@@ -117,6 +136,13 @@ export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
     snoutHeight.set(SNOUT_HEIGHT_DEFAULT);
     snoutOffset.set(SNOUT_OFFSET_DEFAULT);
     snoutLength.set(SNOUT_LENGTH_DEFAULT);
+
     wingsMode.set(WINGS_MODE_DEFAULT);
     wingsAnimations.set(WINGS_ANIMATIONS_DEFAULT);
+    wingsImage.set(undefined);
+    
+    chestSize.set(CHEST_SIZE_DEFAULT);
+    
+    capeImage.set(undefined);
+    alfalfaData.set(undefined);
 }

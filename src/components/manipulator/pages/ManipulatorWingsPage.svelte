@@ -1,8 +1,19 @@
 <script lang="ts">
-    import { FeatureStatus, WingsAnimations, WingsMode } from "$lib/ears-manipulator";
-    import { writable } from "svelte/store";
+    import { WingsAnimations, WingsMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { snout, snoutWidth, snoutHeight, snoutLength, snoutOffset, wingsMode, wingsAnimations } from "$lib/stores";
+    import { wingsMode, wingsAnimations, wingsImage } from "$lib/stores";
+    import SkinDropZone from "../../SkinDropZone.svelte";
+
+    async function handleWingFile(e: CustomEvent<FileList>) {
+        let files = e.detail;
+        if (files.length !== 1) {
+            console.error("Only one file can be uploaded");
+            return;
+        }
+        
+        let file = files[0];
+        $wingsImage = new Uint8Array(await file.arrayBuffer());
+    }
 </script>
 
 <h2 class="text-2xl">Wings</h2>
@@ -19,6 +30,14 @@
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
+</div>
+
+<div>
+    <h3 class="text-xl">File</h3>
+    <p>Must be 20x16 or 12x12</p>
+    <SkinDropZone on:files={handleWingFile} offerDemoSkin={false}>
+        <svelte:fragment slot="file">wing texture</svelte:fragment>
+    </SkinDropZone>
 </div>
 
 <style lang="postcss">

@@ -1,10 +1,11 @@
 <script lang="ts">
     import { TailMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { tailMode, tailBends, tailSegments, manipulatorWizardPageTitle } from "$lib/stores";
+    import { tailMode, tailBends, tailSegments, manipulatorWizardPageTitle, manipulatorShowCape } from "$lib/stores";
     import { countValue } from "$lib/misc";
 
     $manipulatorWizardPageTitle = "Tail";
+    $manipulatorShowCape = false;
 
     const segmentCountElement = countValue(1, 4);
 </script>

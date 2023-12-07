@@ -12,7 +12,15 @@
             dispatch("files", event.dataTransfer.files);
         }
     }
+
+    function handlePaste(e: ClipboardEvent) {
+        if (e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
+            dispatch("files", e.clipboardData.files);
+        }
+    }
 </script>
+
+<svelte:window on:paste={handlePaste} />
 
 <div
     class="contents"

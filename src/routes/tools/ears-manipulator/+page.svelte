@@ -3,21 +3,20 @@
     import ManipulatorEarsPage from "../../../components/manipulator/pages/ManipulatorEarsPage.svelte";
     import ManipulatorSnoutPage from "../../../components/manipulator/pages/ManipulatorSnoutPage.svelte";
     import ManipulatorTailPage from "../../../components/manipulator/pages/ManipulatorTailPage.svelte";
-    import ManipulatorProtrusionsClawsPage from "../../../components/manipulator/pages/ManipulatorProtrusionsClawsPage.svelte";
-    import ManipulatorProtrusionsHornPage from "../../../components/manipulator/pages/ManipulatorProtrusionsHornPage.svelte";
+    import ManipulatorProtrusionsPage from "../../../components/manipulator/pages/ManipulatorProtrusionsPage.svelte";
     import ManipulatorWingsPage from "../../../components/manipulator/pages/ManipulatorWingsPage.svelte";
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
     import {
         earsFeatures,
         lastEarsFeatures,
-        lastManipulatorSkinFile,
+        manipulatorShowCape,
         manipulatorSkinFile,
         manipulatorSkinSlimModel,
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
-        setEarsFeatures,
     } from "$lib/stores";
+    
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
     import init, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
@@ -26,6 +25,7 @@
     import { apply_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import { tick } from "svelte";
     import { browser } from "$app/environment";
+    import ManipulatorExtrasPage from "../../../components/manipulator/pages/ManipulatorExtrasPage.svelte";
 
     let currentPage = 0;
     let manipulatorInitialized = false;
@@ -35,9 +35,9 @@
         ManipulatorEarsPage,
         ManipulatorSnoutPage,
         ManipulatorTailPage,
-        ManipulatorProtrusionsClawsPage,
-        ManipulatorProtrusionsHornPage,
+        ManipulatorProtrusionsPage,
         ManipulatorWingsPage,
+        ManipulatorExtrasPage,
         ManipulatorFinalPage,
     ];
 
@@ -50,6 +50,7 @@
     }
 
     $: currentPage != undefined && ($manipulatorWizardPageTitle = null);
+    $: currentPage != undefined && ($manipulatorShowCape = true);
     $: canvasScale = renderingSupport != undefined && $renderingSupport === RenderingSupport.SoftwareRendering ? 0.75 : 1;
 
     $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
@@ -93,7 +94,7 @@
     <div class:hidden={currentPage === 0} class="flex h-full flex-col justify-center gap-4 portrait:order-1">
         <SkinCanvas
             showDevInfo={false}
-            showCape={false}
+            showCape={$manipulatorShowCape}
             style="image-rendering: pixelated; aspect-ratio: 512 / 832;"
             class="min-h-0 flex-1 object-contain"
             width={512 * canvasScale}
