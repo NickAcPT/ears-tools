@@ -72,9 +72,12 @@ export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegment
     ]
 }));
 
-export function resetManipulatorEarsFeatures() {
-    manipulatorSkinFile.set(null);
-    manipulatorSkinSlimModel.set(false);
+export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
+    if (resetFile) {
+        manipulatorSkinFile.set(null);
+        manipulatorSkinSlimModel.set(false);
+    }
+    
     earsMode.set(EARS_MODE_DEFAULT);
     earsAnchor.set(EARS_ANCHOR_DEFAULT);
     tailMode.set(TAIL_MODE_DEFAULT);

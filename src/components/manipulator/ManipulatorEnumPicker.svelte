@@ -6,6 +6,10 @@
     export let kind: string;
 
     export let value: Writable<number | number[]>;
+
+    function humanizeEnumKey(key: string) {
+        return key.replace(/([A-Z])/g, " $1").trim();
+    }
 </script>
 
 <div class="keys-grid">
@@ -17,8 +21,8 @@
             {/if}
             <!-- prettier-ignore -->
             <span class="cursor-pointer w-fit button peer-checked:!bg-primary-700 dark:peer-checked:!bg-primary-800 peer-checked:!text-text-on-primary-inverse flex-1 flex flex-col justify-center items-center {$$restProps["class"] ?? ""}">
-            <slot {element}>
-                {element}
+            <slot element={humanizeEnumKey(element)}>
+                {humanizeEnumKey(element)}
             </slot>
         </span>
         </label>
@@ -29,7 +33,7 @@
     :root {
         --keys-grid-size: 100px;
     }
-    
+
     @media screen("lg") {
         :root {
             --keys-grid-size: 200px;
@@ -40,11 +44,9 @@
             --keys-grid-size: 250px;
         }
     }
-    
+
     .keys-grid {
         @apply grid gap-2;
-        grid-template-columns: repeat(auto-fill,minmax(min-content, var(--keys-grid-size)));
+        grid-template-columns: repeat(auto-fill, minmax(min-content, var(--keys-grid-size)));
     }
-    
-    
 </style>

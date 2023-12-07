@@ -44,7 +44,7 @@
     
     $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
     
-    resetManipulatorEarsFeatures();
+    resetManipulatorEarsFeatures(true);
     
     async function updateFeatures() {
         if (!$manipulatorSkinFile || !manipulatorInitialized) {

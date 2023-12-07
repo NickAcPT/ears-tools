@@ -2,8 +2,11 @@
     import { TailMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
     import { tailMode, tailBends, tailSegments, manipulatorWizardPageTitle } from "$lib/stores";
-    
+    import { countValue } from "$lib/misc";
+
     $manipulatorWizardPageTitle = "Tail";
+
+    const segmentCountElement = countValue(1, 4);
 </script>
 
 <div>
@@ -13,11 +16,12 @@
         {element}
     </ManipulatorEnumPicker>
 </div>
-
 <div>
-    <label for="tail-segment-count" class="block text-xl">Tail Segments</label>
-    <input type="range" id="tail-segment-count" min="1" max="4" step="1" bind:value={$tailSegments} />
+    <h3 class="text-xl">Segments</h3>
+    <ManipulatorEnumPicker elements={segmentCountElement} kind="tail-segment-count" value={tailSegments} class="px-10 py-5">
+    </ManipulatorEnumPicker>
 </div>
+
 <div>
     <h3 class="text-xl">Bends</h3>
 
