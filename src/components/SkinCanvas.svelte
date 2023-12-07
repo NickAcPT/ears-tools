@@ -102,6 +102,13 @@
                     fallbackRenderingSupport();
                 };
                 await init().catch(handleError);
+                
+                console.log("Initialized skin renderer module", width, height)
+                
+                if (width % 4 != 0) {
+                    // Width must be a multiple of 4
+                    throw new Error("Width must be a multiple of 4");
+                }
 
                 await initialize(canvas, width, height).catch(handleError);
                 canvas.width = width;

@@ -367,8 +367,8 @@
             <div class="flex flex-1 flex-col items-center">
                 <SkinCanvas
                     currentRenderingSupport={renderingSupport}
-                    width={150}
-                    height={256}
+                    width={152}
+                    height={257}
                     on:loaded={updateSkinFile}
                     class="flex-1 object-contain"
                     skin={$lastSkin}

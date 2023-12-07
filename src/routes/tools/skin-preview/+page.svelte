@@ -29,7 +29,6 @@
     
     $: skinDropZone && skinDropZone.selectDemoSkin();
     
-    $: multiplier = $renderingSupport != RenderingSupport.SoftwareRendering ? 3 : 2;
 </script>
 
 <div class="container flex gap-5 portrait:flex-col landscape:h-[calc(100dvh-var(--navbar-height))]">
@@ -76,8 +75,8 @@
     <div class="flex flex-1 portrait:aspect-square portrait:w-full">
         <SkinCanvas
             currentRenderingSupport={renderingSupport}
-            width={150 * multiplier}
-            height={256 * multiplier}
+            width={452}
+            height={771}
             class="flex-1 object-contain h-full"
             style="{$renderingSupport == RenderingSupport.SoftwareRendering ? "image-rendering: pixelated" : ""}"
             skin={$lastSkin}
