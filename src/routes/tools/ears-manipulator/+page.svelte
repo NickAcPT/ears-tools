@@ -3,7 +3,8 @@
     import ManipulatorEarsPage from "../../../components/manipulator/pages/ManipulatorEarsPage.svelte";
     import ManipulatorSnoutPage from "../../../components/manipulator/pages/ManipulatorSnoutPage.svelte";
     import ManipulatorTailPage from "../../../components/manipulator/pages/ManipulatorTailPage.svelte";
-    import ManipulatorProtrusionsPage from "../../../components/manipulator/pages/ManipulatorProtrusionsPage.svelte";
+    import ManipulatorProtrusionsClawsPage from "../../../components/manipulator/pages/ManipulatorProtrusionsClawsPage.svelte";
+    import ManipulatorProtrusionsHornPage from "../../../components/manipulator/pages/ManipulatorProtrusionsHornPage.svelte";
     import ManipulatorWingsPage from "../../../components/manipulator/pages/ManipulatorWingsPage.svelte";
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
@@ -24,7 +25,8 @@
         ManipulatorEarsPage,
         ManipulatorSnoutPage,
         ManipulatorTailPage,
-        ManipulatorProtrusionsPage,
+        ManipulatorProtrusionsClawsPage,
+        ManipulatorProtrusionsHornPage,
         ManipulatorWingsPage,
         ManipulatorFinalPage,
     ];

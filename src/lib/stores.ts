@@ -1,9 +1,9 @@
 import { derived, writable } from "svelte/store";
-import { EarsAnchor, EarsMode, Protrusion, SnoutStatus, TailMode, WingsAnimations, WingsMode } from "./ears-manipulator";
+import { EarsAnchor, EarsMode, Protrusion, FeatureStatus, TailMode, WingsAnimations, WingsMode } from "./ears-manipulator";
 
 export const earsRegionEditorCurrentFile = writable<File | null>(null);
 
-const SNOUT_DEFAULT = SnoutStatus.Disabled;
+const FEATURE_DEFAULT = FeatureStatus.Disabled;
 const SNOUT_WIDTH_DEFAULT = 1;
 const SNOUT_HEIGHT_DEFAULT = 1;
 const SNOUT_OFFSET_DEFAULT = 0;
@@ -19,14 +19,15 @@ const TAIL_BENDS_DEFAULT = [0, 0, 0, 0];
 const WINGS_MODE_DEFAULT = WingsMode.None;
 const WINGS_ANIMATIONS_DEFAULT = WingsAnimations.Normal;
 
-const PROTRUSIONS_DEFAULT: Protrusion[] = [];
-
 export const manipulatorWizardPageTitle = writable<string | null>(null);
 
 export const manipulatorSkinFile = writable<File | null>(null);
 export const manipulatorSkinSlimModel = writable<boolean>(false);
 
-export const snout = writable(SNOUT_DEFAULT);
+export const snout = writable(FEATURE_DEFAULT);
+export const claws = writable(FEATURE_DEFAULT);
+export const horn = writable(FEATURE_DEFAULT);
+
 export const snoutWidth = writable(SNOUT_WIDTH_DEFAULT);
 export const snoutHeight = writable(SNOUT_HEIGHT_DEFAULT);
 export const snoutOffset = writable(SNOUT_OFFSET_DEFAULT);
@@ -42,10 +43,8 @@ export const tailBends = writable(TAIL_BENDS_DEFAULT.slice());
 export const wingsMode = writable(WINGS_MODE_DEFAULT);
 export const wingsAnimations = writable(WINGS_ANIMATIONS_DEFAULT);
 
-export const protrusions = writable(PROTRUSIONS_DEFAULT.slice());
-
 export const lastEarsFeatures = writable<unknown>(null);
-export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, protrusions], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $protrusions]) => ({
+export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn]) => ({
     ears: {
         mode: $ears,
         anchor: $earsAnchor
@@ -55,7 +54,7 @@ export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegment
         segments: $tailSegments,
         bends: $tailBends
     },
-    ...($snout === SnoutStatus.Enabled ? {
+    ...($snout === FeatureStatus.Enabled ? {
         snout: {
             width: $snoutWidth,
             height: $snoutHeight,
@@ -67,7 +66,10 @@ export const earsFeatures = derived([earsMode, earsAnchor, tailMode, tailSegment
         mode: $wings,
         animations: $wingsAnimations
     },
-    protrusions: $protrusions
+    protrusions: [
+        ...($claws === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
+        ...($horn === FeatureStatus.Enabled ? [Protrusion.Horns] : [])
+    ]
 }));
 
 export function resetManipulatorEarsFeatures() {
@@ -78,12 +80,13 @@ export function resetManipulatorEarsFeatures() {
     tailMode.set(TAIL_MODE_DEFAULT);
     tailSegments.set(TAIL_SEGMENTS_DEFAULT);
     tailBends.set(TAIL_BENDS_DEFAULT.slice());
-    snout.set(SNOUT_DEFAULT);
+    snout.set(FEATURE_DEFAULT);
+    claws.set(FEATURE_DEFAULT);
+    horn.set(FEATURE_DEFAULT);
     snoutWidth.set(SNOUT_WIDTH_DEFAULT);
     snoutHeight.set(SNOUT_HEIGHT_DEFAULT);
     snoutOffset.set(SNOUT_OFFSET_DEFAULT);
     snoutLength.set(SNOUT_LENGTH_DEFAULT);
     wingsMode.set(WINGS_MODE_DEFAULT);
     wingsAnimations.set(WINGS_ANIMATIONS_DEFAULT);
-    protrusions.set(PROTRUSIONS_DEFAULT.slice());
 }

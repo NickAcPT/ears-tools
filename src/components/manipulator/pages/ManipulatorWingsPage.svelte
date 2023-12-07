@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SnoutStatus, WingsAnimations, WingsMode } from "$lib/ears-manipulator";
+    import { FeatureStatus, WingsAnimations, WingsMode } from "$lib/ears-manipulator";
     import { writable } from "svelte/store";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
     import { snout, snoutWidth, snoutHeight, snoutLength, snoutOffset, wingsMode, wingsAnimations } from "$lib/stores";

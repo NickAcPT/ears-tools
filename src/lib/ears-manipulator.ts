@@ -17,7 +17,7 @@ export interface TailSettings {
     bends: number[];
 }
 
-export enum SnoutStatus {
+export enum FeatureStatus {
     Disabled,
     Enabled,
 }

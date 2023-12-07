@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { EarsAnchor, EarsMode, SnoutStatus } from "$lib/ears-manipulator";
+    import { FeatureStatus } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
     import { manipulatorWizardPageTitle, snout, snoutWidth, snoutHeight, snoutLength, snoutOffset } from "$lib/stores";
 
@@ -7,7 +7,7 @@
 </script>
 
 <div>
-    <ManipulatorEnumPicker let:element elements={SnoutStatus} kind="snout-mode" value={snout} class="px-10 py-5">
+    <ManipulatorEnumPicker let:element elements={FeatureStatus} kind="snout-mode" value={snout} class="px-10 py-5">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>

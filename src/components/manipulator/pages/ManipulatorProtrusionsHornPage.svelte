@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { Protrusion, TailMode } from "$lib/ears-manipulator";
+    import { FeatureStatus, Protrusion } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { protrusions, manipulatorWizardPageTitle } from "$lib/stores";
+    import { horn, manipulatorWizardPageTitle } from "$lib/stores";
     
-    $manipulatorWizardPageTitle = "Protrusions"
+    $manipulatorWizardPageTitle = "Protrusions - Horn"
 </script>
 
-<ManipulatorEnumPicker let:element elements={Protrusion} kind="protrusion" value={protrusions} class="py-5">
+<ManipulatorEnumPicker let:element elements={FeatureStatus} kind="protrusion" value={horn} class="py-5">
     <canvas class="flex-1" width="96" height="96"></canvas>
     {element}
 </ManipulatorEnumPicker>
