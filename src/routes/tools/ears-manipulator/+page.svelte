@@ -25,6 +25,7 @@
 
     import { apply_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import { tick } from "svelte";
+    import { browser } from "$app/environment";
 
     let currentPage = 0;
     let manipulatorInitialized = false;
@@ -73,6 +74,9 @@
     }
 
     async function initWasm() {
+        if (!browser) {
+            return Promise.resolve();
+        }
         await init();
         manipulatorInitialized = true;
     }

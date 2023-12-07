@@ -8,6 +8,7 @@
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import { earsRegionEditorCurrentFile } from "$lib/stores";
     import { goto } from "$app/navigation";
+    import { browser } from "$app/environment";
 
     let data: AlfalfaData = new AlfalfaData({});
 
@@ -85,6 +86,9 @@
     }
 
     async function initWasm() {
+        if (!browser) {
+            return Promise.resolve();
+        }
         await init();
     }
 
