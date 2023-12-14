@@ -329,7 +329,11 @@ function __wbg_get_imports() {
         const ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
         return ret;
     };
-    imports.wbg.__wbg_String_917f38a1211cf44b = function(arg0, arg1) {
+    imports.wbg.__wbindgen_as_number = function(arg0) {
+        const ret = +getObject(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_String_389b54bd9d25375f = function(arg0, arg1) {
         const ret = String(getObject(arg1));
         const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
@@ -348,11 +352,11 @@ function __wbg_get_imports() {
         const ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_getwithrefkey_3b3c46ba20582127 = function(arg0, arg1) {
+    imports.wbg.__wbg_getwithrefkey_4a92a5eca60879b9 = function(arg0, arg1) {
         const ret = getObject(arg0)[getObject(arg1)];
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_set_8761474ad72b9bf1 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_set_9182712abebf82ef = function(arg0, arg1, arg2) {
         getObject(arg0)[takeObject(arg1)] = takeObject(arg2);
     };
     imports.wbg.__wbg_new_abda76e883ba8a5f = function() {
@@ -525,7 +529,7 @@ function __wbg_finalize_init(instance, module) {
 }
 
 function initSync(module) {
-    if (wasm !== undefined) return wasm;
+    //if (wasm !== undefined) return wasm;
 
     const imports = __wbg_get_imports();
 
@@ -541,7 +545,7 @@ function initSync(module) {
 }
 
 async function __wbg_init(input) {
-    if (wasm !== undefined) return wasm;
+    //if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
         input = new URL('ears_manipulator_bg.wasm', import.meta.url);
