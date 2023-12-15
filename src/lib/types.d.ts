@@ -1,7 +1,7 @@
 import type { SvelteComponent } from "svelte";
 
 interface Tool {
-    icon: typeof SvelteComponent;
+    icon: typeof SvelteComponent<unknown>;
     name: string;
     description?: string[];
     url?: string;

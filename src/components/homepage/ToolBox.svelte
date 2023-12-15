@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { SvelteComponent } from "svelte";
 
-    export let icon: typeof SvelteComponent;
+    export let icon: typeof SvelteComponent<any>;
     export let name: string;
     export let description: string[] | undefined = undefined;
     export let ghost: boolean = false;
