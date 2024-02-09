@@ -249,10 +249,6 @@
         region.width = Math.max(1, region.width);
         region.height = Math.max(1, region.height);
 
-        // Regions can be at most 32x32
-        region.width = Math.min(32, region.width);
-        region.height = Math.min(32, region.height);
-
         // Regions can't be outside of the image
         if (region.x + region.width > 64) {
             region.width = 64 - region.x;
@@ -260,6 +256,10 @@
         if (region.y + region.height > 64) {
             region.height = 64 - region.y;
         }
+        
+        // Regions can be at most 32x32 and at least 1x1
+        region.width = Math.min(32, Math.max(1, region.width));
+        region.height = Math.min(32, Math.max(1, region.height));
 
         return region;
     }
