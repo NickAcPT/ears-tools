@@ -445,8 +445,9 @@
         on:dragEnd={async ({ detail: e }) => {
             if (!e.isSelect) return;
 
-            let eventX = e.rect.left - imgCanvasBounds.left;
-            let eventY = e.rect.top - imgCanvasBounds.top;
+            let eventX = e.rect.left - imgCanvasBounds.left + window.scrollX;
+            let eventY = e.rect.top - imgCanvasBounds.top + window.scrollY;
+            
             let x = Math.round(eventX / getImagePixelWidth());
             let y = Math.round(eventY / getImagePixelHeight());
 
