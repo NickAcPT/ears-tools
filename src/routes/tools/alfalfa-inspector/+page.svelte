@@ -22,6 +22,21 @@
             alert("Please enter a key");
             return;
         }
+        
+        {
+            for (let i = 0; i < newEntryKey.length; i++) {
+                let c = newEntryKey[i];
+                if (c < "@" && i === 0) {
+                    alert("Invalid alfalfa entry name - must start with a letter");
+                    return;
+                }
+                if (c > "\u{7F}") {
+                    alert("Invalid alfalfa entry name - must be ASCII");
+                    return;
+                }
+            }
+        }
+
         if (newEntryValue === "") {
             alert("Please enter a value");
             return;
@@ -47,11 +62,15 @@
         let entry = e.detail;
 
         if (entry.key == "cape" || entry.key == "wings") {
-            if (!confirm(`Are you sure you want to delete the ${entry.key}?\n\nThis will delete the cape from the alfalfa data, but it will not remove the cape from the encoded Ears data in the skin.`)) {
+            if (
+                !confirm(
+                    `Are you sure you want to delete the ${entry.key}?\n\nThis will delete the cape from the alfalfa data, but it will not remove the cape from the encoded Ears data in the skin.`
+                )
+            ) {
                 return;
             }
         }
-        
+
         data.delete(entry.key);
         notifyDataChange();
     }
@@ -95,10 +114,14 @@
     async function notifyDataChange() {
         // Update our skin file
         if (currentSkin) {
-            let skinData = new Uint8Array(await currentSkin.arrayBuffer());
-            let fileData = write_alfalfa_data(skinData, data.data);
+            try {
+                let skinData = new Uint8Array(await currentSkin.arrayBuffer());
+                let fileData = write_alfalfa_data(skinData, data.data);
 
-            currentSkin = new File([fileData], currentSkin.name, { type: currentSkin.type });
+                currentSkin = new File([fileData], currentSkin.name, { type: currentSkin.type });
+            } catch (error) {
+                console.error("Failed to update skin file", error);
+            }
         }
     }
 
