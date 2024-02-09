@@ -7,10 +7,10 @@
 export function read_alfalfa_data(data: Uint8Array): any;
 /**
 * @param {Uint8Array} image_data
-* @param {any} data
+* @param {any} workspace
 * @returns {Uint8Array}
 */
-export function write_alfalfa_data(image_data: Uint8Array, data: any): Uint8Array;
+export function write_alfalfa_data(image_data: Uint8Array, workspace: any): Uint8Array;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
