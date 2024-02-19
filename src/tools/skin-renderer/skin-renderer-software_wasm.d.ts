@@ -202,18 +202,18 @@ export interface InitOutput {
   readonly notify_mouse_scroll: (a: number) => number;
   readonly render_frame: () => number;
   readonly initialize: (a: number, b: number, c: number) => number;
-  readonly __wbg_set_wasmvec3_0: (a: number, b: number) => void;
-  readonly __wbg_set_wasmvec3_1: (a: number, b: number) => void;
-  readonly set_camera_rotation: (a: number, b: number, c: number) => void;
   readonly __wbg_get_wasmvec3_0: (a: number) => number;
   readonly __wbg_get_wasmvec3_1: (a: number) => number;
+  readonly set_camera_rotation: (a: number, b: number, c: number) => void;
+  readonly __wbg_set_wasmvec3_0: (a: number, b: number) => void;
+  readonly __wbg_set_wasmvec3_1: (a: number, b: number) => void;
   readonly __wbindgen_export_0: WebAssembly.Table;
-  readonly wasm_bindgen__convert__closures__invoke1_mut__hced3eb0035b8ac83: (a: number, b: number, c: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke1_mut__h32a752f2157ca54a: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__h1ccd072748317a50: (a: number, b: number, c: number, d: number) => void;
+  readonly wasm_bindgen__convert__closures__invoke2_mut__h4ff77fb26b511454: (a: number, b: number, c: number, d: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
