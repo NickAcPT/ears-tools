@@ -48,7 +48,7 @@
     onMount(async () => {
         if (browser) {
             const base64File = $page.url.searchParams.get("base64")?.replace(/-/g, "+")?.replace(/_/g, "/");
-            const slimArmsFromUrl = $page.url.searchParams.has("slim") !== null;
+            const slimArmsFromUrl = $page.url.searchParams.has("slim");
             if (base64File) {
                 function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
                     return array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset);
