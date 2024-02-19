@@ -6,20 +6,25 @@
     import { browser } from "$app/environment";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
+    import { createLazyPromise } from "$lib/misc";
 
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
     let hasLayers = writable<boolean>(true);
+    
+    let loadPromise = createLazyPromise<null>();
 
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
         }
         await init();
+        loadPromise.resolve(null);
     }
 
     async function handleSkinFile(file: File) {
+        await loadPromise;
         let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, $hasLayers);
 
         try {
@@ -68,7 +73,7 @@
                 </select>
             </div>
             <div>
-                <div class="flex gap-2 items-center">
+                <div class="flex items-center gap-2">
                     <label for="has-layers">Has layers:</label>
                     <input type="checkbox" name="has-layers" id="has-layers" bind:checked={$hasLayers} />
                 </div>

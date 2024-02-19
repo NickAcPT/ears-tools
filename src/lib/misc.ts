@@ -23,3 +23,17 @@ export function countValue(start: number, end: number): Record<string, number> {
     }
     return result;   
 }
+
+
+
+type ResolvablePromise<T> = Promise<T> & { resolve: (v: T) => void };
+        
+export function createLazyPromise<T = unknown>(): ResolvablePromise<T> {
+    let onResolve: (v: T) => void;
+    const promise = new Promise<T>((resolve) => {
+        onResolve = resolve;
+    });
+    // @ts-expect-error This relies on the value being set by the time we get here
+    promise.resolve = onResolve;
+    return promise as ResolvablePromise<T>;
+}

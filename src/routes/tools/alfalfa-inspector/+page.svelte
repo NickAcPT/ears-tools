@@ -9,6 +9,7 @@
     import { earsRegionEditorCurrentFile } from "$lib/stores";
     import { goto } from "$app/navigation";
     import { browser } from "$app/environment";
+    import { createLazyPromise } from "$lib/misc";
 
     let data: AlfalfaData = new AlfalfaData({});
 
@@ -16,6 +17,8 @@
 
     let newEntryKey: AlfalfaKey = "";
     let newEntryValue: string = "";
+    
+    let loadPromise = createLazyPromise<null>();
 
     function addNewEntry() {
         if (newEntryKey === "") {
@@ -109,6 +112,7 @@
             return Promise.resolve();
         }
         await init();
+        loadPromise.resolve(null);
     }
 
     async function notifyDataChange() {
@@ -126,6 +130,8 @@
     }
 
     async function handleFiles(e: CustomEvent<FileList>) {
+        await loadPromise;
+        
         let files = e.detail;
 
         if (files.length !== 1) {

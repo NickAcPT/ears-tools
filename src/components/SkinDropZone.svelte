@@ -50,6 +50,10 @@
             const base64File = $page.url.searchParams.get("base64")?.replace(/-/g, "+")?.replace(/_/g, "/");
             const slimArmsFromUrl = $page.url.searchParams.has("slim") !== null;
             if (base64File) {
+                function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
+                    return array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset);
+                }
+
                 try {
                     const data = atob(base64File);
                     // Decode the string to a Uint8Array
@@ -59,10 +63,11 @@
                     }
                     // "Upload" the file
                     const list = new DataTransfer();
-                    const file = new File([uint8Array], "skin.png", { type: "image/png" });
+                    const file = new File([typedArrayToBuffer(uint8Array)], "skin.png", { type: "image/png" });
                     list.items.add(file);
-
-                    $slimArms = slimArmsFromUrl;
+                    if (slimArms) {
+                        $slimArms = slimArmsFromUrl;
+                    }
 
                     dispatch("files", list.files);
                 } catch (e) {
