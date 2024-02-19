@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
+    import { writable, type Readable, type Writable } from "svelte/store";
 
     import init, { WasmPlayerModel, generate_blockbench_model } from "../../../tools/bbmodel-generator/bbmodel_generator";
     import { saveAs } from "file-saver";
@@ -12,8 +12,24 @@
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
     let hasLayers = writable<boolean>(true);
-    
+
     let loadPromise = createLazyPromise<null>();
+
+    let hasSlimArms: Readable<boolean> & Writable<boolean> = {
+        update: (fn) => {
+            skinModel.update((value: WasmPlayerModel): WasmPlayerModel => {
+                return fn(value === WasmPlayerModel.Alex) ? WasmPlayerModel.Alex : WasmPlayerModel.Steve;
+            });
+        },
+        set: (value) => {
+            skinModel.set(value ? WasmPlayerModel.Alex : WasmPlayerModel.Steve);
+        },
+        subscribe: (callback) => {
+            return skinModel.subscribe((value) => {
+                callback(value === WasmPlayerModel.Alex);
+            });
+        },
+    };
 
     async function initWasm() {
         if (!browser) {
@@ -83,6 +99,6 @@
 
     <div class="flex flex-col items-center">
         <h2 class="max-w-fit text-center text-2xl">Input</h2>
-        <SkinDropZone slimArms={hasLayers} on:files={handleSkinFiles} />
+        <SkinDropZone slimArms={hasSlimArms} on:files={handleSkinFiles} />
     </div>
 </div>
