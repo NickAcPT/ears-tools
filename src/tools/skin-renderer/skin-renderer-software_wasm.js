@@ -78,7 +78,7 @@ function makeMutClosure(arg0, arg1, dtor, f) {
     return real;
 }
 function __wbg_adapter_16(arg0, arg1, arg2) {
-    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h571469fe53c82e0d(arg0, arg1, addHeapObject(arg2));
+    wasm._dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h772cd52b61eef787(arg0, arg1, addHeapObject(arg2));
 }
 
 function _assertClass(instance, klass) {
@@ -284,7 +284,7 @@ function getClampedArrayU8FromWasm0(ptr, len) {
     return getUint8ClampedMemory0().subarray(ptr / 1, ptr / 1 + len);
 }
 function __wbg_adapter_94(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen__convert__closures__invoke2_mut__h5c6323f1f1f2bf26(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
+    wasm.wasm_bindgen__convert__closures__invoke2_mut__h8eebe96c5f986b39(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
 const SceneCameraSettingsFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -887,7 +887,7 @@ function __wbg_finalize_init(instance, module) {
 }
 
 function initSync(module) {
-    //if (wasm !== undefined) return wasm;
+    if (wasm !== undefined) return wasm;
 
     const imports = __wbg_get_imports();
 
@@ -903,7 +903,7 @@ function initSync(module) {
 }
 
 async function __wbg_init(input) {
-    //if (wasm !== undefined) return wasm;
+    if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
         input = new URL('skin-renderer-software_wasm_bg.wasm', import.meta.url);
