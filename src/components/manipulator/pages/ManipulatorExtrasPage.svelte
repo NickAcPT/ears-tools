@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { capeImage, chestSize } from "$lib/stores";
+    import { capeImage, chestSize, emissiveSkin } from "$lib/stores";
     import SkinDropZone from "../../SkinDropZone.svelte";
 
     async function handleCapeFile(e: CustomEvent<FileList>) {
@@ -24,6 +24,15 @@
     <h2 class="text-2xl">Chest size</h2>
     <label for="chest-size">Chest Size</label>
     <input type="range" id="chest-size" min="0" max="1" step="0.1" bind:value={$chestSize} />
+    
+</div>
+
+<div>
+    <h2 class="text-2xl">Emissive</h2>
+    <div class="flex flex-row items-center gap-2">
+    <label for="chest-size">Emissive Skin</label>
+    <input type="checkbox" id="emissive-skin" bind:checked={$emissiveSkin} />
+    </div>
 </div>
 
 <style lang="postcss">
