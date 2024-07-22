@@ -4,6 +4,7 @@
     import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/skin-canvas";
     import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
+    import { page } from "$app/stores";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
@@ -71,7 +72,24 @@
         }
         isLoadedAlready = false;
         isInitialized = false;
-
+        
+        const renderingOverride = $page.url.searchParams.get("rendering");
+        if (renderingOverride) {
+            let targetSupport: RenderingSupport | undefined = undefined;
+            try {
+                targetSupport = RenderingSupport[renderingOverride as keyof typeof RenderingSupport];
+            } catch (e) {
+                console.error("Invalid rendering override provided", e);
+            }
+            
+            if (targetSupport != undefined && targetSupport != $currentRenderingSupport) {
+                console.log("Overriding rendering support to", RenderingSupport[targetSupport]);
+                $currentRenderingSupport = targetSupport;
+                throw new Error("Rendering support overridden");
+            }
+        }
+        
+        
         try {
             let renderers = import.meta.glob("./../tools/skin-renderer/*.js");
             let name = "";
@@ -87,7 +105,7 @@
                     break;
             }
 
-            if (!checkWebGpuSupport()) {
+            if (renderingOverride == undefined && !checkWebGpuSupport()) {
                 throw new Error("WebGPU is not supported - Performing fallback");
             }
 
