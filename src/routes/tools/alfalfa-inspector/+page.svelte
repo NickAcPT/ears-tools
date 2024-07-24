@@ -1,6 +1,6 @@
 <script lang="ts">
     import { AlfalfaData, type AlfalfaEntry, type AlfalfaEntryData, type AlfalfaKey } from "$lib/alfalfa-inspector";
-    import { saveAs } from "file-saver";
+    import saveAs from "file-saver";
     import PlusIcon from "../../../components/icons/PlusIcon.svelte";
     import AlfalfaEntryRow from "../../../components/alfalfa/AlfalfaEntryRow.svelte";
     import init, { read_alfalfa_data, write_alfalfa_data } from "../../../tools/alfalfa-inspector/alfalfa_inspector";

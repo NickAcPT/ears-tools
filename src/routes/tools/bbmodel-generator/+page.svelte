@@ -2,7 +2,7 @@
     import { writable, type Readable, type Writable } from "svelte/store";
 
     import init, { WasmPlayerModel, generate_blockbench_model } from "../../../tools/bbmodel-generator/bbmodel_generator";
-    import { saveAs } from "file-saver";
+    import saveAs from "file-saver";
     import { browser } from "$app/environment";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";

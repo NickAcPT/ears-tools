@@ -1,7 +1,7 @@
 <script lang="ts">
     import { dev } from "$app/environment";
     import { earsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores";
-    import { saveAs } from "file-saver";
+    import saveAs from "file-saver";
     
     $: outImageSrc = $manipulatorSkinFile && URL.createObjectURL($manipulatorSkinFile);
     
