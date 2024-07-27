@@ -266,7 +266,7 @@
             lastDist = dist;
         } else if (e.touches.length == 1) {
             let touch = e.touches[0];
-            await module.notify_mouse_move(touch.clientX / 4, touch.clientY / 4);
+            await module.notify_mouse_move(touch.clientX, touch.clientY);
         }
     }
 
