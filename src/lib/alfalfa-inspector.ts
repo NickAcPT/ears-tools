@@ -49,4 +49,12 @@ export class AlfalfaData {
         values.sort((a, b) => a.key.localeCompare(b.key));
         return values;
     }
+    
+    cleanup(): void {
+        for (const key of Object.keys(this.data)) {
+            if (this.data[key].type === "binary" && this.data[key].value.length === 0) {
+                delete this.data[key];
+            }
+        }
+    }
 }

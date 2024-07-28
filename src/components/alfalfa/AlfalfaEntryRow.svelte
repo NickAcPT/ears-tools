@@ -12,7 +12,7 @@
     let dispatcher = createEventDispatcher();
 </script>
 
-<div class="grid grid-cols-3 items-center justify-center">
+<div class="grid grid-cols-[1fr_2fr_1fr] items-center justify-center">
     <div>
         <p>{entry.key}</p>
     </div>

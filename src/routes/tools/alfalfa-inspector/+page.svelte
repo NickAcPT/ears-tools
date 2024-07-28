@@ -10,6 +10,7 @@
     import { goto } from "$app/navigation";
     import { browser } from "$app/environment";
     import { createLazyPromise } from "$lib/misc";
+    import UploadIcon from "../../../components/icons/UploadIcon.svelte";
 
     let data: AlfalfaData = new AlfalfaData({});
 
@@ -17,27 +18,35 @@
 
     let newEntryKey: AlfalfaKey = "";
     let newEntryValue: string = "";
-    
+
     let loadPromise = createLazyPromise<null>();
 
-    function addNewEntry() {
-        if (newEntryKey === "") {
-            alert("Please enter a key");
-            return;
+    function validateName(name: string): string | null {
+        if (name === "") {
+            return "Please enter a key";
         }
-        
+
         {
-            for (let i = 0; i < newEntryKey.length; i++) {
-                let c = newEntryKey[i];
+            for (let i = 0; i < name.length; i++) {
+                let c = name[i];
                 if (c < "@" && i === 0) {
-                    alert("Invalid alfalfa entry name - must start with a letter");
-                    return;
+                    return "Invalid alfalfa entry name - must start with a letter";
                 }
                 if (c > "\u{7F}") {
-                    alert("Invalid alfalfa entry name - must be ASCII");
-                    return;
+                    return "Invalid alfalfa entry name - must be ASCII";
                 }
             }
+        }
+
+        return null;
+    }
+
+    function addNewEntry() {
+        const validationResult = validateName(newEntryKey);
+
+        if (validationResult) {
+            alert(validationResult);
+            return;
         }
 
         if (newEntryValue === "") {
@@ -58,7 +67,7 @@
             throw new Error("Cannot download non-binary data");
         }
 
-        saveAs(new Blob([entry.value.value]), entry.key + ".bin", );
+        saveAs(new Blob([entry.value.value]), entry.key + ".bin");
     }
 
     function deleteEntry(e: CustomEvent<AlfalfaEntry>): any {
@@ -78,10 +87,10 @@
         notifyDataChange();
     }
 
-    function uploadEntryData(e: CustomEvent<AlfalfaEntry>) {
+    function uploadEntryData(e: CustomEvent<AlfalfaEntry | null>) {
         let entry = e.detail;
 
-        if (entry.value.type === "erase") {
+        if (entry?.value.type === "erase") {
             throw new Error("Cannot upload non-binary data");
         }
 
@@ -99,7 +108,21 @@
                     return;
                 }
 
-                entry.value.value = new Uint8Array(reader.result as ArrayBuffer);
+                const fileData = new Uint8Array(reader.result as ArrayBuffer);
+                if (entry === null) {
+                    // Uploading a new entry.
+                    const result = validateName(newEntryKey);
+
+                    if (result) {
+                        alert(result);
+                        return;
+                    }
+
+                    data.set(newEntryKey, { type: "binary", value: fileData });
+                } else {
+                    entry.value.value = fileData;
+                }
+
                 notifyDataChange();
             });
             reader.readAsArrayBuffer(file);
@@ -124,6 +147,15 @@
 
                 currentSkin = new File([fileData], currentSkin.name, { type: currentSkin.type });
             } catch (error) {
+                if (error instanceof Error) {
+                    if (error.message.includes("Cannot write more than 1428 bytes of data")) {
+                        alert("The data you uploaded is too large.\nPlease upload a smaller file.");
+                    } else {
+                        alert(
+                            "An error occurred while attempting to apply the features to the skin.\nPlease fix the error (check browser console) and try again."
+                        );
+                    }
+                }
                 console.error("Failed to update skin file", error);
             }
         }
@@ -131,11 +163,16 @@
 
     async function handleFiles(e: CustomEvent<FileList>) {
         await loadPromise;
-        
+
         let files = e.detail;
 
-        if (files.length !== 1) {
-            alert("Please only drop one file");
+        if (files.length > 1) {
+            alert("Please only drop one file. Amount of files dropped: " + files.length);
+            return;
+        }
+        
+        if (files.length === 0) {
+            debugger;
             return;
         }
 
@@ -150,6 +187,17 @@
         let alfalfaData = <Record<AlfalfaKey, AlfalfaEntryData>>read_alfalfa_data(fileData);
 
         data = new AlfalfaData(alfalfaData);
+    }
+
+    function uploadNewEntry() {
+        const validationResult = validateName(newEntryKey);
+
+        if (validationResult) {
+            alert(validationResult);
+            return;
+        }
+
+        uploadEntryData(new CustomEvent("upload", null));
     }
 
     function downloadCurrentSkin() {
@@ -201,9 +249,12 @@
                 />
             {/each}
 
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-[1fr_2fr_1fr] gap-2">
                 <input type="text" bind:value={newEntryKey} />
-                <input type="text" bind:value={newEntryValue} />
+                <div class="grid grid-cols-[3fr_1fr] gap-2">
+                    <input type="text" bind:value={newEntryValue} />
+                    <button class="flex flex-1 justify-center" on:click={uploadNewEntry}><UploadIcon class="h-5" />Upload</button>
+                </div>
                 <button class="flex flex-1 justify-center" on:click={addNewEntry}><PlusIcon class="h-5" /></button>
             </div>
         </div>

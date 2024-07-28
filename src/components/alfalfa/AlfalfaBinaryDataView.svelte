@@ -24,8 +24,7 @@
             
             let hexValues = hexCodes.join(" ");
             let asciiValues = asciiCodes.join("");
-            
-            return `${hexOffset} | ${hexValues.padEnd(16, " ")} | ${asciiValues}`;
+            return `${hexOffset} | ${hexValues.padEnd(16 * 3 - 1, " ")} | ${asciiValues}`;
         }
     
         let hexLines = [];

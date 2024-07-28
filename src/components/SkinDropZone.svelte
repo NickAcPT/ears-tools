@@ -21,7 +21,6 @@
     function handleInput() {
         if (filePicker.files && filePicker.files.length > 0) {
             dispatch("files", filePicker.files);
-            filePicker.value = "";
         }
     }
 
