@@ -15,8 +15,9 @@
         manipulatorSkinSlimModel,
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
+        setEarsFeatures,
     } from "$lib/stores";
-    
+
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
     import init, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
@@ -51,7 +52,7 @@
 
     $: currentPage != undefined && ($manipulatorWizardPageTitle = null);
     $: currentPage != undefined && ($manipulatorShowCape = true);
-    $: canvasScale = renderingSupport != undefined && $renderingSupport === RenderingSupport.SoftwareRendering ? 0.75 : 1;
+    $: canvasScale = renderingSupport != undefined && $renderingSupport == RenderingSupport.SoftwareRendering ? 0.75 : 1;
 
     $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
 
@@ -66,12 +67,29 @@
         $lastEarsFeatures = $earsFeatures;
         console.log("Updating features");
 
-        const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $earsFeatures);
+        try {
+            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $earsFeatures);
 
-        $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
-            type: $manipulatorSkinFile.type,
-            lastModified: new Date().getTime(),
-        });
+            $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
+                type: $manipulatorSkinFile.type,
+                lastModified: new Date().getTime(),
+            });
+        } catch (e) {
+            const features = await get_ears_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()));
+            setEarsFeatures(features);
+
+            if (e instanceof Error) {
+                if (e.message.includes("Cannot write more than 1428 bytes of data")) {
+                    alert("The cape/wings file you uploaded is too large.\nPlease upload a smaller file.");
+                }
+            } else {
+                alert(
+                    "An error occurred while attempting to apply the features to the skin.\nPlease fix the error (check browser console) and try again."
+                );
+            }
+
+            console.error(e);
+        }
     }
 
     async function initWasm() {
@@ -86,12 +104,12 @@
 <RequiresWasm init={initWasm} />
 
 <div
-    class="container portrait:!flex portrait:flex-col h-full justify-between gap-5 py-5"
+    class="container h-full justify-between gap-5 py-5 portrait:!flex portrait:flex-col"
     class:landscape:grid-cols-[1fr_3fr]={currentPage !== 0}
     class:portrait:grid-rows-[1fr_3fr]={currentPage !== 0}
     class:grid={currentPage !== 0}
 >
-    <div class:hidden={currentPage === 0} class="flex h-full flex-col justify-center gap-4 portrait:order-1">
+    <div class:hidden={currentPage == 0} class="flex h-full flex-col justify-center gap-4 portrait:order-1">
         <SkinCanvas
             showDevInfo={false}
             showCape={$manipulatorShowCape}
@@ -124,17 +142,18 @@
             </div>
         </div>
 
-        <div class="flex justify-end gap-2" class:hidden={!$manipulatorSkinFile}>
+        <div class="flex justify-end gap-2" class:hidden={!$manipulatorSkinFile || currentPage == 0}>
             <!-- prettier-ignore -->
             <ol class="flex items-center justify-center gap-1">
                 {#each pages as _, i}
-                <button class="appearance-none bullet text-3xl h-5 flex items-center" title="Go to page {i + 1}" class:active={currentPage === i} on:click={() => (currentPage = i)}>
+                <button aria-labelledby="page_{i+1}_description" id="page_{i+1}" class="appearance-none bullet text-3xl h-5 flex items-center" title="Go to page {i + 1}" class:active={currentPage == i} on:click={() => (currentPage = i)}>
                     •
                 </button>
+                <span id="page_{i+1}_description" class="sr-only">Page {i + 1} - {currentPage == i ? "Current page" : "Go to page"}</span>
                 {/each}
             </ol>
-            <button on:click={previousPage}>Previous step</button>
-            <button on:click={nextPage}>Next step</button>
+            <button disabled={currentPage == 0} on:click={previousPage}>Previous step</button>
+            <button disabled={currentPage == pages.length - 1} on:click={nextPage}>Next step</button>
         </div>
     </div>
 </div>

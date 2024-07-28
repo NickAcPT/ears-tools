@@ -58,7 +58,7 @@
             throw new Error("Cannot download non-binary data");
         }
 
-        saveAs(new Blob([entry.value.value]), entry.key + ".bin");
+        saveAs(new Blob([entry.value.value]), entry.key + ".bin", );
     }
 
     function deleteEntry(e: CustomEvent<AlfalfaEntry>): any {

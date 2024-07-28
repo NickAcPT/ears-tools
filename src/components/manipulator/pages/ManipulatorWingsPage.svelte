@@ -35,9 +35,19 @@
 <div>
     <h3 class="text-xl">File</h3>
     <p>Must be 20x16 or 12x12</p>
-    <SkinDropZone on:files={handleWingFile} offerDemoSkin={false}>
-        <svelte:fragment slot="file">wing texture</svelte:fragment>
-    </SkinDropZone>
+    
+    <div class="flex h-min gap-2">
+        <SkinDropZone on:files={handleWingFile} offerDemoSkin={false}>
+            <svelte:fragment slot="file">wing texture</svelte:fragment>
+        </SkinDropZone>
+        
+        {#if $wingsImage}
+            <div class="flex-1">
+                <!-- prettier-ignore -->
+                <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([$wingsImage], { type: "image/png" }))} alt="Cape texture" />
+            </div>
+        {/if}
+    </div>
 </div>
 
 <style lang="postcss">

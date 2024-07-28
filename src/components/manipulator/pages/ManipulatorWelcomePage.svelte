@@ -7,7 +7,7 @@
 
     const dispatcher = createEventDispatcher();
 
-    async function handleFiles(e: CustomEvent<FileList>): void {
+    async function handleFiles(e: CustomEvent<FileList>) {
         const list = e.detail;
 
         if (list.length !== 1) {
@@ -33,7 +33,7 @@
 
 <div class="flex h-full flex-col items-center gap-10">
     <h1 class="text-3xl">Welcome to <NickAc />'s Ears Manipulator!</h1>
-    <div class="flex flex-col justify-center gap-4">
+    <div class="flex flex-col justify-center gap-4 text-center">
         <p>Let's get started by selecting a skin or picking a template skin.</p>
         <SkinDropZone on:files={handleFiles} slimArms={manipulatorSkinSlimModel} />
     </div>

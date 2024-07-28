@@ -6,4 +6,5 @@ interface Tool {
     description?: string[];
     url?: string;
     ghost?: boolean;
+    wip?: boolean;
 }

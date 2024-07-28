@@ -23,6 +23,10 @@
         @apply rounded-md bg-secondary-500 px-4 py-2 text-text shadow-md hover:bg-secondary-300;
     }
 
+    button:disabled {
+        @apply cursor-not-allowed;
+    }
+    
     @media (prefers-color-scheme: dark) {
         button:not(.link):not(.appearance-none) {
             @apply text-background;

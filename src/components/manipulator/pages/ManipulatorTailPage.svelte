@@ -19,7 +19,7 @@
 </div>
 <div>
     <h3 class="text-xl">Segments</h3>
-    <ManipulatorEnumPicker elements={segmentCountElement} kind="tail-segment-count" value={tailSegments} class="px-10 py-5">
+    <ManipulatorEnumPicker  elements={segmentCountElement} kind="tail-segment-count" value={tailSegments} class="px-10 py-5">
     </ManipulatorEnumPicker>
 </div>
 

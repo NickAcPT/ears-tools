@@ -5,18 +5,23 @@
     
     $: outImageSrc = $manipulatorSkinFile && URL.createObjectURL($manipulatorSkinFile);
     
+    function replacer(key: string, value: any) {
+        if (key=="cape" || key == "wings") return undefined;
+        else return value;
+    }
+
 </script>
 
 <h1>Page 5</h1>
 
 {#if dev}
-    <pre>{JSON.stringify($earsFeatures, null, 4)}</pre>
+    <pre>{JSON.stringify($earsFeatures, replacer, 4)}</pre>
+    
+    <!-- prettier-ignore -->
+    <button on:click={() => {
+        resetManipulatorEarsFeatures();
+    }}>Reset</button>
 {/if}
-
-<!-- prettier-ignore -->
-<button on:click={() => {
-    resetManipulatorEarsFeatures();
-}}>Reset</button>
 
 <button on:click={() => {
     const skin = $manipulatorSkinFile;

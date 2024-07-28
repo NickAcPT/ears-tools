@@ -9,7 +9,6 @@
     import MirrorIcon from "../components/icons/MirrorIcon.svelte";
     import PlusIcon from "../components/icons/PlusIcon.svelte";
     import FlaskIcon from "../components/icons/FlaskIcon.svelte";
-    import { dev } from "$app/environment";
 
     const tools: Tool[] = [
         {
@@ -41,7 +40,7 @@
             url: "alfalfa-inspector",
         },
         // @ts-ignore I don't know how to type this lol
-        ...dev ? [{
+        {
             // @ts-ignore I don't know how to type this lol
             icon: FlaskIcon,
             name: "Ears Manipulator",
@@ -50,7 +49,8 @@
                 "Just like a science experiment, this might go wrong.",
             ],
             url: "ears-manipulator",
-        }] : [],
+            wip: true,
+        },
         {
             // @ts-ignore I don't know how to type this lol
             icon: PlusIcon,
