@@ -1598,15 +1598,15 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper725 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper717 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 202, __wbg_adapter_28);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper727 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper719 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 202, __wbg_adapter_28);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper1442 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper1434 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 396, __wbg_adapter_33);
         return addHeapObject(ret);
     };
@@ -1630,7 +1630,7 @@ function __wbg_finalize_init(instance, module) {
 }
 
 function initSync(module) {
-    //if (wasm !== undefined) return wasm;
+    if (wasm !== undefined) return wasm;
 
     const imports = __wbg_get_imports();
 
@@ -1646,7 +1646,7 @@ function initSync(module) {
 }
 
 async function __wbg_init(input) {
-    //if (wasm !== undefined) return wasm;
+    if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
         input = new URL('skin-renderer-webgpu_wasm_bg.wasm', import.meta.url);

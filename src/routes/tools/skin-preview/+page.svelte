@@ -5,7 +5,7 @@
     import { page } from "$app/stores";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
-    import { browser, dev } from "$app/environment";
+    import { browser } from "$app/environment";
     import type { SkinCanvasSunSettings } from "$lib/skin-canvas";
     import initManipulator, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
@@ -34,8 +34,8 @@
     $: sun = {
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
-        intensity: $lightsOut ? 0.0 : null,
-        ambient: $lightsOut ? 0.0 : null,
+        intensity: $isSkinEmissive && $lightsOut ? 0.0 : null,
+        ambient: $isSkinEmissive && $lightsOut ? 0.0 : null,
     } as SkinCanvasSunSettings;
 
     async function handleFile(file: File) {
@@ -130,7 +130,7 @@
             showCape={$showCape}
             renderLayers={$showLayers}
             renderEars={$showEars}
-            showDevInfo={dev}
+            showDevInfo={false}
             bind:sun
         />
     </div>
