@@ -184,8 +184,11 @@
             camera.distance = cameraSettings.distance;
             camera.rotation = [cameraSettings.rotation[0], cameraSettings.rotation[1], cameraSettings.rotation[2]];
 
+            console.table(sun);
+            
             sun.direction = [sunSettings.direction[0], sunSettings.direction[1], sunSettings.direction[2]];
-            sun.intensity = sunSettings.intensity;
+            //sun.intensity = sunSettings.intensity;
+            //sun.ambient = sunSettings.ambient;
 
             sunSettings.free();
             cameraSettings.free();
@@ -199,8 +202,8 @@
 
         let lighting = new SceneLightingSettings();
         lighting.direction = vec3(sun.direction[0], sun.direction[1], sun.direction[2]);
-        lighting.ambient = sun.renderShading ? 0.621 : 1.0;
-        lighting.intensity = sun.intensity;
+        lighting.ambient = sun.ambient != undefined ? sun.ambient : sun.renderShading ? 0.621 : 1.0;
+        lighting.intensity = sun.intensity != undefined ? sun.intensity : 2.0;
 
         let character = new SceneCharacterSettings();
         character.has_ears = renderEars;

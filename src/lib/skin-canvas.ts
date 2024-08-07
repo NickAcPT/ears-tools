@@ -7,5 +7,6 @@ export interface SkinCanvasCameraSettings {
 export interface SkinCanvasSunSettings {
     direction: [number, number, number];
     renderShading: boolean;
-    intensity: number;
+    intensity?: number;
+    ambient?: number;
 }
