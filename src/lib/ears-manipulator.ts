@@ -13,6 +13,13 @@ export interface EarsFeatures {
     cape?: Uint8Array;
     chestSize: number;
     alfalfa?: AlfalfaData;
+    emissives: EmissiveData;
+    dataVersion: number;
+}
+
+export interface EmissiveData {
+    enabled: boolean;
+    palette: number[];
 }
 
 export interface AlfalfaData {

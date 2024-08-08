@@ -9,6 +9,7 @@
     import type { SkinCanvasSunSettings } from "$lib/skin-canvas";
     import initManipulator, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
+    import type { EarsFeatures } from "$lib/ears-manipulator";
 
     let skinDropZone: SkinDropZone;
 
@@ -43,7 +44,8 @@
         
         if ($isManipulatorWasmLoaded) {
             try {
-                $isSkinEmissive = await get_ears_features(new Uint8Array(await file.arrayBuffer()))?.emissiveSkin;
+                const features: EarsFeatures | undefined = await get_ears_features(new Uint8Array(await file.arrayBuffer()));
+                $isSkinEmissive = features?.emissives?.enabled || false;
             } catch (e) {
                 console.warn("Failed to get skin features", e);
             }
