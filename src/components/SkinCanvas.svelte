@@ -184,8 +184,6 @@
             camera.distance = cameraSettings.distance;
             camera.rotation = [cameraSettings.rotation[0], cameraSettings.rotation[1], cameraSettings.rotation[2]];
 
-            console.table(sun);
-            
             sun.direction = [sunSettings.direction[0], sunSettings.direction[1], sunSettings.direction[2]];
             //sun.intensity = sunSettings.intensity;
             //sun.ambient = sunSettings.ambient;
