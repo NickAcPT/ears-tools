@@ -19,7 +19,7 @@ const TAIL_BENDS_DEFAULT = [0, 0, 0, 0];
 const WINGS_MODE_DEFAULT = WingsMode.None;
 const WINGS_ANIMATIONS_DEFAULT = WingsAnimations.Normal;
 
-const CHEST_SIZE_DEFAULT = 0;
+const CHEST_SIZE_DEFAULT = 0.0;
 const EMISSIVE_DEFAULT = false;
 
 const DATA_VERSION_DEFAULT = 1;

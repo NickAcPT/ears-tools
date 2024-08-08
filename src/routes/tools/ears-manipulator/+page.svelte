@@ -9,6 +9,7 @@
 
     import {
         earsFeatures,
+        emissiveSkin,
         lastEarsFeatures,
         manipulatorShowCape,
         manipulatorSkinFile,
@@ -19,6 +20,7 @@
     } from "$lib/stores";
 
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
+    import type { SkinCanvasSunSettings } from "$lib/skin-canvas";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
     import init, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
@@ -27,6 +29,7 @@
     import { tick } from "svelte";
     import { browser } from "$app/environment";
     import ManipulatorExtrasPage from "../../../components/manipulator/pages/ManipulatorExtrasPage.svelte";
+    import { writable } from "svelte/store";
 
     let currentPage = 0;
     let manipulatorInitialized = false;
@@ -57,7 +60,15 @@
     $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
 
     resetManipulatorEarsFeatures(true);
-
+    
+    let lightsOut = writable(false);
+    $: sun = {
+        direction: [0.0, 1.0, 1.0],
+        renderShading: true,
+        intensity: $emissiveSkin && $lightsOut ? 0.0 : null,
+        ambient: $emissiveSkin && $lightsOut ? 0.0 : null,
+    } as SkinCanvasSunSettings;
+    
     async function updateFeatures() {
         if (!$manipulatorSkinFile || !manipulatorInitialized) {
             console.log(!$manipulatorSkinFile, !manipulatorInitialized);
@@ -120,11 +131,20 @@
             currentRenderingSupport={renderingSupport}
             skin={$manipulatorSkinFile}
             slimArms={$manipulatorSkinSlimModel}
+            bind:sun
         />
         <label for="manipulator-use-slim-arms" class="flex items-center gap-2">
-            <input type="checkbox" id="manipulator-use-slim-arms" bind:checked={$manipulatorSkinSlimModel} />
             <span>Use slim arms for preview</span>
+            <input type="checkbox" id="manipulator-use-slim-arms" bind:checked={$manipulatorSkinSlimModel} />
         </label>
+        
+        
+        {#if $emissiveSkin}
+            <label for="manipulator-lights-out" class="flex items-center gap-2">
+                <span>Lights out! <em>(To test emissive skins)</em></span>
+                <input type="checkbox" id="manipulator-lights-out" bind:checked={$lightsOut} />
+            </label>
+        {/if}
 
         {#if $renderingSupport == RenderingSupport.SoftwareRendering}
             <div class="min-w-none break-words">
