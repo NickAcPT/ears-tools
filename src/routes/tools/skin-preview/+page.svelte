@@ -1,4 +1,4 @@
-<svelte:options runes={true} />
+<svelte:options runes />
 
 <script lang="ts">
     import { writable } from "svelte/store";

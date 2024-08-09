@@ -1,4 +1,4 @@
-<svelte:options runes={true} />
+<svelte:options runes />
 <script lang="ts">
     import DropZone from "./DropZone.svelte";
     import { onMount, type Snippet } from "svelte";

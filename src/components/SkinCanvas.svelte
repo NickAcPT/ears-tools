@@ -1,4 +1,4 @@
-<svelte:options runes={true} />
+<svelte:options runes />
 <script lang="ts">
     import { browser, dev } from "$app/environment";
     import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
