@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
     import { writable } from "svelte/store";
 
@@ -30,14 +32,14 @@
         handleFile(files[0]);
     }
 
-    let lastSkin = writable<File | undefined>(undefined);
+    let lastSkin = writable<File | null>(null);
 
-    $: sun = {
+    let sun: SkinCanvasSunSettings = $derived({
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
-        intensity: $isSkinEmissive && $lightsOut ? 0.0 : null,
-        ambient: $isSkinEmissive && $lightsOut ? 0.0 : null,
-    } as SkinCanvasSunSettings;
+        intensity: $isSkinEmissive && $lightsOut ? 0.0 : undefined,
+        ambient: $isSkinEmissive && $lightsOut ? 0.0 : undefined,
+    });
 
     async function handleFile(file: File) {
         $lastSkin = file;
@@ -65,7 +67,9 @@
         }
     }
 
-    $: skinDropZone && skinDropZone.selectDemoSkin();
+    $effect(() => {
+        skinDropZone?.selectDemoSkin();
+    });
 </script>
 
 <RequiresWasm init={initManipulatorWasm} />
@@ -133,7 +137,7 @@
             renderLayers={$showLayers}
             renderEars={$showEars}
             showDevInfo={false}
-            bind:sun
+            sun={sun}
         />
     </div>
 </div>

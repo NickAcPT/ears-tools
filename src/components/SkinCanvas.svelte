@@ -1,5 +1,4 @@
 <svelte:options runes={true} />
-
 <script lang="ts">
     import { browser, dev } from "$app/environment";
     import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
@@ -20,8 +19,8 @@
         renderLayers: boolean;
         renderEars: boolean;
         currentRenderingSupport: Writable<RenderingSupport>;
-        camera: SkinCanvasCameraSettings;
-        sun: SkinCanvasSunSettings;
+        camera?: SkinCanvasCameraSettings;
+        sun?: SkinCanvasSunSettings;
         skin: File | null;
     }
     
@@ -41,6 +40,7 @@
             distance: 45,
             look_at: [0, 16.5, 0],
         },
+        
         sun = $bindable({
             direction: [0.0, 1.0, 1.0],
             renderShading: true,

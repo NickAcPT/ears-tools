@@ -6,7 +6,7 @@
     
     interface RequiresWasmProps {
         init: () => Promise<void>;
-        updateReceiver: any;
+        updateReceiver?: any;
         children?: Snippet;
     }
 
