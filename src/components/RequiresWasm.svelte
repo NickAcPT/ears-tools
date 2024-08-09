@@ -1,17 +1,25 @@
-<script lang="ts">
-    import { readable, type Readable } from "svelte/store";
-    import RequiresJs from "./RequiresJs.svelte";
+<svelte:options runes={true} />
 
-    export let init: () => Promise<void>;
+<script lang="ts">
+    import RequiresJs from "./RequiresJs.svelte";
+    import type { Snippet } from "svelte";
     
-    export let updateReceiver: Readable<any> = readable(false);
+    interface RequiresWasmProps {
+        init: () => Promise<void>;
+        updateReceiver: any;
+        children?: Snippet;
+    }
+
+    let { children, init, updateReceiver = false }: RequiresWasmProps = $props();
 </script>
 
 <RequiresJs>
-    {#await $updateReceiver != undefined && init()}
+    {#await updateReceiver != undefined && init()}
         <p class="text-center">Loading...</p>
     {:then}
-        <slot />
+        {#if children}
+            {@render children()}
+        {/if}
     {:catch error}
         <div class="relative left-0 my-5 flex w-full flex-col items-center gap-2 border-y-2 border-gray-400 bg-red-500/10 p-2">
             <p class="p-2 text-center text-xl">It seems like your browser doesn't support WebAssembly</p>

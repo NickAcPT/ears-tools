@@ -1,41 +1,61 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
     import { browser, dev } from "$app/environment";
     import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
     import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/skin-canvas";
-    import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
     import { page } from "$app/stores";
+    import type { HTMLCanvasAttributes } from "svelte/elements";
+    import { type Writable } from "svelte/store";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
-    export let width = 512;
-    export let height = 832;
+    interface SkinCanvasProps extends HTMLCanvasAttributes {
+        width: number;
+        height: number;
+        showDevInfo: boolean;
+        showCape: boolean;
+        slimArms: boolean;
+        renderLayers: boolean;
+        renderEars: boolean;
+        currentRenderingSupport: Writable<RenderingSupport>;
+        camera: SkinCanvasCameraSettings;
+        sun: SkinCanvasSunSettings;
+        skin: File | null;
+    }
+    
+    let {
+        width = 512,
+        height = 832,
 
-    export let showDevInfo = true;
-    export let showCape = true;
-    export let slimArms = false;
-    export let renderLayers = true;
-    export let renderEars = true;
-    export let currentRenderingSupport: Readable<RenderingSupport>;
+        showDevInfo = true,
+        showCape = true,
+        slimArms = false,
+        renderLayers = true,
+        renderEars = true,
+        currentRenderingSupport,
 
-    export let camera: SkinCanvasCameraSettings = {
-        rotation: [20, 10, 0],
-        distance: 45,
-        look_at: [0, 16.5, 0],
-    };
+        camera = {
+            rotation: [20, 10, 0],
+            distance: 45,
+            look_at: [0, 16.5, 0],
+        },
+        sun = $bindable({
+            direction: [0.0, 1.0, 1.0],
+            renderShading: true,
+            intensity: 2.0,
+        }),
+        
+        skin = null,
 
-    export let sun: SkinCanvasSunSettings = {
-        direction: [0.0, 1.0, 1.0],
-        renderShading: true,
-        intensity: 2.0,
-    };
+        ...rest
+    }: SkinCanvasProps = $props();
 
-    export let skin: File | null = null;
+    let isLoadedAlready = $state(false);
+    let isInitialized = $state(false);
 
-    let isLoadedAlready = false;
-    let isInitialized = false;
-
-    let canvas: HTMLCanvasElement;
+    let canvas: HTMLCanvasElement | undefined = $state(undefined);
 
     let module: SkinRendererModule | null = null;
 
@@ -72,7 +92,7 @@
         }
         isLoadedAlready = false;
         isInitialized = false;
-        
+
         const renderingOverride = $page.url.searchParams.get("rendering");
         if (renderingOverride) {
             let targetSupport: RenderingSupport | undefined = undefined;
@@ -81,15 +101,14 @@
             } catch (e) {
                 console.error("Invalid rendering override provided", e);
             }
-            
+
             if (targetSupport != undefined && targetSupport != $currentRenderingSupport) {
                 console.log("Overriding rendering support to", RenderingSupport[targetSupport]);
                 $currentRenderingSupport = targetSupport;
                 throw new Error("Rendering support overridden");
             }
         }
-        
-        
+
         try {
             let renderers = import.meta.glob("./../tools/skin-renderer/*.js");
             let name = "";
@@ -109,21 +128,21 @@
                 throw new Error("WebGPU is not supported - Performing fallback");
             }
 
-            module = await renderers[`../tools/skin-renderer/${name}.js`]() as SkinRendererModule;
+            module = (await renderers[`../tools/skin-renderer/${name}.js`]()) as SkinRendererModule;
 
             let init = module?.default;
             let initialize = module?.initialize;
 
-            if (init && initialize) {
+            if (canvas && init && initialize) {
                 const handleError = (e: any) => {
                     console.log("An error occurred while initializing the skin renderer module, falling back", e);
                     fallbackRenderingSupport();
                 };
-                
+
                 await init().catch(handleError);
-                
-                console.log("Initialized skin renderer module", width, height)
-                
+
+                console.log("Initialized skin renderer module", width, height);
+
                 if (width % 4 != 0) {
                     // Width must be a multiple of 4
                     throw new Error("Width must be a multiple of 4");
@@ -221,13 +240,13 @@
     }
 
     async function handlePointerDown(e: PointerEvent) {
-        canvas.setPointerCapture(e.pointerId);
+        canvas?.setPointerCapture(e.pointerId);
         if (module == null || !isInitialized) return;
         await module.notify_mouse_down();
     }
 
     async function handlePointerUp(e: PointerEvent) {
-        canvas.releasePointerCapture(e.pointerId);
+        canvas?.releasePointerCapture(e.pointerId);
         if (module == null || !isInitialized) return;
         await module.notify_mouse_up();
     }
@@ -272,31 +291,43 @@
         }
     }
 
-    $: canvas && isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms, showCape);
+    $effect(() => {
+        if (isInitialized && skin) {
+            setupScene(skin, camera, sun, renderEars, renderLayers, slimArms, showCape);
+        }
+    });
+    
+    function preventDefault<T extends Event, TR>(handler: (e: T) => TR) {
+        return (e: T) => {
+            e.preventDefault();
+            handler(e);
+        };
+    }
 </script>
 
 {#if dev && showDevInfo}
-    <button on:click={() => fallbackRenderingSupport()}>Fallback Rendering Support</button>
+    <button onclick={() => fallbackRenderingSupport()}>Fallback Rendering Support</button>
     <p>Current: {RenderingSupport[$currentRenderingSupport]}</p>
 {/if}
 
 {#key $currentRenderingSupport}
-    <RequiresWasm updateReceiver={currentRenderingSupport} init={initWasm} />
+    <RequiresWasm updateReceiver={$currentRenderingSupport} init={initWasm} />
 
-    <div class="flex min-h-0 max-h-full">
+    <div class="flex max-h-full min-h-0">
         <canvas
-        style:width="100%"
-        style:display={isInitialized ? "block" : "none"}
-        bind:this={canvas}
-        {...$$restProps}
-        on:touchstart|preventDefault={handleTouchStart}
-        on:touchend|preventDefault={handleTouchEnd}
-        on:touchmove|preventDefault={handleTouchMove}
-        on:pointerdown|preventDefault={handlePointerDown}
-        on:pointerup|preventDefault={handlePointerUp}
-        on:pointermove|preventDefault={handlePointerMove}
-        on:wheel|preventDefault={handleScroll}
-    ></canvas>
+            style:width="100%"
+            style:display={isInitialized ? "block" : "none"}
+            bind:this={canvas}
+            ontouchstart={preventDefault(handleTouchStart)}
+            ontouchend={preventDefault(handleTouchEnd)}
+            ontouchmove={preventDefault(handleTouchMove)}
+            onpointerdown={preventDefault(handlePointerDown)}
+            onpointerup={preventDefault(handlePointerUp)}
+            onpointermove={preventDefault(handlePointerMove)}
+            onwheel={preventDefault(handleScroll)}
+            
+            {...rest}
+        ></canvas>
     </div>
 {/key}
 
