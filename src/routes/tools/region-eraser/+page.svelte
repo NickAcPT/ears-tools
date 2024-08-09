@@ -12,7 +12,6 @@
 
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import { page } from "$app/stores";
-    import { onMount } from "svelte";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
@@ -298,6 +297,31 @@
 
     let imgWidthStyle = $derived(imgContainerSizes.clientHeight > imgContainerSizes.clientWidth ? "100%" : "auto");
     let imgHeightStyle = $derived(imgWidthStyle == "auto" ? "100%" : "auto");
+    
+    function regionDragCondition(e: OnDragStart): boolean {
+        let input: { clientX: number; clientY: number } | null = e.inputEvent;
+        
+        if ((input?.clientX == undefined || input?.clientY == undefined) && e.inputEvent instanceof TouchEvent) {
+            input = e.inputEvent.touches.item(0);
+        }
+        
+        if (!input) {
+            console.log("No input found", e);
+            return false;
+        }
+        
+
+        const offset = 10;
+        const left = imgCanvasBounds.left - offset - window.scrollX;
+        const top = imgCanvasBounds.top - offset - window.scrollY;
+        const right = imgCanvasBounds.right + offset - window.scrollX;
+        const bottom = imgCanvasBounds.bottom + offset - window.scrollY;
+
+        const withinX = input.clientX >= left && input.clientX <= right;
+        const withinY = input.clientY >= top && input.clientY <= bottom;
+
+        return withinX && withinY;
+    }
 </script>
 
 <RequiresWasm init={initWasm} />
@@ -429,18 +453,7 @@
         selectFromInside={false}
         selectableTargets={[".region"]}
         boundContainer={imgCanvas}
-        dragCondition={(e) => {
-            const offset = 10;
-            const left = imgCanvasBounds.left - offset - window.scrollX;
-            const top = imgCanvasBounds.top - offset - window.scrollY;
-            const right = imgCanvasBounds.right + offset - window.scrollX;
-            const bottom = imgCanvasBounds.bottom + offset - window.scrollY;
-
-            const withinX = e.inputEvent.clientX >= left && e.inputEvent.clientX <= right;
-            const withinY = e.inputEvent.clientY >= top && e.inputEvent.clientY <= bottom;
-
-            return withinX && withinY;
-        }}
+        dragCondition={regionDragCondition}
         on:dragEnd={async ({ detail: e }) => {
             if (!e.isSelect) return;
 
