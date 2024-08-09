@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { writable, type Readable, type Writable } from "svelte/store";
 
@@ -11,7 +13,7 @@
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
-    let hasLayers = writable<boolean>(true);
+    let hasLayers = $state<boolean>(true);
 
     let loadPromise = createLazyPromise<null>();
 
@@ -41,7 +43,7 @@
 
     async function handleSkinFile(file: File) {
         await loadPromise;
-        let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, $hasLayers);
+        let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, hasLayers);
 
         try {
             let model = result;
@@ -91,7 +93,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <label for="has-layers">Has layers:</label>
-                    <input type="checkbox" name="has-layers" id="has-layers" bind:checked={$hasLayers} />
+                    <input type="checkbox" name="has-layers" id="has-layers" bind:checked={hasLayers} />
                 </div>
             </div>
         </div>
@@ -99,6 +101,6 @@
 
     <div class="flex flex-col items-center">
         <h2 class="max-w-fit text-center text-2xl">Input</h2>
-        <SkinDropZone slimArms={hasSlimArms} on:files={handleSkinFiles} />
+        <SkinDropZone bind:slimArms={$hasSlimArms} onfiles={handleSkinFiles} />
     </div>
 </div>

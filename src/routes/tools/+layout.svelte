@@ -1,5 +1,10 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { page } from "$app/stores";
+    import type { Snippet } from "svelte";
+
+    let { children } = $props<{ children: Snippet }>();
 </script>
 
 {#if !$page.data.noDescription}
@@ -18,4 +23,4 @@
     </div>
 </noscript>
 
-<slot />
+{@render children()}
