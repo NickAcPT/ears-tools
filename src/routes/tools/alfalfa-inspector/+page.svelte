@@ -184,7 +184,7 @@
     async function updateAlfalfaDataFromFile(file: File) {
         let fileData = new Uint8Array(await file.arrayBuffer());
 
-        let alfalfaData = <Record<AlfalfaKey, AlfalfaEntryData>>read_alfalfa_data(fileData);
+        let alfalfaData = read_alfalfa_data(fileData) as Record<AlfalfaKey, AlfalfaEntryData>;
 
         data = new AlfalfaData(alfalfaData);
     }

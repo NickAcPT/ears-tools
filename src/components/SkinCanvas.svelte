@@ -109,7 +109,7 @@
                 throw new Error("WebGPU is not supported - Performing fallback");
             }
 
-            module = <SkinRendererModule>await renderers[`../tools/skin-renderer/${name}.js`]();
+            module = await renderers[`../tools/skin-renderer/${name}.js`]() as SkinRendererModule;
 
             let init = module?.default;
             let initialize = module?.initialize;
@@ -119,6 +119,7 @@
                     console.log("An error occurred while initializing the skin renderer module, falling back", e);
                     fallbackRenderingSupport();
                 };
+                
                 await init().catch(handleError);
                 
                 console.log("Initialized skin renderer module", width, height)
