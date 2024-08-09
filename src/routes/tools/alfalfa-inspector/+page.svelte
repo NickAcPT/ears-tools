@@ -197,7 +197,7 @@
             return;
         }
 
-        uploadEntryData(new CustomEvent("upload", null));
+        uploadEntryData(new CustomEvent("upload", { detail: null }));
     }
 
     function downloadCurrentSkin() {

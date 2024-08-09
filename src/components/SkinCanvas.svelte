@@ -1,4 +1,5 @@
 <svelte:options runes />
+
 <script lang="ts">
     import { browser, dev } from "$app/environment";
     import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
@@ -8,23 +9,24 @@
     import type { HTMLCanvasAttributes } from "svelte/elements";
     import { type Writable } from "svelte/store";
     import { preventDefault } from "$lib/misc";
+    import { untrack } from "svelte";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
     interface SkinCanvasProps extends HTMLCanvasAttributes {
         width: number;
         height: number;
-        showDevInfo: boolean;
-        showCape: boolean;
-        slimArms: boolean;
-        renderLayers: boolean;
-        renderEars: boolean;
+        showDevInfo?: boolean;
+        showCape?: boolean;
+        slimArms?: boolean;
+        renderLayers?: boolean;
+        renderEars?: boolean;
         currentRenderingSupport: Writable<RenderingSupport>;
         camera?: SkinCanvasCameraSettings;
         sun?: SkinCanvasSunSettings;
         skin: File | null;
     }
-    
+
     let {
         width = 512,
         height = 832,
@@ -41,13 +43,13 @@
             distance: 45,
             look_at: [0, 16.5, 0],
         },
-        
+
         sun = $bindable({
             direction: [0.0, 1.0, 1.0],
             renderShading: true,
             intensity: 2.0,
         }),
-        
+
         skin = null,
 
         ...rest
@@ -191,6 +193,7 @@
         slimArms: boolean,
         showCape: boolean
     ) {
+        await Promise.resolve();
         console.log(skinFile, camera, sun, renderEars, renderLayers, slimArms);
 
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
@@ -202,12 +205,12 @@
             let cameraSettings = get_camera();
             let sunSettings = get_sun();
 
-            camera.distance = cameraSettings.distance;
-            camera.rotation = [cameraSettings.rotation[0], cameraSettings.rotation[1], cameraSettings.rotation[2]];
+            untrack(() => {
+                camera.distance = cameraSettings.distance;
+                camera.rotation = [cameraSettings.rotation[0], cameraSettings.rotation[1], cameraSettings.rotation[2]];
 
-            sun.direction = [sunSettings.direction[0], sunSettings.direction[1], sunSettings.direction[2]];
-            //sun.intensity = sunSettings.intensity;
-            //sun.ambient = sunSettings.ambient;
+                sun.direction = [sunSettings.direction[0], sunSettings.direction[1], sunSettings.direction[2]];
+            });
 
             sunSettings.free();
             cameraSettings.free();
@@ -319,7 +322,6 @@
             onpointerup={preventDefault(handlePointerUp)}
             onpointermove={preventDefault(handlePointerMove)}
             onwheel={preventDefault(handleScroll)}
-            
             {...rest}
         ></canvas>
     </div>

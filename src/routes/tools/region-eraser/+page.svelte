@@ -35,7 +35,7 @@
     let imgContainerSizes = $state({ clientWidth: 1, clientHeight: 1 });
     let skinDropZone: SkinDropZone;
 
-    let demoUsesSlimSkin = writable(false);
+    let demoUsesSlimSkin = $state(false);
 
     async function initWasm() {
         if (!browser) {
@@ -103,7 +103,7 @@
 
     let workspace: EarsImageWorkspace | undefined = $state(undefined);
     let regions: EraseRegion[] = $state([]);
-    let lastSkin: File | undefined = $state(undefined);
+    let lastSkin: File | null = $state(null);
 
     async function handleFile(file: File) {
         workspace?.free();
@@ -138,7 +138,7 @@
             regions = workspace.get_regions();
         } catch (error) {
             alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
-            lastSkin = undefined;
+            lastSkin = null;
             workspace?.free();
             workspace = undefined;
             regions = [];
@@ -148,7 +148,7 @@
 
     async function onImageError() {
         alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
-        lastSkin = undefined;
+        lastSkin = null;
         workspace = undefined;
         regions = [];
     }
@@ -333,12 +333,12 @@
             {/if}
         </div>
 
-        <SkinDropZone bind:this={skinDropZone} slimArms={demoUsesSlimSkin} on:files={handleSkinFiles} />
+        <SkinDropZone bind:this={skinDropZone} slimArms={demoUsesSlimSkin} onfiles={handleSkinFiles} />
 
         <div class="flex flex-col gap-2">
             <div class="flex gap-2">
                 <label for="slim-skin">Use slim skin</label>
-                <input type="checkbox" id="slim-skin" bind:checked={$demoUsesSlimSkin} />
+                <input type="checkbox" id="slim-skin" bind:checked={demoUsesSlimSkin} />
             </div>
             {#if $renderingSupport == RenderingSupport.SoftwareRendering}
                 <div class="min-w-none w-full break-words">
@@ -382,7 +382,7 @@
                     on:loaded={updateSkinFile}
                     class="flex-1 object-contain"
                     skin={lastSkin}
-                    slimArms={$demoUsesSlimSkin}
+                    slimArms={demoUsesSlimSkin}
                 />
             </div>
         </div>
