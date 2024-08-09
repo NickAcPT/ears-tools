@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { AlfalfaData, type AlfalfaEntry, type AlfalfaEntryData, type AlfalfaKey } from "$lib/alfalfa-inspector";
     import saveAs from "file-saver";
@@ -12,12 +14,12 @@
     import { createLazyPromise } from "$lib/misc";
     import UploadIcon from "../../../components/icons/UploadIcon.svelte";
 
-    let data: AlfalfaData = new AlfalfaData({});
+    let data: AlfalfaData = $state(new AlfalfaData({}));
 
-    let currentSkin: File | null = null;
+    let currentSkin: File | null = $state(null);
 
-    let newEntryKey: AlfalfaKey = "";
-    let newEntryValue: string = "";
+    let newEntryKey: AlfalfaKey = $state("");
+    let newEntryValue: string = $state("");
 
     let loadPromise = createLazyPromise<null>();
 
@@ -216,7 +218,9 @@
         goto("/tools/region-eraser");
     }
 
-    $: currentSkin && updateAlfalfaDataFromFile(currentSkin);
+    $effect(() => {
+        if (currentSkin) updateAlfalfaDataFromFile(currentSkin);
+    });
 </script>
 
 <RequiresWasm init={initWasm} />
@@ -228,12 +232,12 @@
                 <p class="text-center">Currently inspecting file &quot;{currentSkin.name}&quot;.</p>
 
                 <div class="flex gap-2">
-                    <button on:click={downloadCurrentSkin}>Download edited file</button>
-                    <button on:click={closeCurrentFile}>Close current file</button>
+                    <button onclick={downloadCurrentSkin}>Download edited file</button>
+                    <button onclick={closeCurrentFile}>Close current file</button>
                 </div>
             </div>
         {:else}
-            <SkinDropZone on:files={handleFiles} />
+            <SkinDropZone onfiles={handleFiles} />
         {/if}
     </div>
 
@@ -253,9 +257,9 @@
                 <input type="text" bind:value={newEntryKey} />
                 <div class="grid grid-cols-[3fr_1fr] gap-2">
                     <input type="text" bind:value={newEntryValue} />
-                    <button class="flex flex-1 justify-center" on:click={uploadNewEntry}><UploadIcon class="h-5" />Upload</button>
+                    <button class="flex flex-1 justify-center" onclick={uploadNewEntry}><UploadIcon class="h-5" />Upload</button>
                 </div>
-                <button class="flex flex-1 justify-center" on:click={addNewEntry}><PlusIcon class="h-5" /></button>
+                <button class="flex flex-1 justify-center" onclick={addNewEntry}><PlusIcon class="h-5" /></button>
             </div>
         </div>
     {/if}

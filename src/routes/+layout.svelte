@@ -1,8 +1,13 @@
+<svelte:options runes />
+
 <script lang="ts">
     import "../app.css";
     import { page } from "$app/stores";
     import Navbar from "../components/Navbar.svelte";
     import { base } from "$app/paths";
+    import type { Snippet } from "svelte";
+    
+    let { children } = $props<{ children: Snippet }>();
 </script>
 
 <svelte:head>
@@ -31,7 +36,7 @@
 <Navbar />
 
 <article>
-    <slot />
+    {@render children()}
 </article>
 
 <style>
