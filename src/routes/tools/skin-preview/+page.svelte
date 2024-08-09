@@ -22,8 +22,8 @@
         lightsOut: false,
     });
 
-    let isSkinEmissive = writable(false);
-    let isManipulatorWasmLoaded = writable(false);
+    let isSkinEmissive = $state(false);
+    let isManipulatorWasmLoaded = $state(false);
 
     async function handleSkinFiles(event: CustomEvent<FileList>) {
         const files = event.detail;
@@ -38,17 +38,17 @@
     let sun: SkinCanvasSunSettings = $derived({
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
-        intensity: $isSkinEmissive && previewSettings.lightsOut ? 0.0 : undefined,
-        ambient: $isSkinEmissive && previewSettings.lightsOut ? 0.0 : undefined,
+        intensity: isSkinEmissive && previewSettings.lightsOut ? 0.0 : undefined,
+        ambient: isSkinEmissive && previewSettings.lightsOut ? 0.0 : undefined,
     });
 
     async function handleFile(file: File) {
         $lastSkin = file;
 
-        if ($isManipulatorWasmLoaded) {
+        if (isManipulatorWasmLoaded) {
             try {
                 const features: EarsFeatures | undefined = await get_ears_features(new Uint8Array(await file.arrayBuffer()));
-                $isSkinEmissive = features?.emissives?.enabled || false;
+                isSkinEmissive = features?.emissives?.enabled || false;
             } catch (e) {
                 console.warn("Failed to get skin features", e);
             }
@@ -62,7 +62,7 @@
 
         try {
             await initManipulator();
-            $isManipulatorWasmLoaded = true;
+            isManipulatorWasmLoaded = true;
         } catch (e) {
             console.warn("Failed to initialize ears manipulator", e);
         }
@@ -107,7 +107,7 @@
                 <input type="checkbox" id="show-cape" bind:checked={previewSettings.showCape} />
             </div>
 
-            {#if $isSkinEmissive}
+            {#if isSkinEmissive}
                 <div class="flex gap-2">
                     <label for="lights-out">
                         Lights out! <em>(To test emissive skins)</em>
