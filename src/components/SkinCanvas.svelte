@@ -193,7 +193,10 @@
         slimArms: boolean,
         showCape: boolean
     ) {
+        // According to https://github.com/sveltejs/svelte/issues/11978#issuecomment-2158564735, Svelte 5 tracks reactivity across function boundaries
+        // This call here is to break the reactivity chain and make sure that it doesn't loop infinitely 
         await Promise.resolve();
+        
         console.log(skinFile, camera, sun, renderEars, renderLayers, slimArms);
 
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
@@ -205,12 +208,10 @@
             let cameraSettings = get_camera();
             let sunSettings = get_sun();
 
-            untrack(() => {
-                camera.distance = cameraSettings.distance;
-                camera.rotation = [cameraSettings.rotation[0], cameraSettings.rotation[1], cameraSettings.rotation[2]];
+            camera.distance = cameraSettings.distance;
+            camera.rotation = [cameraSettings.rotation[0], cameraSettings.rotation[1], cameraSettings.rotation[2]];
 
-                sun.direction = [sunSettings.direction[0], sunSettings.direction[1], sunSettings.direction[2]];
-            });
+            sun.direction = [sunSettings.direction[0], sunSettings.direction[1], sunSettings.direction[2]];
 
             sunSettings.free();
             cameraSettings.free();
