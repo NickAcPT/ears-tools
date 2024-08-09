@@ -2,7 +2,6 @@
 
 <script lang="ts">
     import { writable } from "svelte/store";
-
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import { page } from "$app/stores";
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
@@ -15,11 +14,13 @@
 
     let skinDropZone: SkinDropZone;
 
-    let useSlimSkin = writable(false);
-    let showLayers = writable(true);
-    let showEars = writable(true);
-    let showCape = writable(true);
-    let lightsOut = writable(false);
+    let previewSettings = $state({
+        useSlimSkin: false,
+        showLayers: true,
+        showEars: true,
+        showCape: true,
+        lightsOut: false,
+    });
 
     let isSkinEmissive = writable(false);
     let isManipulatorWasmLoaded = writable(false);
@@ -37,8 +38,8 @@
     let sun: SkinCanvasSunSettings = $derived({
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
-        intensity: $isSkinEmissive && $lightsOut ? 0.0 : undefined,
-        ambient: $isSkinEmissive && $lightsOut ? 0.0 : undefined,
+        intensity: $isSkinEmissive && previewSettings.lightsOut ? 0.0 : undefined,
+        ambient: $isSkinEmissive && previewSettings.lightsOut ? 0.0 : undefined,
     });
 
     async function handleFile(file: File) {
@@ -83,27 +84,27 @@
             {/if}
         </div>
 
-        <SkinDropZone bind:this={skinDropZone} slimArms={useSlimSkin} on:files={handleSkinFiles} />
+        <SkinDropZone bind:this={skinDropZone} bind:slimArms={previewSettings.useSlimSkin} onfiles={handleSkinFiles} />
 
         <div class="flex flex-col gap-2">
             <div class="flex gap-2">
                 <label for="slim-skin">Use slim skin</label>
-                <input type="checkbox" id="slim-skin" bind:checked={$useSlimSkin} />
+                <input type="checkbox" id="slim-skin" bind:checked={previewSettings.useSlimSkin} />
             </div>
 
             <div class="flex gap-2">
                 <label for="show-layers">Show layers</label>
-                <input type="checkbox" id="show-layers" bind:checked={$showLayers} />
+                <input type="checkbox" id="show-layers" bind:checked={previewSettings.showLayers} />
             </div>
 
             <div class="flex gap-2">
                 <label for="show-ears">Show ears</label>
-                <input type="checkbox" id="show-ears" bind:checked={$showEars} />
+                <input type="checkbox" id="show-ears" bind:checked={previewSettings.showEars} />
             </div>
 
             <div class="flex gap-2">
                 <label for="show-cape">Show cape</label>
-                <input type="checkbox" id="show-cape" bind:checked={$showCape} />
+                <input type="checkbox" id="show-cape" bind:checked={previewSettings.showCape} />
             </div>
 
             {#if $isSkinEmissive}
@@ -111,7 +112,7 @@
                     <label for="lights-out">
                         Lights out! <em>(To test emissive skins)</em>
                     </label>
-                    <input type="checkbox" id="lights-out" bind:checked={$lightsOut} />
+                    <input type="checkbox" id="lights-out" bind:checked={previewSettings.lightsOut} />
                 </div>
             {/if}
 
@@ -132,10 +133,10 @@
             class="h-full flex-1 object-contain"
             style={$renderingSupport == RenderingSupport.SoftwareRendering ? "image-rendering: pixelated" : ""}
             skin={$lastSkin}
-            slimArms={$useSlimSkin}
-            showCape={$showCape}
-            renderLayers={$showLayers}
-            renderEars={$showEars}
+            slimArms={previewSettings.useSlimSkin}
+            showCape={previewSettings.showCape}
+            renderLayers={previewSettings.showLayers}
+            renderEars={previewSettings.showEars}
             showDevInfo={false}
             sun={sun}
         />

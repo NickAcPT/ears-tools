@@ -24,7 +24,12 @@ export function countValue(start: number, end: number): Record<string, number> {
     return result;   
 }
 
-
+export function preventDefault<T extends Event, TR>(handler: (e: T) => TR) {
+    return (e: T) => {
+        e.preventDefault();
+        handler(e);
+    };
+}
 
 type ResolvablePromise<T> = Promise<T> & { resolve: (v: T) => void };
         

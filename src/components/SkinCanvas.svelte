@@ -7,6 +7,7 @@
     import { page } from "$app/stores";
     import type { HTMLCanvasAttributes } from "svelte/elements";
     import { type Writable } from "svelte/store";
+    import { preventDefault } from "$lib/misc";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
@@ -296,13 +297,6 @@
             setupScene(skin, camera, sun, renderEars, renderLayers, slimArms, showCape);
         }
     });
-    
-    function preventDefault<T extends Event, TR>(handler: (e: T) => TR) {
-        return (e: T) => {
-            e.preventDefault();
-            handler(e);
-        };
-    }
 </script>
 
 {#if dev && showDevInfo}

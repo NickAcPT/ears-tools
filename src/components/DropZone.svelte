@@ -1,21 +1,28 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { writable } from "svelte/store";
-
-    const dispatch = createEventDispatcher();
-
-    export let hovered = writable(false);
+    import { preventDefault } from "$lib/misc";
+    import { type Snippet } from "svelte";
+    
+    interface DropZoneProps {
+        hovered?: boolean;
+        children?: Snippet;
+        
+        onfiles?: (files: FileList) => void;
+    }
+    
+    let { onfiles, children, hovered = false }: DropZoneProps = $props();
 
     function handleDrop(event: DragEvent) {
         event.preventDefault();
         if (event.dataTransfer?.files) {
-            dispatch("files", event.dataTransfer.files);
+            onfiles?.(event.dataTransfer.files);
         }
     }
 
     function handlePaste(e: ClipboardEvent) {
         if (e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
-            dispatch("files", e.clipboardData.files);
+            onfiles?.(e.clipboardData.files);
         }
     }
 </script>
@@ -26,11 +33,15 @@
     class="contents"
     role="form"
     aria-roledescription="File Upload"
-    on:dragenter|preventDefault={() => hovered.set(true)}
-    on:dragover|preventDefault={() => hovered.set(true)}
-    on:dragleave|preventDefault={() => hovered.set(false)}
-    on:drop|preventDefault={() => hovered.set(false)}
-    on:drop={handleDrop}
+    ondragenter={preventDefault(() => (hovered = true))}
+    ondragover={preventDefault(() => (hovered = true))}
+    ondragleave={preventDefault(() => (hovered = false))}
+    ondrop={preventDefault((e) => {
+        hovered = false;
+        handleDrop(e);
+    })}
 >
-    <slot />
+    {#if children}
+        {@render children()}
+    {/if}
 </div>
