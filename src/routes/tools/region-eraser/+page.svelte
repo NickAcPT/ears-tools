@@ -1,10 +1,12 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
     import { writable, type Writable } from "svelte/store";
     import { browser } from "$app/environment";
 
     import init, { decode_ears_image, EarsImageWorkspace, encode_ears_image } from "../../../tools/ears-eraser/ears_eraser";
 
-    import Selecto from "svelte-selecto";
+    import Selecto, { type OnDragStart } from "svelte-selecto";
     import Moveable, { type OnBeforeResize, type OnDrag, type OnResize } from "svelte-moveable";
     import saveAs from "file-saver";
 
@@ -24,23 +26,15 @@
         free?: () => void;
     }
 
-    onMount(() => {
-        let resizeObserver = new ResizeObserver(() => {
-            $regions = $regions;
-        });
 
-        resizeObserver.observe(imgCanvas);
+    let moveable: Moveable | null = $state<Moveable | null>(null);
 
-        return () => {
-            resizeObserver.disconnect();
-        };
-    });
+    let selectedRegionIndex: number | null = $state(null);
 
-    let moveable: Moveable;
-    let selectedRegionIndex: Writable<number | null> = writable(null);
+    let imgCanvas = $state<HTMLImageElement | null>(null);
+    let imgCanvasSizes = $state({ naturalWidth: 1, clientWidth: 1, naturalHeight: 1, clientHeight: 1 });
 
-    let imgCanvas: HTMLImageElement;
-    let imgContainer: HTMLDivElement;
+    let imgContainerSizes = $state({ clientWidth: 1, clientHeight: 1 });
     let skinDropZone: SkinDropZone;
 
     let demoUsesSlimSkin = writable(false);
@@ -68,21 +62,21 @@
     }
 
     function handleDragEvent(e: OnDrag) {
-        if (!isFinite(getImagePixelWidth()) || !isFinite(getImagePixelHeight())) return;
+        if (!isFinite(imagePixelWidth) || !isFinite(imagePixelHeight)) return;
 
         const left = roundToPixelWidth(e.translate[0]);
         const top = roundToPixelHeight(e.translate[1]);
         e.target.style.transform = "translate(" + left + "px, " + top + "px)";
 
         updateRegion(e.target, (r) => {
-            r.x = left / getImagePixelWidth();
-            r.y = top / getImagePixelHeight();
+            r.x = left / imagePixelWidth;
+            r.y = top / imagePixelHeight;
         });
     }
 
     function handleBeforeResizeEvent(e: OnBeforeResize) {
-        let width = roundToPixelWidth(e.boundingWidth) / getImagePixelHeight();
-        let height = roundToPixelHeight(e.boundingHeight) / getImagePixelHeight();
+        let width = roundToPixelWidth(e.boundingWidth) / imagePixelHeight;
+        let height = roundToPixelHeight(e.boundingHeight) / imagePixelHeight;
 
         width = Math.max(1, width);
         height = Math.max(1, height);
@@ -90,7 +84,7 @@
         width = Math.min(32, width);
         height = Math.min(32, height);
 
-        e.setSize([width * getImagePixelWidth(), height * getImagePixelHeight()]);
+        e.setSize([width * imagePixelWidth, height * imagePixelHeight]);
 
         updateRegion(e.target, (r) => {
             r.width = width;
@@ -109,72 +103,73 @@
         e.target.style.transform = e.transform;
     }
 
-    let workspace = writable<EarsImageWorkspace | undefined>(undefined);
-    let regions = writable<EraseRegion[]>([]);
-    let lastSkin = writable<File | undefined>(undefined);
+    let workspace: EarsImageWorkspace | undefined = $state(undefined);
+    let regions: EraseRegion[] = $state([]);
+    let lastSkin: File | undefined = $state(undefined);
 
     async function handleFile(file: File) {
-        $workspace?.free();
-        $workspace = undefined;
-        $lastSkin = file;
+        workspace?.free();
+        workspace = undefined;
+        lastSkin = file;
     }
 
     function removeRegion(index: number) {
-        $regions = $regions.filter((_, i) => i != index);
+        regions.splice(index);
 
-        if ($selectedRegionIndex == index) {
-            $selectedRegionIndex = null;
+        if (selectedRegionIndex == index) {
+            selectedRegionIndex = null;
         }
     }
 
-    $: imageSource =
-        ($lastSkin && URL.createObjectURL($lastSkin)) ?? "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA=";
+    let imageSource = $derived(
+        (lastSkin && URL.createObjectURL(lastSkin)) ?? "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBAAA="
+    );
 
     async function onImageLoad() {
-        if (!imgCanvas || !$lastSkin) return;
+        if (!imgCanvas || !lastSkin) return;
 
         try {
-            $workspace?.free();
-            $workspace = undefined;
+            workspace?.free();
+            workspace = undefined;
         } catch (error) {
             console.error("Failed to free previous workspace", error);
         }
 
         try {
-            $workspace = decode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()));
-            $regions = $workspace.get_regions();
+            workspace = decode_ears_image(new Uint8Array(await lastSkin.arrayBuffer()));
+            regions = workspace.get_regions();
         } catch (error) {
             alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
-            $lastSkin = undefined;
-            $workspace?.free();
-            $workspace = undefined;
-            $regions = [];
+            lastSkin = undefined;
+            workspace?.free();
+            workspace = undefined;
+            regions = [];
             console.error(error);
         }
     }
 
     async function onImageError() {
         alert("Failed to load skin file.\nAre you sure that's a valid Minecraft skin?\n(I'm looking for a PNG file)");
-        $lastSkin = undefined;
-        $workspace = undefined;
-        $regions = [];
+        lastSkin = undefined;
+        workspace = undefined;
+        regions = [];
     }
 
     async function updateSkinFile() {
         console.log("updateSkinFile");
-        if (!$workspace || !$lastSkin) return;
+        if (!workspace || !lastSkin) return;
 
-        const existingRegions: EraseRegion[] = $workspace.get_regions();
+        const existingRegions: EraseRegion[] = workspace.get_regions();
 
         document.querySelectorAll(".region.overlapping").forEach((element) => {
             element.classList.remove("overlapping");
         });
 
         const changed =
-            existingRegions.length != $regions.length ||
+            existingRegions.length != regions.length ||
             existingRegions
                 .map((region, i) => {
-                    const newRegion = $regions[i];
+                    const newRegion = regions[i];
 
                     const differentX = region.x != newRegion.x;
                     const differentY = region.y != newRegion.y;
@@ -189,10 +184,10 @@
 
         if (!changed) return;
 
-        $workspace.set_regions($regions);
-        const newImage = encode_ears_image(new Uint8Array(await $lastSkin.arrayBuffer()), $workspace);
+        workspace.set_regions(regions);
+        const newImage = encode_ears_image(new Uint8Array(await lastSkin.arrayBuffer()), workspace);
 
-        $lastSkin = new File([newImage], $lastSkin.name, { type: $lastSkin.type });
+        lastSkin = new File([newImage], lastSkin.name, { type: lastSkin.type });
     }
 
     let imgCanvasBounds = {
@@ -206,29 +201,24 @@
             return imgCanvas?.getBoundingClientRect().right ?? 0 + window.scrollX;
         },
         get bottom(): number {
-            return this.top + imgCanvas.clientHeight;
+            return this.top + (imgCanvas?.clientHeight ?? 0);
         },
     };
 
-    function getImagePixelWidth(): number {
-        return imgCanvas.clientWidth / imgCanvas.naturalWidth;
-    }
-
-    function getImagePixelHeight(): number {
-        return imgCanvas.clientHeight / imgCanvas.naturalHeight;
-    }
+    let imagePixelWidth: number = $derived(imgCanvasSizes.clientWidth / imgCanvasSizes.naturalWidth);
+    let imagePixelHeight: number = $derived(imgCanvasSizes.clientHeight / imgCanvasSizes.naturalHeight);
 
     function roundToPixelWidth(value: number): number {
-        return Math.round(value / getImagePixelWidth()) * getImagePixelWidth();
+        return Math.round(value / imagePixelWidth) * imagePixelWidth;
     }
 
     function roundToPixelHeight(value: number): number {
-        return Math.round(value / getImagePixelHeight()) * getImagePixelHeight();
+        return Math.round(value / imagePixelHeight) * imagePixelHeight;
     }
 
     function updateRegion(target: HTMLElement | SVGElement, block: (r: EraseRegion, index: number) => void) {
         const targetIndex = parseInt(target.getAttribute("data-region-id") ?? "0");
-        const region = $regions.find((_, i) => i == targetIndex);
+        const region = regions.find((_, i) => i == targetIndex);
         if (!region) return;
 
         block(region, targetIndex);
@@ -256,7 +246,7 @@
         if (region.y + region.height > 64) {
             region.height = 64 - region.y;
         }
-        
+
         // Regions can be at most 32x32 and at least 1x1
         region.width = Math.min(32, Math.max(1, region.width));
         region.height = Math.min(32, Math.max(1, region.height));
@@ -265,15 +255,15 @@
     }
 
     async function addRegion(x: number, y: number, w: number, h: number, index: number | null = null) {
-        if (!$workspace) return;
+        if (!workspace) return;
 
         let newRegion = sanitizeRegion({ x, y, width: w, height: h });
 
         if (index == null) {
-            $regions = [...$regions, newRegion];
-            $selectedRegionIndex = $regions.length - 1;
+            regions = [...regions, newRegion];
+            selectedRegionIndex = regions.length - 1;
         } else {
-            $regions[index] = newRegion;
+            regions[index] = newRegion;
         }
 
         await updateSkinFile();
@@ -286,15 +276,15 @@
     }
 
     async function handleDelete() {
-        let index = $selectedRegionIndex;
+        let index = selectedRegionIndex;
         if (index == null) return;
 
-        let region = $regions[index];
+        let region = regions[index];
         region?.free?.();
 
         removeRegion(index);
 
-        $selectedRegionIndex = null;
+        selectedRegionIndex = null;
 
         await updateSkinFile();
     }
@@ -306,10 +296,8 @@
         saveAs(src, "skin.png");
     }
 
-    let lastResize = Date.now();
-
-    $: imgWidthStyle = lastResize && imgContainer?.clientHeight > imgContainer?.clientWidth ? "100%" : "auto";
-    $: imgHeightStyle = imgWidthStyle == "auto" ? "100%" : "auto";
+    let imgWidthStyle = $derived(imgContainerSizes.clientHeight > imgContainerSizes.clientWidth ? "100%" : "auto");
+    let imgHeightStyle = $derived(imgWidthStyle == "auto" ? "100%" : "auto");
 </script>
 
 <RequiresWasm init={initWasm} />
@@ -352,11 +340,11 @@
                         to select a region
                     </li>
                     <li class="w-fit">
-                        <button on:click={handleDelete}>Delete</button>
+                        <button onclick={handleDelete}>Delete</button>
                         to delete the selected region
                     </li>
                     <li class="w-fit">
-                        <button on:click={saveImage}>Save image</button>
+                        <button onclick={saveImage}>Save image</button>
                         or right click on the image and
                         <kbd>Save image as...</kbd>
                         to save the skin
@@ -371,22 +359,26 @@
                     height={257}
                     on:loaded={updateSkinFile}
                     class="flex-1 object-contain"
-                    skin={$lastSkin}
+                    skin={lastSkin}
                     slimArms={$demoUsesSlimSkin}
                 />
             </div>
         </div>
     </div>
 
-    <div class="flex-1 portrait:aspect-square portrait:w-full" bind:this={imgContainer}>
+    <div
+        class="flex-1 portrait:aspect-square portrait:w-full"
+        bind:clientWidth={imgContainerSizes.clientWidth}
+        bind:clientHeight={imgContainerSizes.clientHeight}
+    >
         {#if imgCanvas}
-            {#each $regions as region, i (i)}
+            {#each regions as region, i (i)}
                 <div
                     class="region absolute block"
-                    class:selected={$selectedRegionIndex == i}
-                    style:transform="translate({region.x * getImagePixelWidth()}px, {region.y * getImagePixelHeight()}px)"
-                    style:width="{getImagePixelWidth() * region.width}px"
-                    style:height="{getImagePixelHeight() * region.height}px"
+                    class:selected={selectedRegionIndex == i}
+                    style:transform="translate({region.x * imagePixelWidth}px, {region.y * imagePixelHeight}px)"
+                    style:width="{imagePixelWidth * region.width}px"
+                    style:height="{imagePixelHeight * region.height}px"
                     data-region-id={i}
                 ></div>
             {/each}
@@ -396,11 +388,18 @@
             style:width={imgWidthStyle}
             style:height={imgHeightStyle}
             class="pixelated render aspect-square"
-            on:dragstart|preventDefault={() => false}
-            on:load={onImageLoad}
-            on:error={onImageError}
+            ondragstart={(e) => {
+                false;
+                e.preventDefault();
+            }}
+            onload={onImageLoad}
+            onerror={onImageError}
             src={imageSource}
             bind:this={imgCanvas}
+            bind:naturalWidth={imgCanvasSizes.naturalWidth}
+            bind:naturalHeight={imgCanvasSizes.naturalHeight}
+            bind:clientWidth={imgCanvasSizes.clientWidth}
+            bind:clientHeight={imgCanvasSizes.clientHeight}
             alt="Minecraft Skin"
         />
     </div>
@@ -408,7 +407,7 @@
 
 {#if browser}
     <Moveable
-        bind:this={moveable}
+        bind:moveable
         bounds={imgCanvasBounds}
         on:drag={({ detail: e }) => handleDragEvent(e)}
         on:beforeResize={({ detail: e }) => handleBeforeResizeEvent(e)}
@@ -421,7 +420,7 @@
         useResizeObserver
         useMutationObserver
         origin={false}
-        target={$selectedRegionIndex != null ? `.region[data-region-id="${$selectedRegionIndex}"]` : ""}
+        target={selectedRegionIndex != null ? `.region[data-region-id="${selectedRegionIndex}"]` : ""}
     />
 
     <Selecto
@@ -447,12 +446,12 @@
 
             let eventX = e.rect.left - imgCanvasBounds.left + window.scrollX;
             let eventY = e.rect.top - imgCanvasBounds.top + window.scrollY;
-            
-            let x = Math.round(eventX / getImagePixelWidth());
-            let y = Math.round(eventY / getImagePixelHeight());
 
-            let width = Math.round(e.rect.width / getImagePixelWidth());
-            let height = Math.round(e.rect.height / getImagePixelHeight());
+            let x = Math.round(eventX / imagePixelWidth);
+            let y = Math.round(eventY / imagePixelHeight);
+
+            let width = Math.round(e.rect.width / imagePixelWidth);
+            let height = Math.round(e.rect.height / imagePixelHeight);
 
             if (width < 1 || height < 1) {
                 return;
@@ -463,27 +462,21 @@
         on:selectEnd={({ detail: e }) => {
             if (e.isDragStart) {
                 e.inputEvent.preventDefault();
-                moveable.waitToChangeTarget().then(() => {
-                    moveable.dragStart(e.inputEvent);
+                moveable?.waitToChangeTarget().then(() => {
+                    moveable?.dragStart(e.inputEvent);
                 });
             }
 
             if (e.selected.length == 0) {
-                $selectedRegionIndex = null;
+                selectedRegionIndex = null;
             } else {
                 let regionId = e.selected[0]?.getAttribute("data-region-id");
-                $selectedRegionIndex = regionId ? parseInt(regionId) : null;
+                selectedRegionIndex = regionId ? parseInt(regionId) : null;
             }
         }}
     />
 {/if}
 
-<svelte:window
-    on:resize={() => {
-        $regions = $regions;
-        lastResize = Date.now();
-    }}
-/>
 <svelte:document on:keyup={handleKeyPress} />
 
 <style lang="postcss">
