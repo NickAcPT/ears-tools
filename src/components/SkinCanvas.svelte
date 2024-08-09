@@ -9,7 +9,6 @@
     import type { HTMLCanvasAttributes } from "svelte/elements";
     import { type Writable } from "svelte/store";
     import { preventDefault } from "$lib/misc";
-    import { untrack } from "svelte";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
@@ -197,7 +196,9 @@
         // This call here is to break the reactivity chain and make sure that it doesn't loop infinitely 
         await Promise.resolve();
         
-        console.log(skinFile, camera, sun, renderEars, renderLayers, slimArms);
+        if (dev) {
+            console.log(skinFile, camera, $state.snapshot(sun), renderEars, renderLayers, slimArms);
+        }
 
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
         if (module == null) throw new Error("Module is null");

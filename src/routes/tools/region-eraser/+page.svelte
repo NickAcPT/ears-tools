@@ -333,7 +333,7 @@
             {/if}
         </div>
 
-        <SkinDropZone bind:this={skinDropZone} slimArms={demoUsesSlimSkin} onfiles={handleSkinFiles} />
+        <SkinDropZone bind:this={skinDropZone} bind:slimArms={demoUsesSlimSkin} onfiles={handleSkinFiles} />
 
         <div class="flex flex-col gap-2">
             <div class="flex gap-2">
@@ -379,7 +379,6 @@
                     currentRenderingSupport={renderingSupport}
                     width={152}
                     height={257}
-                    on:loaded={updateSkinFile}
                     class="flex-1 object-contain"
                     skin={lastSkin}
                     slimArms={demoUsesSlimSkin}
