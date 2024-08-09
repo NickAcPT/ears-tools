@@ -63,9 +63,10 @@
             <svelte:fragment slot="file">cape texture</svelte:fragment>
         </SkinDropZone>
         {#if $capeImage}
-            <div class="flex-1">
+            <div class="flex flex-1 items-start gap-2">
                 <!-- prettier-ignore -->
                 <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([$capeImage], { type: "image/png" }))} alt="Cape texture" />
+                <button class="mt-2" on:click={() => $capeImage = undefined}>Remove</button>
             </div>
         {/if}
     </div>

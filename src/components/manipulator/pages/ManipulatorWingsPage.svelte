@@ -42,9 +42,10 @@
         </SkinDropZone>
         
         {#if $wingsImage}
-            <div class="flex-1">
+            <div class="flex flex-1 items-start gap-2">
                 <!-- prettier-ignore -->
                 <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([$wingsImage], { type: "image/png" }))} alt="Cape texture" />
+                <button class="mt-2" on:click={() => $wingsImage = undefined}>Remove</button>
             </div>
         {/if}
     </div>
