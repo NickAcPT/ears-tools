@@ -1,4 +1,11 @@
-<svg {...$$restProps} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<svelte:options runes />
+<script lang="ts">
+    import type { SVGAttributes } from "svelte/elements";
+
+    let { ...rest }: SVGAttributes<SVGSVGElement> = $props();
+</script>
+
+<svg {...rest} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <linearGradient
             id="b"

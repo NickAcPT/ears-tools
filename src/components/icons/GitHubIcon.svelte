@@ -1,4 +1,4 @@
-<svg  width="1em" height="1em" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">
+<svg  {...$$restProps} width="1em" height="1em" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">
     <path
         fill="currentColor"
         fill-rule="evenodd"
