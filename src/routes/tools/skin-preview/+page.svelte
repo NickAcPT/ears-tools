@@ -41,7 +41,7 @@
 
     async function handleFile(file: File) {
         $lastSkin = file;
-        
+
         if ($isManipulatorWasmLoaded) {
             try {
                 const features: EarsFeatures | undefined = await get_ears_features(new Uint8Array(await file.arrayBuffer()));
@@ -56,7 +56,7 @@
         if (!browser) {
             return Promise.resolve();
         }
-        
+
         try {
             await initManipulator();
             $isManipulatorWasmLoaded = true;
@@ -68,7 +68,7 @@
     $: skinDropZone && skinDropZone.selectDemoSkin();
 </script>
 
-<RequiresWasm init={initManipulatorWasm}/>
+<RequiresWasm init={initManipulatorWasm} />
 
 <div class="container flex gap-5 portrait:flex-col landscape:h-[calc(100dvh-var(--navbar-height))]">
     <div class="flex flex-shrink flex-col gap-5">

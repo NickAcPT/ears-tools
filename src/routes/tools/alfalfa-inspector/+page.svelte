@@ -170,7 +170,7 @@
             alert("Please only drop one file. Amount of files dropped: " + files.length);
             return;
         }
-        
+
         if (files.length === 0) {
             debugger;
             return;

@@ -25,7 +25,6 @@
         free?: () => void;
     }
 
-
     let moveable: Moveable | null = $state<Moveable | null>(null);
 
     let selectedRegionIndex: number | null = $state(null);
@@ -297,19 +296,18 @@
 
     let imgWidthStyle = $derived(imgContainerSizes.clientHeight > imgContainerSizes.clientWidth ? "100%" : "auto");
     let imgHeightStyle = $derived(imgWidthStyle == "auto" ? "100%" : "auto");
-    
+
     function regionDragCondition(e: OnDragStart): boolean {
         let input: { clientX: number; clientY: number } | null = e.inputEvent;
-        
+
         if ((input?.clientX == undefined || input?.clientY == undefined) && e.inputEvent instanceof TouchEvent) {
             input = e.inputEvent.touches.item(0);
         }
-        
+
         if (!input) {
             console.log("No input found", e);
             return false;
         }
-        
 
         const offset = 10;
         const left = imgCanvasBounds.left - offset - window.scrollX;
