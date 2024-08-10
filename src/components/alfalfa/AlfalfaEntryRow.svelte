@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { AlfalfaEntry } from "$lib/alfalfa-inspector";
+    import type { AlfalfaEntry } from "$lib/alfalfa-inspector.svelte";
     import { createEventDispatcher } from "svelte";
     import DownloadIcon from "../icons/DownloadIcon.svelte";
     import UploadIcon from "../icons/UploadIcon.svelte";

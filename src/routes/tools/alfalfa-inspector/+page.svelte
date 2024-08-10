@@ -1,7 +1,7 @@
 <svelte:options runes />
 
 <script lang="ts">
-    import { AlfalfaData, type AlfalfaEntry, type AlfalfaEntryData, type AlfalfaKey } from "$lib/alfalfa-inspector";
+    import { AlfalfaData, type AlfalfaEntry, type AlfalfaEntryData, type AlfalfaKey } from "$lib/alfalfa-inspector.svelte";
     import saveAs from "file-saver";
     import PlusIcon from "../../../components/icons/PlusIcon.svelte";
     import AlfalfaEntryRow from "../../../components/alfalfa/AlfalfaEntryRow.svelte";
@@ -16,10 +16,15 @@
 
     let data: AlfalfaData = $state(new AlfalfaData({}));
 
-    let currentSkin: File | null = $state(null);
+    let uploadedSkin: File | null = $state(null);
 
-    let newEntryKey: AlfalfaKey = $state("");
-    let newEntryValue: string = $state("");
+    let newEntry = $state<{
+        key: AlfalfaKey;
+        value: string;
+    }>({
+        key: "",
+        value: "",
+    });
 
     let loadPromise = createLazyPromise<null>();
 
@@ -44,22 +49,21 @@
     }
 
     function addNewEntry() {
-        const validationResult = validateName(newEntryKey);
+        const validationResult = validateName(newEntry.key);
 
         if (validationResult) {
             alert(validationResult);
             return;
         }
 
-        if (newEntryValue === "") {
+        if (newEntry.value === "") {
             alert("Please enter a value");
             return;
         }
-        data.set(newEntryKey, { type: "binary", value: new TextEncoder().encode(newEntryValue) });
-        notifyDataChange();
+        data.set(newEntry.key, { type: "binary", value: new TextEncoder().encode(newEntry.value) });
 
-        newEntryKey = "";
-        newEntryValue = "";
+        newEntry.key = "";
+        newEntry.value = "";
     }
 
     function downloadEntryData(e: CustomEvent<AlfalfaEntry>) {
@@ -86,7 +90,6 @@
         }
 
         data.delete(entry.key);
-        notifyDataChange();
     }
 
     function uploadEntryData(e: CustomEvent<AlfalfaEntry | null>) {
@@ -113,19 +116,17 @@
                 const fileData = new Uint8Array(reader.result as ArrayBuffer);
                 if (entry === null) {
                     // Uploading a new entry.
-                    const result = validateName(newEntryKey);
+                    const result = validateName(newEntry.key);
 
                     if (result) {
                         alert(result);
                         return;
                     }
 
-                    data.set(newEntryKey, { type: "binary", value: fileData });
+                    data.set(newEntry.key, { type: "binary", value: fileData });
                 } else {
                     entry.value.value = fileData;
                 }
-
-                notifyDataChange();
             });
             reader.readAsArrayBuffer(file);
         });
@@ -140,14 +141,16 @@
         loadPromise.resolve(null);
     }
 
-    async function notifyDataChange() {
-        // Update our skin file
-        if (currentSkin) {
-            try {
-                let skinData = new Uint8Array(await currentSkin.arrayBuffer());
-                let fileData = write_alfalfa_data(skinData, data.data);
+    async function makeEditedSkin(data: AlfalfaData): Promise<File | undefined> {
+        await Promise.resolve();
 
-                currentSkin = new File([fileData], currentSkin.name, { type: currentSkin.type });
+        // Update our skin file
+        if (uploadedSkin) {
+            try {
+                let skinData = new Uint8Array(await uploadedSkin.arrayBuffer());
+                let fileData = write_alfalfa_data(skinData, $state.snapshot(data.data));
+
+                return new File([fileData], uploadedSkin.name, { type: uploadedSkin.type });
             } catch (error) {
                 if (error instanceof Error) {
                     if (error.message.includes("Cannot write more than 1428 bytes of data")) {
@@ -159,6 +162,8 @@
                     }
                 }
                 console.error("Failed to update skin file", error);
+
+                return undefined;
             }
         }
     }
@@ -180,7 +185,7 @@
 
         let file = files[0];
 
-        currentSkin = file;
+        uploadedSkin = file;
     }
 
     async function updateAlfalfaDataFromFile(file: File) {
@@ -192,7 +197,7 @@
     }
 
     function uploadNewEntry() {
-        const validationResult = validateName(newEntryKey);
+        const validationResult = validateName(newEntry.key);
 
         if (validationResult) {
             alert(validationResult);
@@ -202,32 +207,38 @@
         uploadEntryData(new CustomEvent("upload", { detail: null }));
     }
 
-    function downloadCurrentSkin() {
-        if (currentSkin) {
-            saveAs(currentSkin);
+    async function downloadCurrentSkin() {
+        let out = await editedSkin;
+
+        if (out) {
+            saveAs(out);
         }
     }
 
     function closeCurrentFile() {
-        currentSkin = null;
+        uploadedSkin = null;
         data = new AlfalfaData({});
     }
 
     function openInEraserTool(e: CustomEvent<AlfalfaEntry>) {
-        $earsRegionEditorCurrentFile = currentSkin;
+        $earsRegionEditorCurrentFile = uploadedSkin;
         goto("/tools/region-eraser");
     }
 
-    $effect(() => { currentSkin && updateAlfalfaDataFromFile(currentSkin); });
+    $effect(() => {
+        uploadedSkin && updateAlfalfaDataFromFile(uploadedSkin);
+    });
+
+    let editedSkin = $derived.by(async () => await makeEditedSkin(data));
 </script>
 
 <RequiresWasm init={initWasm} />
 
 <div class="container flex flex-col gap-2">
     <div class="flex items-center justify-center">
-        {#if currentSkin}
+        {#if uploadedSkin}
             <div class="flex flex-col gap-2">
-                <p class="text-center">Currently inspecting file &quot;{currentSkin.name}&quot;.</p>
+                <p class="text-center">Currently inspecting file &quot;{uploadedSkin.name}&quot;.</p>
 
                 <div class="flex gap-2">
                     <button onclick={downloadCurrentSkin}>Download edited file</button>
@@ -239,7 +250,7 @@
         {/if}
     </div>
 
-    {#if currentSkin}
+    {#if uploadedSkin}
         <div class="grid grid-rows-[auto] gap-2">
             {#each data.entries() as entry (entry.key)}
                 <AlfalfaEntryRow
@@ -252,9 +263,9 @@
             {/each}
 
             <div class="grid grid-cols-[1fr_2fr_1fr] gap-2">
-                <input type="text" bind:value={newEntryKey} />
+                <input type="text" bind:value={newEntry.key} />
                 <div class="grid grid-cols-[3fr_1fr] gap-2">
-                    <input type="text" bind:value={newEntryValue} />
+                    <input type="text" bind:value={newEntry.value} />
                     <button class="flex flex-1 justify-center" onclick={uploadNewEntry}><UploadIcon class="h-5" />Upload</button>
                 </div>
                 <button class="flex flex-1 justify-center" onclick={addNewEntry}><PlusIcon class="h-5" /></button>

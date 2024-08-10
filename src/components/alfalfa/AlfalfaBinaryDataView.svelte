@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { AlfalfaBinaryEntryData } from "$lib/alfalfa-inspector";
+    import type { AlfalfaBinaryEntryData } from "$lib/alfalfa-inspector.svelte";
 
     export let data: AlfalfaBinaryEntryData;
 

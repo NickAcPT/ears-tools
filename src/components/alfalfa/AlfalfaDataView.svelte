@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { AlfalfaEntryData } from "$lib/alfalfa-inspector";
+    import type { AlfalfaEntryData } from "$lib/alfalfa-inspector.svelte";
     import AlfalfaBinaryDataView from "./AlfalfaBinaryDataView.svelte";
     import AlfalfaEraseDataView from "./AlfalfaEraseDataView.svelte";
     import AlfaflaImageDataView from "./AlfalfaImageDataView.svelte";

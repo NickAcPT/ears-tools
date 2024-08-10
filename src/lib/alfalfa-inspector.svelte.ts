@@ -29,7 +29,10 @@ export type AlfalfaEntry = {
 };
 
 export class AlfalfaData {
-    constructor(public data: Record<AlfalfaKey, AlfalfaEntryData>) {
+    public data: Record<AlfalfaKey, AlfalfaEntryData> = $state({});
+    
+    constructor(data: Record<AlfalfaKey, AlfalfaEntryData>) {
+        this.data = data;
     }
 
     get(key: AlfalfaKey): AlfalfaEntryData | undefined {
