@@ -8,26 +8,26 @@
         hovered?: boolean;
         children?: Snippet;
         
-        onfiles?: (files: FileList) => void;
+        onfiles?: (files: CustomEvent<FileList>) => void;
     }
     
-    let { onfiles, children, hovered = false }: DropZoneProps = $props();
+    let { onfiles, children, hovered = $bindable(false) }: DropZoneProps = $props();
 
     function handleDrop(event: DragEvent) {
         event.preventDefault();
         if (event.dataTransfer?.files) {
-            onfiles?.(event.dataTransfer.files);
+            onfiles?.(new CustomEvent("files", { detail: event.dataTransfer.files }));
         }
     }
 
     function handlePaste(e: ClipboardEvent) {
         if (e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
-            onfiles?.(e.clipboardData.files);
+            onfiles?.(new CustomEvent("files", { detail: e.clipboardData.files }));
         }
     }
 </script>
 
-<svelte:window on:paste={handlePaste} />
+<svelte:window onpaste={handlePaste} />
 
 <div
     class="contents"

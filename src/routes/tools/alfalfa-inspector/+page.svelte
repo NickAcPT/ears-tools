@@ -218,9 +218,7 @@
         goto("/tools/region-eraser");
     }
 
-    $effect(() => {
-        if (currentSkin) updateAlfalfaDataFromFile(currentSkin);
-    });
+    $effect(() => { currentSkin && updateAlfalfaDataFromFile(currentSkin); });
 </script>
 
 <RequiresWasm init={initWasm} />

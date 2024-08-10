@@ -93,7 +93,7 @@
     skin
 {/snippet}
 
-<DropZone hovered={pickerHovered} on:files>
+<DropZone bind:hovered={pickerHovered} {onfiles}>
     <div
         class="flex h-fit w-full max-w-2xl flex-col justify-around gap-5 rounded-2xl border-2 border-dashed border-accent-500 p-10 {pickerBgClass} items-center"
     >
