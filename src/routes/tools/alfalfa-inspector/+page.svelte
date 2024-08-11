@@ -62,12 +62,17 @@
 
     function downloadEntryData(e: CustomEvent<AlfalfaEntry>) {
         let entry = e.detail;
-
-        if (entry.value.type !== "binary") {
+        
+        if (entry.value.type === "erase") {
             throw new Error("Cannot download non-binary data");
         }
+        
+        let extension = "bin";
+        if (entry.value.type === "image") {
+            extension = "png";
+        }
 
-        saveAs(new Blob([entry.value.value]), entry.key + ".bin");
+        saveAs(new Blob([entry.value.value]), `${entry.key}.${extension}`);
     }
 
     function deleteEntry(e: CustomEvent<AlfalfaEntry>): any {
