@@ -1,7 +1,9 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { EarsAnchor, EarsMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { currentEarsFeatures, getEarsFeatures, manipulatorWizardPageTitle } from "$lib/stores.svelte";
+    import { currentEarsFeatures, manipulatorWizardPageTitle } from "$lib/stores.svelte";
 
     $manipulatorWizardPageTitle = "Ears";
 </script>

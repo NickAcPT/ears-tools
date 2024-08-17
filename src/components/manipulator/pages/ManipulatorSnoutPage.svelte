@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { FeatureStatus, type SnoutSettings } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";

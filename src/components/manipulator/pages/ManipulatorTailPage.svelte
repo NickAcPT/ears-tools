@@ -10,8 +10,16 @@
     $manipulatorShowCape = false;
 
     const segmentCountElement = countValue(1, 4);
-    
-    $inspect(currentEarsFeatures.current).with(console.log);
+
+    $effect(() => {
+        const tail = currentEarsFeatures.current.tail;
+        const bends = tail.bends;
+        if (tail.segments > 0) {
+            for (let i = bends.length; i < tail.segments; i++) {
+                tail.bends[i] = 0;
+            }
+        }
+    });
 </script>
 
 <div>
@@ -25,18 +33,30 @@
 </div>
 <div>
     <h3 class="text-xl">Segments</h3>
-    <ManipulatorEnumPicker elements={segmentCountElement} kind="tail-segment-count" bind:value={currentEarsFeatures.current.tail.segments} class="px-10 py-5">
-    </ManipulatorEnumPicker>
+    <ManipulatorEnumPicker
+        elements={segmentCountElement}
+        kind="tail-segment-count"
+        bind:value={currentEarsFeatures.current.tail.segments}
+        class="px-10 py-5"
+    ></ManipulatorEnumPicker>
 </div>
 
 <div>
     <h3 class="text-xl">Bends</h3>
 
     <div class="grid grid-cols-2 justify-items-center">
-        {#each currentEarsFeatures.current.tail.bends as bend, i}
+        {#each currentEarsFeatures.current.tail.bends as _, i}
             <div>
                 <label for="tail-bend-{i}">Bend {i + 1}</label>
-                <input type="range" id="tail-bend-{i}" min="-90" max="90" step="15" bind:value={currentEarsFeatures.current.tail.bends[i]} disabled={i >= currentEarsFeatures.current.tail.segments} />
+                <input
+                    type="range"
+                    id="tail-bend-{i}"
+                    min="-90"
+                    max="90"
+                    step="15"
+                    bind:value={currentEarsFeatures.current.tail.bends[i]}
+                    disabled={i >= currentEarsFeatures.current.tail.segments}
+                />
             </div>
         {/each}
     </div>

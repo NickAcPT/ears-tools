@@ -138,8 +138,6 @@
         await init();
         manipulatorInitialized = true;
     }
-
-    $inspect($manipulatorShowCape).with(console.log);
 </script>
 
 <RequiresWasm init={initWasm} />

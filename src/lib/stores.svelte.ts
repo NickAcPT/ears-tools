@@ -82,6 +82,8 @@ class EarsFeaturesHolder {
 
 export let currentEarsFeatures: EarsFeaturesHolder = new EarsFeaturesHolder();
 
+
+
 export function getEarsFeatures(): EarsFeatures {
     return currentEarsFeatures.current;
 }

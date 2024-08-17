@@ -54,7 +54,6 @@
         }
 
         palette.splice(i, 1);
-        console.log("Pray this works", palette);
     }
 </script>
 
