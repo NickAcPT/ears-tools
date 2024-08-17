@@ -16,14 +16,16 @@
 
 <div>
     <h3 class="text-xl">Mode</h3>
-    <ManipulatorEnumPicker let:element elements={TailMode} kind="tail-mode" bind:value={currentEarsFeatures.current.tail.mode} class="px-10 py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
+    <ManipulatorEnumPicker elements={TailMode} kind="tail-mode" bind:value={currentEarsFeatures.current.tail.mode} class="px-10 py-5">
+        {#snippet children(element)}
+            <canvas class="flex-1" width="96" height="96"></canvas>
+            {element}
+        {/snippet}
     </ManipulatorEnumPicker>
 </div>
 <div>
     <h3 class="text-xl">Segments</h3>
-    <ManipulatorEnumPicker  elements={segmentCountElement} kind="tail-segment-count" bind:value={currentEarsFeatures.current.tail.segments} class="px-10 py-5">
+    <ManipulatorEnumPicker elements={segmentCountElement} kind="tail-segment-count" bind:value={currentEarsFeatures.current.tail.segments} class="px-10 py-5">
     </ManipulatorEnumPicker>
 </div>
 

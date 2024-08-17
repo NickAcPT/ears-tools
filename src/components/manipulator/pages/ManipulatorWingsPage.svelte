@@ -21,16 +21,20 @@
 <h2 class="text-2xl">Wings</h2>
 <div>
     <h3 class="text-xl">Mode</h3>
-    <ManipulatorEnumPicker let:element elements={WingsMode} kind="wings-mode" bind:value={currentEarsFeatures.current.wings.mode} class="py-4">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
+    <ManipulatorEnumPicker elements={WingsMode} kind="wings-mode" bind:value={currentEarsFeatures.current.wings.mode} class="py-4">
+        {#snippet children(element)}
+            <canvas class="flex-1" width="96" height="96"></canvas>
+            {element}
+        {/snippet}
     </ManipulatorEnumPicker>
 </div>
 <div>
     <h3 class="text-xl">Animations</h3>
-    <ManipulatorEnumPicker let:element elements={WingsAnimations} kind="wings-animations" bind:value={currentEarsFeatures.current.wings.animations} class="py-4">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
+    <ManipulatorEnumPicker elements={WingsAnimations} kind="wings-animations" bind:value={currentEarsFeatures.current.wings.animations} class="py-4">
+        {#snippet children(element)}
+            <canvas class="flex-1" width="96" height="96"></canvas>
+            {element}
+        {/snippet}
     </ManipulatorEnumPicker>
 </div>
 

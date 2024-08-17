@@ -51,13 +51,14 @@
         );
     }
     
-    $inspect(snout.current).with(console.log);
 </script>
 
 <div>
-    <ManipulatorEnumPicker let:element elements={FeatureStatus} kind="snout-mode" bind:value={snout.current} class="px-10 py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
+    <ManipulatorEnumPicker elements={FeatureStatus} kind="snout-mode" bind:value={snout.current} class="px-10 py-5">
+        {#snippet children(element)}
+            <canvas class="flex-1" width="96" height="96"></canvas>
+            {element}
+        {/snippet}
     </ManipulatorEnumPicker>
 </div>
 

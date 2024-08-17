@@ -6,7 +6,7 @@
         kind: string;
         value: number | number[];
         class?: string;
-        children?: Snippet<[string]>
+        children?: (element: string) => ReturnType<import("svelte").Snippet>
     }
 
     import { enumKeys } from "$lib/misc";
