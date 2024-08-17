@@ -1,7 +1,7 @@
 <script lang="ts">
     import { TailMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { tailMode, tailBends, tailSegments, manipulatorWizardPageTitle, manipulatorShowCape } from "$lib/stores";
+    import { tailMode, tailBends, tailSegments, manipulatorWizardPageTitle, manipulatorShowCape } from "$lib/stores.svelte";
     import { countValue } from "$lib/misc";
 
     $manipulatorWizardPageTitle = "Tail";

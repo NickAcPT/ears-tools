@@ -1,6 +1,6 @@
 <script lang="ts">
     import { dev } from "$app/environment";
-    import { dataVersion, earsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores";
+    import { dataVersion, earsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores.svelte";
     import saveAs from "file-saver";
     
     $: outImageSrc = $manipulatorSkinFile && URL.createObjectURL($manipulatorSkinFile);

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EarsAnchor, EarsMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { manipulatorWizardPageTitle, earsAnchor, earsMode, } from "$lib/stores";
+    import { manipulatorWizardPageTitle, earsAnchor, earsMode, } from "$lib/stores.svelte";
 
     $manipulatorWizardPageTitle = "Ears";
 </script>

@@ -17,7 +17,7 @@
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
         setEarsFeatures,
-    } from "$lib/stores";
+    } from "$lib/stores.svelte";
 
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import type { SkinCanvasSunSettings } from "$lib/skin-canvas";

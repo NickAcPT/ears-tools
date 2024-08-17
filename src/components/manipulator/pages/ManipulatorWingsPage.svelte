@@ -1,7 +1,7 @@
 <script lang="ts">
     import { WingsAnimations, WingsMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { wingsMode, wingsAnimations, wingsImage } from "$lib/stores";
+    import { wingsMode, wingsAnimations, wingsImage } from "$lib/stores.svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
 
     async function handleWingFile(e: CustomEvent<FileList>) {

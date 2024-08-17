@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { manipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores";
+    import { manipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores.svelte";
     import { createEventDispatcher } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";

@@ -15,7 +15,7 @@
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
-    import { earsRegionEditorCurrentFile } from "$lib/stores";
+    import { earsRegionEditorCurrentFile } from "$lib/stores.svelte";
 
     interface EraseRegion {
         x: number;

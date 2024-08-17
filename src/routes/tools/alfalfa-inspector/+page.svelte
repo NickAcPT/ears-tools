@@ -8,7 +8,7 @@
     import init, { read_alfalfa_data, write_alfalfa_data } from "../../../tools/alfalfa-inspector/alfalfa_inspector";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
-    import { earsRegionEditorCurrentFile } from "$lib/stores";
+    import { earsRegionEditorCurrentFile } from "$lib/stores.svelte";
     import { goto } from "$app/navigation";
     import { browser } from "$app/environment";
     import { createLazyPromise } from "$lib/misc";

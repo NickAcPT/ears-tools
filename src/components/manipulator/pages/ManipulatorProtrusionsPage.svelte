@@ -1,7 +1,7 @@
 <script lang="ts">
     import { FeatureStatus, Protrusion, TailMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { horn, claws, manipulatorWizardPageTitle } from "$lib/stores";
+    import { horn, claws, manipulatorWizardPageTitle } from "$lib/stores.svelte";
 
     $manipulatorWizardPageTitle = "Protrusions";
 </script>

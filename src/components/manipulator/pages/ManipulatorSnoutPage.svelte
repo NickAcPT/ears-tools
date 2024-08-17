@@ -1,7 +1,7 @@
 <script lang="ts">
     import { FeatureStatus } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { manipulatorWizardPageTitle, snout, snoutWidth, snoutHeight, snoutLength, snoutOffset } from "$lib/stores";
+    import { manipulatorWizardPageTitle, snout, snoutWidth, snoutHeight, snoutLength, snoutOffset } from "$lib/stores.svelte";
 
     $manipulatorWizardPageTitle = "Snout";
 </script>

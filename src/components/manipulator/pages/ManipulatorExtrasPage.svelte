@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { capeImage, chestSize, emissivePalette, emissiveSkin } from "$lib/stores";
+    import { capeImage, chestSize, emissivePalette, emissiveSkin } from "$lib/stores.svelte";
     import DeleteIcon from "../../icons/DeleteIcon.svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
 
