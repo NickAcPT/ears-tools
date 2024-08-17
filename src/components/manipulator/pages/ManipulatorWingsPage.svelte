@@ -1,7 +1,7 @@
 <script lang="ts">
     import { WingsAnimations, WingsMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { wingsMode, wingsAnimations, wingsImage } from "$lib/stores.svelte";
+    import { getEarsFeatures } from "$lib/stores.svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
 
     async function handleWingFile(e: CustomEvent<FileList>) {
@@ -12,21 +12,21 @@
         }
         
         let file = files[0];
-        $wingsImage = new Uint8Array(await file.arrayBuffer());
+        getEarsFeatures().wings.wings = new Uint8Array(await file.arrayBuffer());
     }
 </script>
 
 <h2 class="text-2xl">Wings</h2>
 <div>
     <h3 class="text-xl">Mode</h3>
-    <ManipulatorEnumPicker let:element elements={WingsMode} kind="wings-mode" value={wingsMode} class="py-4">
+    <ManipulatorEnumPicker let:element elements={WingsMode} kind="wings-mode" value={getEarsFeatures().wings.mode} class="py-4">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
 </div>
 <div>
     <h3 class="text-xl">Animations</h3>
-    <ManipulatorEnumPicker let:element elements={WingsAnimations} kind="wings-animations" value={wingsAnimations} class="py-4">
+    <ManipulatorEnumPicker let:element elements={WingsAnimations} kind="wings-animations" value={getEarsFeatures().wings.animations} class="py-4">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
@@ -41,11 +41,11 @@
             {#snippet file()}wing texture{/snippet}
         </SkinDropZone>
         
-        {#if $wingsImage}
+        {#if getEarsFeatures().wings.wings}
             <div class="flex flex-1 items-start gap-2">
                 <!-- prettier-ignore -->
-                <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([$wingsImage], { type: "image/png" }))} alt="Cape texture" />
-                <button class="mt-2" on:click={() => $wingsImage = undefined}>Remove</button>
+                <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([getEarsFeatures().wings.wings!], { type: "image/png" }))} alt="Cape texture" />
+                <button class="mt-2" on:click={() => getEarsFeatures().wings.wings = undefined}>Remove</button>
             </div>
         {/if}
     </div>

@@ -1,9 +1,38 @@
 <script lang="ts">
     import { FeatureStatus, Protrusion, TailMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { horn, claws, manipulatorWizardPageTitle } from "$lib/stores.svelte";
+    import { getEarsFeatures, manipulatorWizardPageTitle } from "$lib/stores.svelte";
+    import { toStore } from "svelte/store";
 
     $manipulatorWizardPageTitle = "Protrusions";
+
+    let claws = toStore(
+        () => (getEarsFeatures().protrusions.includes(Protrusion.Claws) ? FeatureStatus.Enabled : FeatureStatus.Disabled),
+        (value) => {
+            if (value === FeatureStatus.Enabled) {
+                getEarsFeatures().protrusions.push(Protrusion.Claws);
+            } else {
+                const idx = getEarsFeatures().protrusions.indexOf(Protrusion.Claws);
+                if (idx !== -1) {
+                    getEarsFeatures().protrusions.splice(getEarsFeatures().protrusions.indexOf(Protrusion.Claws), 1);
+                }
+            }
+        }
+    );
+    
+    let horn = toStore(
+        () => (getEarsFeatures().protrusions.includes(Protrusion.Horns) ? FeatureStatus.Enabled : FeatureStatus.Disabled),
+        (value) => {
+            if (value === FeatureStatus.Enabled) {
+                getEarsFeatures().protrusions.push(Protrusion.Horns);
+            } else {
+                const idx = getEarsFeatures().protrusions.indexOf(Protrusion.Horns);
+                if (idx !== -1) {
+                    getEarsFeatures().protrusions.splice(getEarsFeatures().protrusions.indexOf(Protrusion.Horns), 1);
+                }
+            }
+        }
+    );
 </script>
 
 <div>

@@ -36,6 +36,6 @@
     <h1 class="text-3xl">Welcome to <NickAc />'s Ears Manipulator!</h1>
     <div class="flex flex-col justify-center gap-4 text-center">
         <p>Let's get started by selecting a skin or picking a template skin.</p>
-        <SkinDropZone on:files={handleFiles} slimArms={fromStore(manipulatorSkinSlimModel).current} />
+        <SkinDropZone onfiles={handleFiles} bind:slimArms={$manipulatorSkinSlimModel} />
     </div>
 </div>

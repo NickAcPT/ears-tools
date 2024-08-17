@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import { dev } from "$app/environment";
-    import { dataVersion, getEarsFeatures as earsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores.svelte";
+    import { currentEarsFeatures, getEarsFeatures as earsFeatures, getEarsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores.svelte";
     import saveAs from "file-saver";
     
     let outImageSrc = $derived($manipulatorSkinFile && URL.createObjectURL($manipulatorSkinFile))
@@ -34,7 +34,7 @@
 {#if dev}
     <div>
         <label for="manipulator-data-version">Manipulator data version</label>
-        <select id="manipulator-data-version" bind:value={$dataVersion}>
+        <select id="manipulator-data-version" bind:value={currentEarsFeatures.current.dataVersion}>
             <option value={0}>V0</option>
             <option value={1}>V1</option>
         </select>

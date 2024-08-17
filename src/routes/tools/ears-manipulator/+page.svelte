@@ -10,7 +10,7 @@
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
     import {
-        getEarsFeatures as earsFeatures,
+    currentEarsFeatures,
         emissiveSkin,
         lastEarsFeatures,
         manipulatorShowCape,
@@ -65,8 +65,8 @@
     });
     
     $effect(() => {
-        if (manipulatorInitialized != undefined && earsFeatures() !== $lastEarsFeatures && $manipulatorSkinFile) {
-            tick().then(updateFeatures)
+        if (manipulatorInitialized != undefined && getEarsFeatures() !== $lastEarsFeatures && $manipulatorSkinFile) {
+            updateFeatures();
         }
     })
 
@@ -82,17 +82,27 @@
         ambient: $emissiveSkin && $lightsOut ? 0.0 : undefined,
     });
 
+    let updateCount = 0;
+    
+    setInterval(() => {
+        updateCount = 0;
+    }, 5000);
+    
     async function updateFeatures() {
+        if (updateCount > 1) {
+            return;
+        }
+        updateCount++;
         if (!$manipulatorSkinFile || !manipulatorInitialized) {
             console.log(!$manipulatorSkinFile, !manipulatorInitialized);
             return;
         }
 
-        $lastEarsFeatures = $state.snapshot(earsFeatures());
+        $lastEarsFeatures = (getEarsFeatures());
         console.log("Updating features");
 
         try {
-            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $state.snapshot(earsFeatures));
+            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $state.snapshot(getEarsFeatures()));
 
             $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
                 type: $manipulatorSkinFile.type,
