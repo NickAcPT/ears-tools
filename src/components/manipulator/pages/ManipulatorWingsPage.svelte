@@ -38,7 +38,7 @@
     
     <div class="flex h-min gap-2">
         <SkinDropZone on:files={handleWingFile} offerDemoSkin={false}>
-            <svelte:fragment slot="file">wing texture</svelte:fragment>
+            {#snippet file()}wing texture{/snippet}
         </SkinDropZone>
         
         {#if $wingsImage}

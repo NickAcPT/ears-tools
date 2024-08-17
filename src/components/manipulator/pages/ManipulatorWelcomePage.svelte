@@ -4,6 +4,7 @@
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
     import { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
+    import { fromStore } from "svelte/store";
 
     const dispatcher = createEventDispatcher();
 
@@ -35,6 +36,6 @@
     <h1 class="text-3xl">Welcome to <NickAc />'s Ears Manipulator!</h1>
     <div class="flex flex-col justify-center gap-4 text-center">
         <p>Let's get started by selecting a skin or picking a template skin.</p>
-        <SkinDropZone on:files={handleFiles} slimArms={manipulatorSkinSlimModel} />
+        <SkinDropZone on:files={handleFiles} slimArms={fromStore(manipulatorSkinSlimModel).current} />
     </div>
 </div>

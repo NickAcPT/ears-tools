@@ -1,5 +1,5 @@
-import { derived, writable, type Readable, type Writable } from "svelte/store";
-import { EarsAnchor, EarsMode, Protrusion, FeatureStatus, TailMode, WingsAnimations, WingsMode, type EarsFeatures, type AlfalfaData, TextureSource } from "./ears-manipulator";
+import { derived, fromStore, writable, type Readable, type Writable } from "svelte/store";
+import { EarsAnchor, EarsMode, Protrusion, FeatureStatus, TailMode, WingsAnimations, WingsMode, type EarsFeatures, type AlfalfaData, TextureSource, type SnoutSettings } from "./ears-manipulator";
 
 export const earsRegionEditorCurrentFile = writable<File | null>(null);
 
@@ -69,47 +69,52 @@ export const capeImage = writable<Uint8Array | undefined>(undefined);
 export const alfalfaData = writable<AlfalfaData | undefined>(undefined);
 
 export const lastEarsFeatures = writable<EarsFeatures | undefined>(undefined);
-export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn, capeImage, wingsImage, chestSize, alfalfaData, earsSource, snoutSource, wingsSource, protrusionsSource, tailSource, emissiveSkin, emissivePalette, dataVersion], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn, $capeImage, $wingsFile, $chestSize, $alfalfaData, $earsSource, $snoutSource, $wingsSource, $protrusionsSource, $tailSource, $emissiveSkin, $emissivePalette, $dataVersion]) => ({
+const earsFeatures: EarsFeatures = $derived({
     ears: {
-        mode: $ears,
-        anchor: $earsAnchor,
-        source: $earsSource
+        mode: fromStore(earsMode).current,
+        anchor: fromStore(earsAnchor).current,
+        source: fromStore(earsSource).current
     },
     tail: {
-        mode: $tail,
-        segments: $tailSegments,
-        bends: $tailBends,
-        source: $tailSource
+        mode: fromStore(tailMode).current,
+        segments: fromStore(tailSegments).current,
+        bends: fromStore(tailBends).current,
+        source: fromStore(tailSource).current
     },
-    ...($snout === FeatureStatus.Enabled ? {
+    ...(fromStore(snout).current === FeatureStatus.Enabled ? {
         snout: {
-            width: $snoutWidth,
-            height: $snoutHeight,
-            offset: $snoutOffset,
-            length: $snoutLength,
-            source: $snoutSource
+            width: fromStore(snoutWidth).current,
+            height: fromStore(snoutHeight).current,
+            offset: fromStore(snoutOffset).current,
+            length: fromStore(snoutLength).current,
+            source: fromStore(snoutSource).current
         }
     } : {}),
     wings: {
-        mode: $wings,
-        animations: $wingsAnimations,
-        wings: $wingsFile,
-        source: $wingsSource
+        mode: fromStore(wingsMode).current,
+        animations: fromStore(wingsAnimations).current,
+        wings: fromStore(wingsImage).current,
+        source: fromStore(wingsSource).current
     },
     protrusions: [
-        ...($claws === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
-        ...($horn === FeatureStatus.Enabled ? [Protrusion.Horns] : [])
+        ...(fromStore(claws).current === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
+        ...(fromStore(horn).current === FeatureStatus.Enabled ? [Protrusion.Horns] : [])
     ],
-    protrusionsSource: $protrusionsSource,
-    chestSize: $chestSize,
-    cape: $capeImage,
-    alfalfa: $alfalfaData,
+    protrusionsSource: fromStore(protrusionsSource).current,
+    chestSize: fromStore(chestSize).current,
+    cape: fromStore(capeImage).current,
+    alfalfa: fromStore(alfalfaData).current,
     emissives: {
-        enabled: $emissiveSkin,
-        palette: $emissivePalette ?? []
+        enabled: fromStore(emissiveSkin).current,
+        palette: fromStore(emissivePalette).current ?? []
     },
-    dataVersion: $dataVersion
-}));
+    dataVersion: fromStore(dataVersion).current
+});
+
+export function getEarsFeatures(): EarsFeatures {
+    return earsFeatures;
+}
+
 
 export function setEarsFeatures(features: EarsFeatures | null) {
     if (features === null) {

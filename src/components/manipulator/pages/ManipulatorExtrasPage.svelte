@@ -60,7 +60,7 @@
     <h2 class="text-2xl">Cape</h2>
     <div class="flex h-min gap-2">
         <SkinDropZone on:files={handleCapeFile} offerDemoSkin={false}>
-            <svelte:fragment slot="file">cape texture</svelte:fragment>
+            {#snippet file()}cape texture{/snippet}
         </SkinDropZone>
         {#if $capeImage}
             <div class="flex flex-1 items-start gap-2">

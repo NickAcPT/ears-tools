@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script lang="ts">
     import ManipulatorWelcomePage from "../../../components/manipulator/pages/ManipulatorWelcomePage.svelte";
     import ManipulatorEarsPage from "../../../components/manipulator/pages/ManipulatorEarsPage.svelte";
@@ -8,7 +10,7 @@
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
     import {
-        earsFeatures,
+        getEarsFeatures as earsFeatures,
         emissiveSkin,
         lastEarsFeatures,
         manipulatorShowCape,
@@ -31,7 +33,7 @@
     import ManipulatorExtrasPage from "../../../components/manipulator/pages/ManipulatorExtrasPage.svelte";
     import { writable } from "svelte/store";
 
-    let currentPage = 0;
+    let currentPage = $state(0);
     let manipulatorInitialized = false;
 
     const pages = [
@@ -53,33 +55,44 @@
         currentPage = Math.max(currentPage - 1, 0);
     }
 
-    $: currentPage != undefined && ($manipulatorWizardPageTitle = null);
-    $: currentPage != undefined && ($manipulatorShowCape = true);
-    $: canvasScale = renderingSupport != undefined && $renderingSupport == RenderingSupport.SoftwareRendering ? 0.75 : 1;
+    let canvasScale = $derived(renderingSupport != undefined && $renderingSupport == RenderingSupport.SoftwareRendering ? 0.75 : 1);
 
-    $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
+    $effect(() => {
+        if (currentPage != undefined) {
+            $manipulatorWizardPageTitle = null;
+            $manipulatorShowCape = true;
+        }
+    });
+    
+    $effect(() => {
+        if (manipulatorInitialized != undefined && earsFeatures() !== $lastEarsFeatures && $manipulatorSkinFile) {
+            tick().then(updateFeatures)
+        }
+    })
+
 
     resetManipulatorEarsFeatures(true);
-    
+
     let lightsOut = writable(false);
-    $: sun = {
+    
+    let sun: SkinCanvasSunSettings = $derived({
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
-        intensity: $emissiveSkin && $lightsOut ? 0.0 : null,
-        ambient: $emissiveSkin && $lightsOut ? 0.0 : null,
-    } as SkinCanvasSunSettings;
-    
+        intensity: $emissiveSkin && $lightsOut ? 0.0 : undefined,
+        ambient: $emissiveSkin && $lightsOut ? 0.0 : undefined,
+    });
+
     async function updateFeatures() {
         if (!$manipulatorSkinFile || !manipulatorInitialized) {
             console.log(!$manipulatorSkinFile, !manipulatorInitialized);
             return;
         }
 
-        $lastEarsFeatures = $earsFeatures;
+        $lastEarsFeatures = $state.snapshot(earsFeatures());
         console.log("Updating features");
 
         try {
-            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $earsFeatures);
+            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $state.snapshot(earsFeatures));
 
             $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
                 type: $manipulatorSkinFile.type,
@@ -131,17 +144,18 @@
             currentRenderingSupport={renderingSupport}
             skin={$manipulatorSkinFile}
             slimArms={$manipulatorSkinSlimModel}
-            bind:sun
+            {sun}
         />
         <label for="manipulator-use-slim-arms" class="flex items-center gap-2">
             <span>Use slim arms for preview</span>
             <input type="checkbox" id="manipulator-use-slim-arms" bind:checked={$manipulatorSkinSlimModel} />
         </label>
-        
-        
+
         {#if $emissiveSkin}
             <label for="manipulator-lights-out" class="flex items-center gap-2">
-                <span>Lights out! <em>(To test emissive skins)</em></span>
+                <span>
+                    Lights out! <em>(To test emissive skins)</em>
+                </span>
                 <input type="checkbox" id="manipulator-lights-out" bind:checked={$lightsOut} />
             </label>
         {/if}
