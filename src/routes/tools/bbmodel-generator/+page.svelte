@@ -43,9 +43,8 @@
 
     async function handleSkinFile(file: File) {
         await loadPromise;
-        let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, hasLayers);
-
         try {
+            let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, hasLayers);
             let model = result;
             let blob = new Blob([JSON.stringify(model, replacer)], { type: "application/json" });
 
@@ -55,7 +54,7 @@
 
             saveAs(blob, fileName.join("."));
         } catch (error) {
-            alert("An error occurred while generating the model. Please notify @nickac on Discord.");
+            alert("An error occurred while generating the model.\n\nPlease notify @nickac on Discord with the following:\n" + error);
             console.error(error);
         }
     }
