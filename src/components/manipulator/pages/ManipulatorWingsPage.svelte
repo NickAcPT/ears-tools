@@ -1,7 +1,9 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { WingsAnimations, WingsMode } from "$lib/ears-manipulator";
     import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
-    import { getEarsFeatures } from "$lib/stores.svelte";
+    import { currentEarsFeatures, getEarsFeatures } from "$lib/stores.svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
 
     async function handleWingFile(e: CustomEvent<FileList>) {
@@ -19,14 +21,14 @@
 <h2 class="text-2xl">Wings</h2>
 <div>
     <h3 class="text-xl">Mode</h3>
-    <ManipulatorEnumPicker let:element elements={WingsMode} kind="wings-mode" value={getEarsFeatures().wings.mode} class="py-4">
+    <ManipulatorEnumPicker let:element elements={WingsMode} kind="wings-mode" bind:value={currentEarsFeatures.current.wings.mode} class="py-4">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
 </div>
 <div>
     <h3 class="text-xl">Animations</h3>
-    <ManipulatorEnumPicker let:element elements={WingsAnimations} kind="wings-animations" value={getEarsFeatures().wings.animations} class="py-4">
+    <ManipulatorEnumPicker let:element elements={WingsAnimations} kind="wings-animations" bind:value={currentEarsFeatures.current.wings.animations} class="py-4">
         <canvas class="flex-1" width="96" height="96"></canvas>
         {element}
     </ManipulatorEnumPicker>
@@ -37,7 +39,7 @@
     <p>Must be 20x16 or 12x12</p>
     
     <div class="flex h-min gap-2">
-        <SkinDropZone on:files={handleWingFile} offerDemoSkin={false}>
+        <SkinDropZone onfiles={handleWingFile} offerDemoSkin={false}>
             {#snippet file()}wing texture{/snippet}
         </SkinDropZone>
         
@@ -45,7 +47,7 @@
             <div class="flex flex-1 items-start gap-2">
                 <!-- prettier-ignore -->
                 <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([getEarsFeatures().wings.wings!], { type: "image/png" }))} alt="Cape texture" />
-                <button class="mt-2" on:click={() => getEarsFeatures().wings.wings = undefined}>Remove</button>
+                <button class="mt-2" onclick={() => getEarsFeatures().wings.wings = undefined}>Remove</button>
             </div>
         {/if}
     </div>

@@ -1,29 +1,39 @@
+<svelte:options runes />
+
 <script lang="ts">
+    interface ManipulatorEnumPickerProps {
+        elements: Record<string, number | string>;
+        kind: string;
+        value: number | number[];
+        class?: string;
+        children?: Snippet<[string]>
+    }
+
     import { enumKeys } from "$lib/misc";
-    import type { Writable } from "svelte/store";
+    import type { Snippet } from "svelte";
+    import type { HTMLAttributes } from "svelte/elements";
 
-    export let elements: Record<string, number | string>;
-    export let kind: string;
-
-    export let value: Writable<number | number[]>;
+    let { elements, kind, value = $bindable(), children, class: clazz }: ManipulatorEnumPickerProps = $props();
 
     function humanizeEnumKey(key: string) {
         return key.replace(/([A-Z])/g, " $1").trim();
     }
 </script>
 
+{#snippet defaultChildren(element: string)}
+    {humanizeEnumKey(element)}
+{/snippet}
+
 <div class="keys-grid">
     {#each enumKeys(elements) as element}
         <label for="{kind}-{element}" class="flex items-center justify-center">
-            {#if typeof $value === "number"}
-                <input class="peer appearance-none" id="{kind}-{element}" type="radio" value={elements[element]} bind:group={$value} />
-            {:else}<input class="peer hidden" id="{kind}-{element}" type="checkbox" value={elements[element]} bind:group={$value} />
+            {#if typeof value === "number"}
+                <input class="peer appearance-none" id="{kind}-{element}" type="radio" value={elements[element]} bind:group={value} />
+            {:else}<input class="peer hidden" id="{kind}-{element}" type="checkbox" value={elements[element]} bind:group={value} />
             {/if}
             <!-- prettier-ignore -->
-            <span class="cursor-pointer w-fit button peer-checked:!bg-primary-700 dark:peer-checked:!bg-primary-800 peer-checked:!text-text-on-primary-inverse flex-1 flex flex-col justify-center items-center {$$restProps["class"] ?? ""}">
-            <slot element={humanizeEnumKey(element)}>
-                {humanizeEnumKey(element)}
-            </slot>
+            <span class="cursor-pointer w-fit button peer-checked:!bg-primary-700 dark:peer-checked:!bg-primary-800 peer-checked:!text-text-on-primary-inverse flex-1 flex flex-col justify-center items-center {clazz ?? ""}">
+            {@render (children ?? defaultChildren)(humanizeEnumKey(element))}
         </span>
         </label>
     {/each}

@@ -24,7 +24,7 @@ export interface EmissiveData {
 
 export interface AlfalfaData {
     version: number;
-    data: Record<string, Uint8Array>;
+    data: Map<string, Uint8Array>;
 }
 
 export interface EarsSettings {

@@ -1,5 +1,6 @@
 import { derived, fromStore, writable, type Readable, type Writable } from "svelte/store";
 import { EarsAnchor, EarsMode, Protrusion, FeatureStatus, TailMode, WingsAnimations, WingsMode, type EarsFeatures, type AlfalfaData, TextureSource, type SnoutSettings } from "./ears-manipulator";
+import { untrack } from "svelte";
 
 export const earsRegionEditorCurrentFile = writable<File | null>(null);
 
@@ -91,6 +92,11 @@ export function setEarsFeatures(features: EarsFeatures | null) {
         return;
     }
 
+    if (features.alfalfa) {
+        features.alfalfa.data.delete("wings");
+        features.alfalfa.data.delete("cape");
+    }
+    
     currentEarsFeatures.current = features
 }
 
@@ -101,4 +107,35 @@ export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
     }
 
     currentEarsFeatures.current = DEFAULT_EARS_FEATURES;
+}
+
+
+export function explicitEffect<T>(fn: () => T, depsFn: () => void) {
+    $effect(() => {
+        depsFn();
+        untrack(fn);
+    });
+}
+
+function pokePropertiesRecursively<T>(value: T) {
+    if (typeof value !== 'object' || value === null) {
+        return;
+    }
+
+    for (const key in value) {
+        if (Object.prototype.hasOwnProperty.call(value, key)) {
+            const prop = value[key];
+            if (typeof prop === 'object' && prop !== null) {
+                pokePropertiesRecursively(prop);
+            }
+        }
+    }
+}
+
+export function stateSnapshotReactive<T>(value: T) {
+    // Force a read on all properties of the value to make it reactive
+    let _ = pokePropertiesRecursively(value);
+    
+    let snapshot = $state.snapshot(value);
+    return snapshot;
 }

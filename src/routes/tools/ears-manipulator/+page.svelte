@@ -10,8 +10,9 @@
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
     import {
-    currentEarsFeatures,
+        currentEarsFeatures,
         emissiveSkin,
+        getEarsFeatures,
         lastEarsFeatures,
         manipulatorShowCape,
         manipulatorSkinFile,
@@ -19,6 +20,7 @@
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
         setEarsFeatures,
+        stateSnapshotReactive,
     } from "$lib/stores.svelte";
 
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
@@ -28,15 +30,16 @@
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     import { apply_features } from "../../../tools/ears-manipulator/ears_manipulator";
-    import { tick } from "svelte";
+    import { untrack } from "svelte";
     import { browser } from "$app/environment";
     import ManipulatorExtrasPage from "../../../components/manipulator/pages/ManipulatorExtrasPage.svelte";
     import { writable } from "svelte/store";
+    import type { ManipulatorPageProps } from "../../../components/manipulator/pages/props";
 
     let currentPage = $state(0);
-    let manipulatorInitialized = false;
+    let manipulatorInitialized = $state(false);
 
-    const pages = [
+    const pages: (ManipulatorPageProps|any) = [
         ManipulatorWelcomePage,
         ManipulatorEarsPage,
         ManipulatorSnoutPage,
@@ -57,60 +60,62 @@
 
     let canvasScale = $derived(renderingSupport != undefined && $renderingSupport == RenderingSupport.SoftwareRendering ? 0.75 : 1);
 
-    $effect(() => {
+    $effect.pre(() => {
         if (currentPage != undefined) {
             $manipulatorWizardPageTitle = null;
             $manipulatorShowCape = true;
         }
     });
-    
+
     $effect(() => {
-        if (manipulatorInitialized != undefined && getEarsFeatures() !== $lastEarsFeatures && $manipulatorSkinFile) {
+        if (
+            manipulatorInitialized &&
+            stateSnapshotReactive(getEarsFeatures()) /* && $state.snapshot(getEarsFeatures()) !== $lastEarsFeatures */
+        ) {
             updateFeatures();
         }
-    })
-
+    });
 
     resetManipulatorEarsFeatures(true);
 
     let lightsOut = writable(false);
-    
+
     let sun: SkinCanvasSunSettings = $derived({
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
         intensity: $emissiveSkin && $lightsOut ? 0.0 : undefined,
         ambient: $emissiveSkin && $lightsOut ? 0.0 : undefined,
     });
-
-    let updateCount = 0;
-    
-    setInterval(() => {
-        updateCount = 0;
-    }, 5000);
     
     async function updateFeatures() {
-        if (updateCount > 1) {
-            return;
-        }
-        updateCount++;
+        await Promise.resolve();
+
         if (!$manipulatorSkinFile || !manipulatorInitialized) {
             console.log(!$manipulatorSkinFile, !manipulatorInitialized);
             return;
         }
 
-        $lastEarsFeatures = (getEarsFeatures());
-        console.log("Updating features");
+        const features = stateSnapshotReactive(getEarsFeatures());
+
+        console.log("Updating features", features);
 
         try {
-            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $state.snapshot(getEarsFeatures()));
+            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), features);
 
-            $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
-                type: $manipulatorSkinFile.type,
-                lastModified: new Date().getTime(),
+            untrack(() => {
+                const previousFile = $manipulatorSkinFile;
+                if (!previousFile) {
+                    return;
+                }
+
+                $manipulatorSkinFile = new File([newFile], previousFile.name, {
+                    type: previousFile.type,
+                    lastModified: new Date().getTime(),
+                });
             });
         } catch (e) {
             const features = await get_ears_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()));
-            setEarsFeatures(features);
+            untrack(() => setEarsFeatures(features));
 
             if (e instanceof Error) {
                 if (e.message.includes("Cannot write more than 1428 bytes of data")) {
@@ -133,6 +138,8 @@
         await init();
         manipulatorInitialized = true;
     }
+
+    $inspect($manipulatorShowCape).with(console.log);
 </script>
 
 <RequiresWasm init={initWasm} />
@@ -182,7 +189,10 @@
         <div class="flex-1">
             <h1 class="text-2xl">{$manipulatorWizardPageTitle ?? ""}</h1>
             <div class="manipulator-page contents">
-                <svelte:component this={pages[currentPage]} on:next={() => currentPage++} />
+                {#if pages[currentPage]}
+                    {@const CurrentPageComponent = pages[currentPage]}
+                    <CurrentPageComponent onnext={() => currentPage++}></CurrentPageComponent>
+                {/if}
             </div>
         </div>
 
@@ -190,14 +200,14 @@
             <!-- prettier-ignore -->
             <ol class="flex items-center justify-center gap-1">
                 {#each pages as _, i}
-                <button aria-labelledby="page_{i+1}_description" id="page_{i+1}" class="appearance-none bullet text-3xl h-5 flex items-center" title="Go to page {i + 1}" class:active={currentPage == i} on:click={() => (currentPage = i)}>
+                <button aria-labelledby="page_{i+1}_description" id="page_{i+1}" class="appearance-none bullet text-3xl h-5 flex items-center" title="Go to page {i + 1}" class:active={currentPage == i} onclick={() => (currentPage = i)}>
                     •
                 </button>
                 <span id="page_{i+1}_description" class="sr-only">Page {i + 1} - {currentPage == i ? "Current page" : "Go to page"}</span>
                 {/each}
             </ol>
-            <button disabled={currentPage == 0} on:click={previousPage}>Previous step</button>
-            <button disabled={currentPage == pages.length - 1} on:click={nextPage}>Next step</button>
+            <button disabled={currentPage == 0} onclick={previousPage}>Previous step</button>
+            <button disabled={currentPage == pages.length - 1} onclick={nextPage}>Next step</button>
         </div>
     </div>
 </div>

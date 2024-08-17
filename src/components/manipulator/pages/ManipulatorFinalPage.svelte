@@ -2,13 +2,13 @@
 
 <script lang="ts">
     import { dev } from "$app/environment";
-    import { currentEarsFeatures, getEarsFeatures as earsFeatures, getEarsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores.svelte";
+    import { currentEarsFeatures, getEarsFeatures, manipulatorSkinFile, resetManipulatorEarsFeatures } from "$lib/stores.svelte";
     import saveAs from "file-saver";
     
     let outImageSrc = $derived($manipulatorSkinFile && URL.createObjectURL($manipulatorSkinFile))
     
     function replacer(key: string, value: any) {
-        if (key=="cape" || key == "wings") return undefined;
+        if (key=="cape" || key == "wings") return (value ? "Present" : "Absent");
         else return value;
     }
 
@@ -17,15 +17,15 @@
 <h1>Page 5</h1>
 
 {#if dev}
-    <pre>{JSON.stringify($state.snapshot(earsFeatures), replacer, 4)}</pre>
+    <pre>{JSON.stringify($state.snapshot(currentEarsFeatures.current), replacer, 4)}</pre>
     
     <!-- prettier-ignore -->
-    <button on:click={() => {
+    <button onclick={() => {
         resetManipulatorEarsFeatures();
     }}>Reset</button>
 {/if}
 
-<button on:click={() => {
+<button onclick={() => {
     const skin = $manipulatorSkinFile;
     if (skin) saveAs(skin, "skin.png");
 }}>Download Skin</button>

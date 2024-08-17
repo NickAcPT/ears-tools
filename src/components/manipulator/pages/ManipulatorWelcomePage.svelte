@@ -1,12 +1,14 @@
+<svelte:options runes />
+
 <script lang="ts">
     import { manipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores.svelte";
-    import { createEventDispatcher } from "svelte";
+    import { untrack } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
     import { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
-    import { fromStore } from "svelte/store";
+    import type { ManipulatorPageProps } from "./props";
 
-    const dispatcher = createEventDispatcher();
+    let { onnext }: ManipulatorPageProps = $props();
 
     async function handleFiles(e: CustomEvent<FileList>) {
         const list = e.detail;
@@ -23,12 +25,12 @@
             const features = await get_ears_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()));
             console.log("Updating features from skin", features);
 
-            setEarsFeatures(features);
+            untrack(() => setEarsFeatures(features));
         } catch (e: any) {
             console.error(e);
         }
 
-        dispatcher("next");
+        onnext?.();
     }
 </script>
 
