@@ -410,8 +410,8 @@
             style:height={imgHeightStyle}
             class="pixelated render aspect-square"
             ondragstart={(e) => {
-                false;
                 e.preventDefault();
+                return false;
             }}
             onload={onImageLoad}
             onerror={onImageError}
