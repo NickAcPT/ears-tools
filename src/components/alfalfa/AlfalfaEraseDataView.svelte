@@ -1,6 +1,9 @@
+<svelte:options runes />
+
 <script lang="ts">
     import type { AlfalfaEraseEntryData } from "$lib/alfalfa-inspector.svelte";
-    export let data: AlfalfaEraseEntryData;
+    
+    let data: AlfalfaEraseEntryData = $props<{ data: AlfalfaEraseEntryData }>();
 </script>
 
 <div class="grid auto-rows-auto">

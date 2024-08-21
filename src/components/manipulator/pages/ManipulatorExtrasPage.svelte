@@ -115,9 +115,3 @@
         {/if}
     </div>
 </div>
-
-<style lang="postcss">
-    canvas {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEVmZmaZmZmoZ+Z2AAAAD0lEQVQIW2PkZ4TADxAIABIoBAXF3RsYAAAAAElFTkSuQmCC");
-    }
-</style>

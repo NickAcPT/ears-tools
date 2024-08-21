@@ -1,10 +1,12 @@
+<svelte:options runes />
+
 <script lang="ts">
     import type { AlfalfaEntryData } from "$lib/alfalfa-inspector.svelte";
     import AlfalfaBinaryDataView from "./AlfalfaBinaryDataView.svelte";
     import AlfalfaEraseDataView from "./AlfalfaEraseDataView.svelte";
     import AlfaflaImageDataView from "./AlfalfaImageDataView.svelte";
 
-    export let data: AlfalfaEntryData;
+    let data: AlfalfaEntryData = $props<{ data: AlfalfaEntryData }>();
 </script>
 
 {#if data.type == "binary"}

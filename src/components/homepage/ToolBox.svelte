@@ -1,16 +1,22 @@
+<svelte:options runes />
+
 <script lang="ts">
     import type { SvelteComponent } from "svelte";
 
-    export let icon: typeof SvelteComponent<any>;
-    export let name: string;
-    export let description: string[] | undefined = undefined;
-    export let ghost: boolean = false;
-    export let wip: boolean = false;
+    interface ToolBoxProps {
+        icon: typeof SvelteComponent;
+        name: string;
+        description?: string[];
+        ghost?: boolean;
+        wip?: boolean;
+    }
+    
+    let { icon: Icon, name, description, ghost, wip }: ToolBoxProps = $props();
 </script>
 
 <div class="toolbox-outer button relative" class:ghost>
     <div class="flex items-center gap-2">
-        <svelte:component this={icon} class="h-10" />
+        <Icon class="h-10" />
         <h2 class="pb-1 text-left text-xl font-medium">{name}</h2>
     </div>
     {#if wip}

@@ -1,3 +1,11 @@
+<svelte:options runes />
+
+<script lang="ts">
+    import type { Snippet } from "svelte";
+
+    let { children } = $props<{ children: Snippet }>();
+</script>
+
 <svelte:head>
     <noscript>
         <style>
@@ -9,7 +17,7 @@
 </svelte:head>
 
 <div class="requires-js" style:display="contents">
-    <slot />
+    {@render children()}
 </div>
 
 <style>

@@ -26,6 +26,11 @@ const config = {
         inspector: true,
         emitCss: true,
         prebundleSvelteLibraries: true,
+        dynamicCompileOptions({ filename }) {
+			if (!filename.includes('node_modules')) {
+				return { runes: true };
+			}
+		}
     },
 };
 
