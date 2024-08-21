@@ -3,7 +3,7 @@
 <script lang="ts">
     import type { AlfalfaEraseEntryData } from "$lib/alfalfa-inspector.svelte";
     
-    let data: AlfalfaEraseEntryData = $props<{ data: AlfalfaEraseEntryData }>();
+    let { data } = $props<{ data: AlfalfaEraseEntryData }>();
 </script>
 
 <div class="grid auto-rows-auto">

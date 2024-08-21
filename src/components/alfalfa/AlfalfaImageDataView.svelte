@@ -3,7 +3,7 @@
 <script lang="ts">
     import type { AlfalfaImageEntryData } from "$lib/alfalfa-inspector.svelte";
 
-    let data: AlfalfaImageEntryData = $props<{ data: AlfalfaImageEntryData }>();
+    let { data } = $props<{ data: AlfalfaImageEntryData }>();
 
     let blob = $derived(new Blob([data.value], { type: "image/png" }));
 </script>

@@ -6,7 +6,7 @@
     import AlfalfaEraseDataView from "./AlfalfaEraseDataView.svelte";
     import AlfaflaImageDataView from "./AlfalfaImageDataView.svelte";
 
-    let data: AlfalfaEntryData = $props<{ data: AlfalfaEntryData }>();
+    let { data } = $props<{ data: AlfalfaEntryData }>();
 </script>
 
 {#if data.type == "binary"}
