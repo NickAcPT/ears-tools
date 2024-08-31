@@ -69,47 +69,53 @@ export const capeImage = writable<Uint8Array | undefined>(undefined);
 export const alfalfaData = writable<AlfalfaData | undefined>(undefined);
 
 export const lastEarsFeatures = writable<EarsFeatures | undefined>(undefined);
-export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn, capeImage, wingsImage, chestSize, alfalfaData, earsSource, snoutSource, wingsSource, protrusionsSource, tailSource, emissiveSkin, emissivePalette, dataVersion], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn, $capeImage, $wingsFile, $chestSize, $alfalfaData, $earsSource, $snoutSource, $wingsSource, $protrusionsSource, $tailSource, $emissiveSkin, $emissivePalette, $dataVersion]) => ({
-    ears: {
-        mode: $ears,
-        anchor: $earsAnchor,
-        source: $earsSource
-    },
-    tail: {
-        mode: $tail,
-        segments: $tailSegments,
-        bends: $tailBends,
-        source: $tailSource
-    },
-    ...($snout === FeatureStatus.Enabled ? {
-        snout: {
-            width: $snoutWidth,
-            height: $snoutHeight,
-            offset: $snoutOffset,
-            length: $snoutLength,
-            source: $snoutSource
-        }
-    } : {}),
-    wings: {
-        mode: $wings,
-        animations: $wingsAnimations,
-        wings: $wingsFile,
-        source: $wingsSource
-    },
-    protrusions: [
-        ...($claws === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
-        ...($horn === FeatureStatus.Enabled ? [Protrusion.Horns] : [])
-    ],
-    protrusionsSource: $protrusionsSource,
-    chestSize: $chestSize,
-    cape: $capeImage,
-    alfalfa: $alfalfaData,
-    emissives: {
-        enabled: $emissiveSkin,
-        palette: $emissivePalette ?? []
-    },
-    dataVersion: $dataVersion
-}));
+export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn, capeImage, wingsImage, chestSize, alfalfaData, earsSource, snoutSource, wingsSource, protrusionsSource, tailSource, emissiveSkin, emissivePalette, dataVersion], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn, $capeImage, $wingsFile, $chestSize, $alfalfaData, $earsSource, $snoutSource, $wingsSource, $protrusionsSource, $tailSource, $emissiveSkin, $emissivePalette, $dataVersion]) => {
+    if ($snoutOffset > (8-$snoutHeight)) {
+        snoutOffset.set(8-$snoutHeight);
+    }
+    
+    return ({
+        ears: {
+            mode: $ears,
+            anchor: $earsAnchor,
+            source: $earsSource
+        },
+        tail: {
+            mode: $tail,
+            segments: $tailSegments,
+            bends: $tailBends,
+            source: $tailSource
+        },
+        ...($snout === FeatureStatus.Enabled ? {
+            snout: {
+                width: $snoutWidth,
+                height: $snoutHeight,
+                offset: $snoutOffset,
+                length: $snoutLength,
+                source: $snoutSource
+            }
+        } : {}),
+        wings: {
+            mode: $wings,
+            animations: $wingsAnimations,
+            wings: $wingsFile,
+            source: $wingsSource
+        },
+        protrusions: [
+            ...($claws === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
+            ...($horn === FeatureStatus.Enabled ? [Protrusion.Horns] : [])
+        ],
+        protrusionsSource: $protrusionsSource,
+        chestSize: $chestSize,
+        cape: $capeImage,
+        alfalfa: $alfalfaData,
+        emissives: {
+            enabled: $emissiveSkin,
+            palette: $emissivePalette ?? []
+        },
+        dataVersion: $dataVersion
+    });
+});
 
 export function setEarsFeatures(features: EarsFeatures | null) {
     if (features === null) {
