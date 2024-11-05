@@ -135,7 +135,7 @@
         if (!browser) {
             return Promise.resolve();
         }
-        await init();
+        await init({});
         manipulatorInitialized = true;
     }
 </script>

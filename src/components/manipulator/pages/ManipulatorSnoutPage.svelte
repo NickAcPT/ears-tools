@@ -75,7 +75,7 @@
     </div>
     <div>
         <label for="snout-offset">Offset</label>
-        <input disabled={!hasSnout} type="range" id="snout-offset" min="0" max="8" step="1" bind:value={$snoutOffset} />
+        <input disabled={!hasSnout} type="range" id="snout-offset" min="0" max={8-$snoutHeight} step="1" bind:value={$snoutOffset} />
     </div>
     <div>
         <label for="snout-length">Length</label>
