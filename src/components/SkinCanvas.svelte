@@ -232,7 +232,7 @@
     }
 
     async function handlePointerMove(e: PointerEvent) {
-        if (module == null || !isInitialized) return;
+        if (module == null || !isInitialized || e.pointerType == "touch") return;
         await module.notify_mouse_move(e.clientX, e.clientY);
     }
 
@@ -261,7 +261,7 @@
             let dist = Math.sqrt(Math.pow(touch1.clientX - touch2.clientX, 2) + Math.pow(touch1.clientY - touch2.clientY, 2));
 
             if (lastDist) {
-                await module.notify_mouse_scroll(-(lastDist - dist) / 20);
+                await module.notify_mouse_scroll(-(lastDist - dist) / 2.5);
             }
 
             lastDist = dist;
@@ -285,6 +285,7 @@
     <div class="flex min-h-0 max-h-full">
         <canvas
         style:width="100%"
+        style:touch-action="none"
         style:display={isInitialized ? "block" : "none"}
         bind:this={canvas}
         {...$$restProps}
