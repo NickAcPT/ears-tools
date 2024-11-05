@@ -31,7 +31,12 @@
     
     let snoutWidth = snoutStore(() => snoutBackup.width, (snout) => snout.width, (snout, value) => snout.width = value);
     let snoutHeight = snoutStore(() => snoutBackup.height, (snout) => snout.height, (snout, value) => snout.height = value);
-    let snoutOffset = snoutStore(() => snoutBackup.offset, (snout) => snout.offset, (snout, value) => snout.offset = value);
+    let snoutOffset = snoutStore(() => snoutBackup.offset, (snout) => snout.offset, (snout, value) => {
+        if (value > (8 - snout.height)) {
+            value = (8 - snout.height);
+        }    
+        snout.offset = value;
+    });
     let snoutLength = snoutStore(() => snoutBackup.length, (snout) => snout.length, (snout, value) => snout.length = value);
 
     function snoutStore<T>(def: () => T, get_fn: (snout: SnoutSettings) => T, set_fn: (snout: SnoutSettings, value: T) => void): Writable<T> {
