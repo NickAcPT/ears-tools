@@ -6,7 +6,7 @@
     $: outImageSrc = $manipulatorSkinFile && URL.createObjectURL($manipulatorSkinFile);
     
     function replacer(key: string, value: any) {
-        if (key=="cape" || key == "wings") return undefined;
+        if (value instanceof Uint8Array) return "[binary data]";
         else return value;
     }
 

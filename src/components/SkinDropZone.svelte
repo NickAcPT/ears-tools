@@ -4,14 +4,16 @@
     import { createEventDispatcher, onMount } from "svelte";
     import demoSkin from "$lib/assets/demo-skin.png";
     import { page } from "$app/stores";
-    import { browser } from "$app/environment";
+    import { browser, dev } from "$app/environment";
 
-    let dispatch = createEventDispatcher();
+    let dispatch = createEventDispatcher<{
+        files: FileList,
+        offerDemoSkin: {replace: (skin: BlobPart) => void}
+    }>();
 
     let pickerHovered = writable<boolean>(false);
     let filePicker: HTMLInputElement;
     export let slimArms: Writable<boolean> | undefined = undefined;
-
     export let offerDemoSkin: boolean = true;
 
     function pickFile() {
@@ -28,11 +30,35 @@
         if (!offerDemoSkin) return;
         if ($page.url.searchParams.has("base64")) return;
 
-        let skin = await fetch(demoSkin);
-        let data = await skin.arrayBuffer();
+        let blobPart = undefined;
+
+        const cancelled = dispatch(
+            "offerDemoSkin",
+            {
+                replace: (skin: BlobPart) => {
+                    blobPart = skin;
+                },
+            },
+            {
+                cancelable: true,
+            }
+        );
+
+        if (cancelled) {
+            let skin = await fetch(demoSkin);
+            let data = await skin.arrayBuffer();
+            blobPart = data;
+        }
+        
+        if (!blobPart) {
+            if (dev) {
+                console.log("No blobPart set for demo skin!");
+            }
+            return;
+        }
 
         let list = new DataTransfer();
-        let file = new File([data], "demo-skin.png", { type: "image/png" });
+        let file = new File([blobPart], "demo-skin.png", { type: "image/png" });
         list.items.add(file);
 
         if (slimArms) {
@@ -49,7 +75,8 @@
             const base64File = $page.url.searchParams.get("base64")?.replace(/-/g, "+")?.replace(/_/g, "/");
             const slimArmsFromUrl = $page.url.searchParams.has("slim");
             if (base64File) {
-                function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
+                function typedArrayToBuffer(array: Uint8Array): BlobPart {
+                    //@ts-expect-error idk
                     return array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset);
                 }
 

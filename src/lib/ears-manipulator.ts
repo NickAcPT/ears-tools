@@ -89,7 +89,11 @@ export enum TailMode {
     Down,
     Back,
     Up,
-    Vertical
+    Vertical,
+    Cross,
+    CrossOverlap,
+    Star,
+    StarOverlap,
 }
 
 export enum WingsMode {
@@ -98,6 +102,8 @@ export enum WingsMode {
     SymmetricSingle,
     AsymmetricSingleLeft,
     AsymmetricSingleRight,
+    AsymmetricDual,
+    Flat,
 }
 
 export enum WingsAnimations {

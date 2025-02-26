@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { manipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores";
+    import { earsFeatures, manipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores";
     import { createEventDispatcher } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
-    import { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
+    import { get_ears_features, get_template_skin } from "../../../tools/ears-manipulator/ears_manipulator";
 
     const dispatcher = createEventDispatcher();
 
@@ -29,12 +29,19 @@
 
         dispatcher("next");
     }
+
+    function handleDemoSkinTemplate(e: CustomEvent<{ replace: (skin: BlobPart) => void; }>): void {
+        e.preventDefault();
+        const skin = get_template_skin($earsFeatures);
+        
+        e.detail.replace(skin);
+    }
 </script>
 
 <div class="flex h-full flex-col items-center gap-10">
     <h1 class="text-3xl">Welcome to <NickAc />'s Ears Manipulator!</h1>
     <div class="flex flex-col justify-center gap-4 text-center">
         <p>Let's get started by selecting a skin or picking a template skin.</p>
-        <SkinDropZone on:files={handleFiles} slimArms={manipulatorSkinSlimModel} />
+        <SkinDropZone on:offerDemoSkin={handleDemoSkinTemplate} on:files={handleFiles} slimArms={manipulatorSkinSlimModel} />
     </div>
 </div>

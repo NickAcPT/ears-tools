@@ -1,28 +1,24 @@
 /* tslint:disable */
 /* eslint-disable */
-/**
-* @param {Uint8Array} skin_data
-* @returns {any}
-*/
 export function get_ears_features(skin_data: Uint8Array): any;
-/**
-* @param {Uint8Array} skin_data
-* @param {any} features
-* @returns {Uint8Array}
-*/
+export function get_template_skin(features: any): Uint8Array;
 export function apply_features(skin_data: Uint8Array, features: any): Uint8Array;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly get_ears_features: (a: number, b: number, c: number) => void;
-  readonly apply_features: (a: number, b: number, c: number, d: number) => void;
+  readonly get_ears_features: (a: number, b: number) => [number, number, number];
+  readonly get_template_skin: (a: any) => [number, number, number];
+  readonly apply_features: (a: number, b: number, c: any) => [number, number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_export_4: WebAssembly.Table;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly __externref_table_dealloc: (a: number) => void;
+  readonly __wbindgen_start: () => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
