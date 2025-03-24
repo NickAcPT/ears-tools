@@ -10,3 +10,8 @@ export interface SkinCanvasSunSettings {
     intensity?: number;
     ambient?: number;
 }
+
+export interface SkinCanvasMovementSettings {
+    limb_swing: number;
+    body_yaw: number;
+}

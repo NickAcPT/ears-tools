@@ -1,10 +1,11 @@
 <script lang="ts">
     import { browser, dev } from "$app/environment";
     import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
-    import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/skin-canvas";
+    import type { SkinCanvasCameraSettings, SkinCanvasMovementSettings, SkinCanvasSunSettings, SceneMovementSettings } from "$lib/skin-canvas";
     import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
     import { page } from "$app/stores";
+    import { onMount } from "svelte";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
@@ -28,6 +29,12 @@
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
         intensity: 2.0,
+    };
+
+    export let movement: SkinCanvasMovementSettings = {
+        body_yaw: 0,
+        limb_swing: 0,
+        time: 0
     };
 
     export let skin: File | null = null;
@@ -165,6 +172,7 @@
         skinFile: File,
         camera: SkinCanvasCameraSettings,
         sun: SkinCanvasSunSettings,
+        movement: SkinCanvasMovementSettings,
         renderEars: boolean,
         renderLayers: boolean,
         slimArms: boolean,
@@ -175,7 +183,7 @@
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
         if (module == null) throw new Error("Module is null");
 
-        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, setup_scene, get_camera, get_sun } = module;
+        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, SceneMovementSettings, setup_scene, get_camera, get_sun, tick_scene } = module;
 
         if (isLoadedAlready) {
             let cameraSettings = get_camera();
@@ -188,6 +196,8 @@
             //sun.intensity = sunSettings.intensity;
             //sun.ambient = sunSettings.ambient;
 
+            console.log(camera);
+            
             sunSettings.free();
             cameraSettings.free();
         }
@@ -209,8 +219,16 @@
         character.has_layers = renderLayers;
         character.is_slim = slimArms;
         character.has_cape = showCape;
+        
+        let movement2 = new SceneMovementSettings();
+        movement2.body_yaw = movement.body_yaw;
+        movement2.limb_swing = movement.limb_swing;
 
-        await setup_scene(settings, lighting, character, new Uint8Array(await skinFile.arrayBuffer()));
+        await setup_scene(settings, lighting, character, movement2, new Uint8Array(await skinFile.arrayBuffer()));
+        sceneTicker = () => {
+            tick_scene();
+        };
+        
         console.log("Setup scene");
         isLoadedAlready = true;
     }
@@ -270,8 +288,20 @@
             await module.notify_mouse_move(touch.clientX, touch.clientY);
         }
     }
+    
+    let sceneTicker: () => void = () => {};
 
-    $: canvas && isInitialized && skin && setupScene(skin, camera, sun, renderEars, renderLayers, slimArms, showCape);
+    onMount(() => {
+        const c = setInterval(() => {
+            sceneTicker();
+        }, 50);
+        
+        return () => {
+            clearInterval(c);
+        }
+    })
+    
+    $: canvas && isInitialized && skin && setupScene(skin, camera, sun, movement, renderEars, renderLayers, slimArms, showCape);
 </script>
 
 {#if dev && showDevInfo}

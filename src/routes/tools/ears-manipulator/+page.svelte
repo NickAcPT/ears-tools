@@ -76,7 +76,7 @@
         }
 
         $lastEarsFeatures = $earsFeatures;
-        console.log("Updating features");
+        console.log("Updating features", $lastEarsFeatures);
 
         try {
             const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $earsFeatures);
