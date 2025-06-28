@@ -163,20 +163,27 @@ function passArray8ToWasm0(arg, malloc) {
  * @param {SceneCameraSettings} settings
  * @param {SceneLightingSettings} light
  * @param {SceneCharacterSettings} model
+ * @param {SceneMovementSettings} movement
  * @param {Uint8Array} skin
  * @returns {Promise<void>}
  */
-export function setup_scene(settings, light, model, skin) {
+export function setup_scene(settings, light, model, movement, skin) {
     _assertClass(settings, SceneCameraSettings);
     var ptr0 = settings.__destroy_into_raw();
     _assertClass(light, SceneLightingSettings);
     var ptr1 = light.__destroy_into_raw();
     _assertClass(model, SceneCharacterSettings);
     var ptr2 = model.__destroy_into_raw();
-    const ptr3 = passArray8ToWasm0(skin, wasm.__wbindgen_malloc);
-    const len3 = WASM_VECTOR_LEN;
-    const ret = wasm.setup_scene(ptr0, ptr1, ptr2, ptr3, len3);
+    _assertClass(movement, SceneMovementSettings);
+    var ptr3 = movement.__destroy_into_raw();
+    const ptr4 = passArray8ToWasm0(skin, wasm.__wbindgen_malloc);
+    const len4 = WASM_VECTOR_LEN;
+    const ret = wasm.setup_scene(ptr0, ptr1, ptr2, ptr3, ptr4, len4);
     return ret;
+}
+
+export function tick_scene() {
+    wasm.tick_scene();
 }
 
 /**
@@ -262,7 +269,7 @@ function __wbg_adapter_18(arg0, arg1, arg2) {
     wasm.closure51_externref_shim(arg0, arg1, arg2);
 }
 
-function __wbg_adapter_96(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_102(arg0, arg1, arg2, arg3) {
     wasm.closure68_externref_shim(arg0, arg1, arg2, arg3);
 }
 
@@ -521,6 +528,57 @@ export class SceneLightingSettings {
     }
 }
 
+const SceneMovementSettingsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_scenemovementsettings_free(ptr >>> 0, 1));
+
+export class SceneMovementSettings {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        SceneMovementSettingsFinalization.unregister(this);
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_scenemovementsettings_free(ptr, 0);
+    }
+    /**
+     * @returns {number}
+     */
+    get limb_swing() {
+        const ret = wasm.__wbg_get_scenemovementsettings_limb_swing(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set limb_swing(arg0) {
+        wasm.__wbg_set_scenemovementsettings_limb_swing(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @returns {number}
+     */
+    get body_yaw() {
+        const ret = wasm.__wbg_get_scenemovementsettings_body_yaw(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set body_yaw(arg0) {
+        wasm.__wbg_set_scenemovementsettings_body_yaw(this.__wbg_ptr, arg0);
+    }
+    constructor() {
+        const ret = wasm.scenemovementsettings_new();
+        this.__wbg_ptr = ret >>> 0;
+        SceneMovementSettingsFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+}
+
 const WasmVec2Finalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_wasmvec2_free(ptr >>> 0, 1));
@@ -550,27 +608,27 @@ export class WasmVec2 {
      * @returns {number}
      */
     get 0() {
-        const ret = wasm.__wbg_get_wasmvec2_0(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_scenemovementsettings_limb_swing(this.__wbg_ptr);
         return ret;
     }
     /**
      * @param {number} arg0
      */
     set 0(arg0) {
-        wasm.__wbg_set_wasmvec2_0(this.__wbg_ptr, arg0);
+        wasm.__wbg_set_scenemovementsettings_limb_swing(this.__wbg_ptr, arg0);
     }
     /**
      * @returns {number}
      */
     get 1() {
-        const ret = wasm.__wbg_get_wasmvec2_1(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_scenemovementsettings_body_yaw(this.__wbg_ptr);
         return ret;
     }
     /**
      * @param {number} arg0
      */
     set 1(arg0) {
-        wasm.__wbg_set_wasmvec2_1(this.__wbg_ptr, arg0);
+        wasm.__wbg_set_scenemovementsettings_body_yaw(this.__wbg_ptr, arg0);
     }
     /**
      * @param {number} x
@@ -613,27 +671,27 @@ export class WasmVec3 {
      * @returns {number}
      */
     get 0() {
-        const ret = wasm.__wbg_get_wasmvec2_0(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_scenemovementsettings_limb_swing(this.__wbg_ptr);
         return ret;
     }
     /**
      * @param {number} arg0
      */
     set 0(arg0) {
-        wasm.__wbg_set_wasmvec2_0(this.__wbg_ptr, arg0);
+        wasm.__wbg_set_scenemovementsettings_limb_swing(this.__wbg_ptr, arg0);
     }
     /**
      * @returns {number}
      */
     get 1() {
-        const ret = wasm.__wbg_get_wasmvec2_1(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_scenemovementsettings_body_yaw(this.__wbg_ptr);
         return ret;
     }
     /**
      * @param {number} arg0
      */
     set 1(arg0) {
-        wasm.__wbg_set_wasmvec2_1(this.__wbg_ptr, arg0);
+        wasm.__wbg_set_scenemovementsettings_body_yaw(this.__wbg_ptr, arg0);
     }
     /**
      * @returns {number}
@@ -735,7 +793,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_96(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_102(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -814,7 +872,7 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper205 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper231 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 52, __wbg_adapter_18);
         return ret;
     };

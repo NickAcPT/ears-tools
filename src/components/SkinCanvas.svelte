@@ -175,7 +175,7 @@
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
         if (module == null) throw new Error("Module is null");
 
-        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, setup_scene, get_camera, get_sun } = module;
+        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, SceneMovementSettings, setup_scene, get_camera, get_sun } = module;
 
         if (isLoadedAlready) {
             let cameraSettings = get_camera();
@@ -210,7 +210,9 @@
         character.is_slim = slimArms;
         character.has_cape = showCape;
 
-        await setup_scene(settings, lighting, character, new Uint8Array(await skinFile.arrayBuffer()));
+        let movement = new SceneMovementSettings();
+        
+        await setup_scene(settings, lighting, character, movement, new Uint8Array(await skinFile.arrayBuffer()));
         console.log("Setup scene");
         isLoadedAlready = true;
     }

@@ -1,14 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-/**
-* @param {Uint8Array} skin_bytes
-* @param {WasmPlayerModel} model
-* @param {boolean} layers
-* @returns {any}
-*/
 export function generate_blockbench_model(skin_bytes: Uint8Array, model: WasmPlayerModel, layers: boolean): any;
-/**
-*/
 export enum WasmPlayerModel {
   Steve = 0,
   Alex = 1,
@@ -18,11 +10,14 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly generate_blockbench_model: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly generate_blockbench_model: (a: number, b: number, c: number, d: number) => [number, number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_exn_store: (a: number) => void;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_export_4: WebAssembly.Table;
+  readonly __externref_table_dealloc: (a: number) => void;
+  readonly __wbindgen_start: () => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

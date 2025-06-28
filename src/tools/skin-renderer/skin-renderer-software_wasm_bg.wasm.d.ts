@@ -1,11 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export const __wbg_wasmvec2_free: (a: number, b: number) => void;
-export const __wbg_get_wasmvec2_0: (a: number) => number;
-export const __wbg_set_wasmvec2_0: (a: number, b: number) => void;
-export const __wbg_get_wasmvec2_1: (a: number) => number;
-export const __wbg_set_wasmvec2_1: (a: number, b: number) => void;
 export const wasmvec2_new: (a: number, b: number) => number;
 export const __wbg_wasmvec3_free: (a: number, b: number) => void;
 export const __wbg_get_wasmvec3_2: (a: number) => number;
@@ -41,7 +36,13 @@ export const __wbg_set_scenecharactersettings_has_layers: (a: number, b: number)
 export const __wbg_get_scenecharactersettings_has_cape: (a: number) => number;
 export const __wbg_set_scenecharactersettings_has_cape: (a: number, b: number) => void;
 export const scenecharactersettings_new: () => number;
-export const setup_scene: (a: number, b: number, c: number, d: number, e: number) => any;
+export const __wbg_scenemovementsettings_free: (a: number, b: number) => void;
+export const __wbg_get_scenemovementsettings_limb_swing: (a: number) => number;
+export const __wbg_set_scenemovementsettings_limb_swing: (a: number, b: number) => void;
+export const __wbg_get_scenemovementsettings_body_yaw: (a: number) => number;
+export const __wbg_set_scenemovementsettings_body_yaw: (a: number, b: number) => void;
+export const scenemovementsettings_new: () => number;
+export const setup_scene: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
 export const get_camera: () => number;
 export const get_sun: () => number;
 export const notify_mouse_down: () => any;
@@ -50,11 +51,17 @@ export const notify_mouse_move: (a: number, b: number) => any;
 export const notify_mouse_scroll: (a: number) => any;
 export const render_frame: () => any;
 export const initialize: (a: any, b: number, c: number) => any;
-export const __wbg_get_wasmvec3_0: (a: number) => number;
-export const __wbg_get_wasmvec3_1: (a: number) => number;
 export const set_camera_rotation: (a: number, b: number, c: number) => void;
 export const __wbg_set_wasmvec3_0: (a: number, b: number) => void;
 export const __wbg_set_wasmvec3_1: (a: number, b: number) => void;
+export const __wbg_set_wasmvec2_0: (a: number, b: number) => void;
+export const __wbg_set_wasmvec2_1: (a: number, b: number) => void;
+export const __wbg_get_wasmvec3_0: (a: number) => number;
+export const __wbg_get_wasmvec3_1: (a: number) => number;
+export const __wbg_get_wasmvec2_0: (a: number) => number;
+export const __wbg_get_wasmvec2_1: (a: number) => number;
+export const tick_scene: () => void;
+export const __wbg_wasmvec2_free: (a: number, b: number) => void;
 export const __wbindgen_exn_store: (a: number) => void;
 export const __externref_table_alloc: () => number;
 export const __wbindgen_export_2: WebAssembly.Table;

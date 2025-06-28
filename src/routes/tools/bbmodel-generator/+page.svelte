@@ -7,11 +7,14 @@
     import SkinDropZone from "../../../components/SkinDropZone.svelte";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
     import { createLazyPromise } from "$lib/misc";
+    import { redirect } from "@sveltejs/kit";
+    import { goto } from "$app/navigation";
 
     const models = Object.entries(WasmPlayerModel).filter((item) => isNaN(Number(item[0])));
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
     let hasLayers = writable<boolean>(true);
+    let openInBlockbenchWeb = writable<boolean>(false);
 
     let loadPromise = createLazyPromise<null>();
 
@@ -45,12 +48,13 @@
         try {
             let result = generate_blockbench_model(new Uint8Array(await file.arrayBuffer()), $skinModel, $hasLayers);
             let model = result;
-            let blob = new Blob([JSON.stringify(model, replacer)], { type: "application/json" });
+            const resultModel = JSON.stringify(model, replacer);
 
             let fileName = file.name.split(".");
             fileName.pop();
             fileName.push("bbmodel");
 
+            const blob = new Blob([resultModel], { type: "application/json" });
             saveAs(blob, fileName.join("."));
         } catch (error) {
             alert("An error occurred while generating the model.\n\nPlease notify @nickac on Discord with the following:\n" + error);
@@ -79,7 +83,7 @@
 <div class="container grid md:grid-cols-2">
     <div class="flex w-full flex-col items-center">
         <h2 class="text-center text-2xl">Settings</h2>
-        <div class="flex h-full max-w-fit flex-col justify-evenly gap-y-2">
+        <div class="flex h-full max-w-fit flex-col gap-y-4">
             <div>
                 <label for="skin-model">Skin model:</label>
                 <select class="rounded border-2 border-accent-500 bg-secondary-50 px-20 py-2" name="skin-model" bind:value={$skinModel}>
@@ -88,10 +92,14 @@
                     {/each}
                 </select>
             </div>
-            <div>
+            <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
-                    <label for="has-layers">Has layers:</label>
+                    <label for="has-layers">Has layers</label>
                     <input type="checkbox" name="has-layers" id="has-layers" bind:checked={$hasLayers} />
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="open-bbweb">Open in Blockbench Web</label>
+                    <input type="checkbox" name="open-bbweb" id="open-bbweb" bind:checked={$openInBlockbenchWeb} />
                 </div>
             </div>
         </div>
