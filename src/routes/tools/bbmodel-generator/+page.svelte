@@ -14,7 +14,6 @@
 
     let skinModel = writable<WasmPlayerModel>(WasmPlayerModel.Steve);
     let hasLayers = writable<boolean>(true);
-    let openInBlockbenchWeb = writable<boolean>(false);
 
     let loadPromise = createLazyPromise<null>();
 
@@ -96,10 +95,6 @@
                 <div class="flex items-center gap-2">
                     <label for="has-layers">Has layers</label>
                     <input type="checkbox" name="has-layers" id="has-layers" bind:checked={$hasLayers} />
-                </div>
-                <div class="flex items-center gap-2">
-                    <label for="open-bbweb">Open in Blockbench Web</label>
-                    <input type="checkbox" name="open-bbweb" id="open-bbweb" bind:checked={$openInBlockbenchWeb} />
                 </div>
             </div>
         </div>
