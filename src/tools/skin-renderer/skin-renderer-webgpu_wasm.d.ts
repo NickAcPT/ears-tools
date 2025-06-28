@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
-export function setup_scene(settings: SceneCameraSettings, light: SceneLightingSettings, model: SceneCharacterSettings, skin: Uint8Array): Promise<void>;
+export function setup_scene(settings: SceneCameraSettings, light: SceneLightingSettings, model: SceneCharacterSettings, movement: SceneMovementSettings, skin: Uint8Array): Promise<void>;
+export function tick_scene(): void;
 export function get_camera(): SceneCameraSettings;
 export function get_sun(): SceneLightingSettings;
 export function set_camera_rotation(yaw: number, pitch: number, roll: number): void;
@@ -34,6 +35,12 @@ export class SceneLightingSettings {
   intensity: number;
   ambient: number;
 }
+export class SceneMovementSettings {
+  free(): void;
+  constructor();
+  limb_swing: number;
+  body_yaw: number;
+}
 export class WasmVec2 {
   free(): void;
   constructor(x: number, y: number);
@@ -52,11 +59,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_wasmvec2_free: (a: number, b: number) => void;
-  readonly __wbg_get_wasmvec2_0: (a: number) => number;
-  readonly __wbg_set_wasmvec2_0: (a: number, b: number) => void;
-  readonly __wbg_get_wasmvec2_1: (a: number) => number;
-  readonly __wbg_set_wasmvec2_1: (a: number, b: number) => void;
   readonly wasmvec2_new: (a: number, b: number) => number;
   readonly __wbg_wasmvec3_free: (a: number, b: number) => void;
   readonly __wbg_get_wasmvec3_2: (a: number) => number;
@@ -92,7 +94,13 @@ export interface InitOutput {
   readonly __wbg_get_scenecharactersettings_has_cape: (a: number) => number;
   readonly __wbg_set_scenecharactersettings_has_cape: (a: number, b: number) => void;
   readonly scenecharactersettings_new: () => number;
-  readonly setup_scene: (a: number, b: number, c: number, d: number, e: number) => any;
+  readonly __wbg_scenemovementsettings_free: (a: number, b: number) => void;
+  readonly __wbg_get_scenemovementsettings_limb_swing: (a: number) => number;
+  readonly __wbg_set_scenemovementsettings_limb_swing: (a: number, b: number) => void;
+  readonly __wbg_get_scenemovementsettings_body_yaw: (a: number) => number;
+  readonly __wbg_set_scenemovementsettings_body_yaw: (a: number, b: number) => void;
+  readonly scenemovementsettings_new: () => number;
+  readonly setup_scene: (a: number, b: number, c: number, d: number, e: number, f: number) => any;
   readonly get_camera: () => number;
   readonly get_sun: () => number;
   readonly notify_mouse_down: () => any;
@@ -101,11 +109,17 @@ export interface InitOutput {
   readonly notify_mouse_scroll: (a: number) => any;
   readonly render_frame: () => any;
   readonly initialize: (a: any, b: number, c: number) => any;
-  readonly __wbg_get_wasmvec3_0: (a: number) => number;
-  readonly __wbg_get_wasmvec3_1: (a: number) => number;
-  readonly set_camera_rotation: (a: number, b: number, c: number) => void;
   readonly __wbg_set_wasmvec3_0: (a: number, b: number) => void;
   readonly __wbg_set_wasmvec3_1: (a: number, b: number) => void;
+  readonly __wbg_set_wasmvec2_0: (a: number, b: number) => void;
+  readonly __wbg_set_wasmvec2_1: (a: number, b: number) => void;
+  readonly __wbg_get_wasmvec3_0: (a: number) => number;
+  readonly __wbg_get_wasmvec3_1: (a: number) => number;
+  readonly __wbg_get_wasmvec2_0: (a: number) => number;
+  readonly __wbg_get_wasmvec2_1: (a: number) => number;
+  readonly set_camera_rotation: (a: number, b: number, c: number) => void;
+  readonly tick_scene: () => void;
+  readonly __wbg_wasmvec2_free: (a: number, b: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __externref_table_alloc: () => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
@@ -113,8 +127,8 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_6: WebAssembly.Table;
-  readonly closure216_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure545_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure215_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure544_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 
