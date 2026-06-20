@@ -12,7 +12,8 @@
         emissiveSkin,
         lastEarsFeatures,
         manipulatorShowCape,
-        manipulatorSkinFile,
+        manipulatorOutSkinFile,
+        originalManipulatorSkinFile,
         manipulatorSkinSlimModel,
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
@@ -57,7 +58,7 @@
     $: currentPage != undefined && ($manipulatorShowCape = true);
     $: canvasScale = renderingSupport != undefined && $renderingSupport == RenderingSupport.SoftwareRendering ? 0.75 : 1;
 
-    $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $manipulatorSkinFile && tick().then(updateFeatures);
+    $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $originalManipulatorSkinFile && tick().then(updateFeatures);
 
     resetManipulatorEarsFeatures(true);
     
@@ -70,8 +71,8 @@
     } as SkinCanvasSunSettings;
     
     async function updateFeatures() {
-        if (!$manipulatorSkinFile || !manipulatorInitialized) {
-            console.log(!$manipulatorSkinFile, !manipulatorInitialized);
+        if (!$originalManipulatorSkinFile || !manipulatorInitialized) {
+            console.log(!$originalManipulatorSkinFile, !manipulatorInitialized);
             return;
         }
 
@@ -79,14 +80,14 @@
         console.log("Updating features");
 
         try {
-            const newFile = apply_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()), $earsFeatures);
+            const newFile = apply_features(new Uint8Array(await $originalManipulatorSkinFile.arrayBuffer()), $earsFeatures);
 
-            $manipulatorSkinFile = new File([newFile], $manipulatorSkinFile.name, {
-                type: $manipulatorSkinFile.type,
+            $manipulatorOutSkinFile = new File([newFile], $originalManipulatorSkinFile.name, {
+                type: $originalManipulatorSkinFile.type,
                 lastModified: new Date().getTime(),
             });
         } catch (e) {
-            const features = await get_ears_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()));
+            const features = await get_ears_features(new Uint8Array(await $originalManipulatorSkinFile.arrayBuffer()));
             setEarsFeatures(features);
 
             if (e instanceof Error) {
@@ -129,7 +130,7 @@
             width={512 * canvasScale}
             height={832 * canvasScale}
             currentRenderingSupport={renderingSupport}
-            skin={$manipulatorSkinFile}
+            skin={$manipulatorOutSkinFile}
             slimArms={$manipulatorSkinSlimModel}
             bind:sun
         />
@@ -162,7 +163,7 @@
             </div>
         </div>
 
-        <div class="flex justify-end gap-2" class:hidden={!$manipulatorSkinFile || currentPage == 0}>
+        <div class="flex justify-end gap-2" class:hidden={!$manipulatorOutSkinFile || currentPage == 0}>
             <!-- prettier-ignore -->
             <ol class="flex items-center justify-center gap-1">
                 {#each pages as _, i}

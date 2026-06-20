@@ -29,7 +29,8 @@ const SOURCE_DEFAULT = TextureSource.SampleSkin;
 export const manipulatorWizardPageTitle = writable<string | null>(null);
 export const manipulatorShowCape = writable<boolean>(true);
 
-export const manipulatorSkinFile = writable<File | null>(null);
+export const originalManipulatorSkinFile = writable<File | null>(null);
+export const manipulatorOutSkinFile = writable<File | null>(null);
 export const manipulatorSkinSlimModel = writable<boolean>(false);
 
 export const snout = writable(FEATURE_DEFAULT);
@@ -68,8 +69,10 @@ export const capeImage = writable<Uint8Array | undefined>(undefined);
 
 export const alfalfaData = writable<AlfalfaData | undefined>(undefined);
 
+export const applyTemplate = writable<boolean>(true);
+
 export const lastEarsFeatures = writable<EarsFeatures | undefined>(undefined);
-export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn, capeImage, wingsImage, chestSize, alfalfaData, earsSource, snoutSource, wingsSource, protrusionsSource, tailSource, emissiveSkin, emissivePalette, dataVersion], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn, $capeImage, $wingsFile, $chestSize, $alfalfaData, $earsSource, $snoutSource, $wingsSource, $protrusionsSource, $tailSource, $emissiveSkin, $emissivePalette, $dataVersion]) => {
+export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAnchor, tailMode, tailSegments, tailBends, snout, snoutWidth, snoutHeight, snoutOffset, snoutLength, wingsMode, wingsAnimations, claws, horn, capeImage, wingsImage, chestSize, alfalfaData, earsSource, snoutSource, wingsSource, protrusionsSource, tailSource, emissiveSkin, emissivePalette, dataVersion, applyTemplate], ([$ears, $earsAnchor, $tail, $tailSegments, $tailBends, $snout, $snoutWidth, $snoutHeight, $snoutOffset, $snoutLength, $wings, $wingsAnimations, $claws, $horn, $capeImage, $wingsFile, $chestSize, $alfalfaData, $earsSource, $snoutSource, $wingsSource, $protrusionsSource, $tailSource, $emissiveSkin, $emissivePalette, $dataVersion, $applyTemplate]) => {
     if ($snoutOffset > (8-$snoutHeight)) {
         snoutOffset.set(8-$snoutHeight);
     }
@@ -113,7 +116,8 @@ export const earsFeatures: Readable<EarsFeatures> = derived([earsMode, earsAncho
             enabled: $emissiveSkin,
             palette: $emissivePalette ?? []
         },
-        dataVersion: $dataVersion
+        dataVersion: $dataVersion,
+        applyTemplate: $applyTemplate
     });
 });
 
@@ -152,11 +156,13 @@ export function setEarsFeatures(features: EarsFeatures | null) {
     emissivePalette.set(features.emissives.palette);
     
     dataVersion.set(features.dataVersion);
+    applyTemplate.set(features.applyTemplate);
 }
 
 export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
     if (resetFile) {
-        manipulatorSkinFile.set(null);
+        manipulatorOutSkinFile.set(null);
+        originalManipulatorSkinFile.set(null);
         manipulatorSkinSlimModel.set(false);
     }
 

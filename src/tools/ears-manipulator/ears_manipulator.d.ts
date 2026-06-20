@@ -8,9 +8,9 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly apply_features: (a: number, b: number, c: any) => [number, number, number];
   readonly get_ears_features: (a: number, b: number) => [number, number, number];
   readonly get_template_skin: (a: any) => [number, number, number];
-  readonly apply_features: (a: number, b: number, c: any) => [number, number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;

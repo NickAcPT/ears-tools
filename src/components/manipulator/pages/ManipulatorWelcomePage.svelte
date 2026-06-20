@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { earsFeatures, manipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores";
+    import { earsFeatures, manipulatorOutSkinFile, originalManipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores";
     import { createEventDispatcher } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
@@ -16,10 +16,11 @@
         }
 
         const file = list[0];
-        $manipulatorSkinFile = file;
+        $manipulatorOutSkinFile = file;
+        $originalManipulatorSkinFile = file;
 
         try {
-            const features = await get_ears_features(new Uint8Array(await $manipulatorSkinFile.arrayBuffer()));
+            const features = await get_ears_features(new Uint8Array(await $manipulatorOutSkinFile.arrayBuffer()));
             console.log("Updating features from skin", features);
 
             setEarsFeatures(features);
@@ -33,7 +34,6 @@
     function handleDemoSkinTemplate(e: CustomEvent<{ replace: (skin: BlobPart) => void; }>): void {
         e.preventDefault();
         const skin = get_template_skin($earsFeatures);
-        
         e.detail.replace(skin);
     }
 </script>

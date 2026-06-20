@@ -15,6 +15,7 @@ export interface EarsFeatures {
     alfalfa?: AlfalfaData;
     emissives: EmissiveData;
     dataVersion: number;
+    applyTemplate: boolean;
 }
 
 export interface EmissiveData {
