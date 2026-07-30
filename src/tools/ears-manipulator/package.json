@@ -1,0 +1,24 @@
+{
+  "name": "ears-manipulator",
+  "type": "module",
+  "collaborators": [
+    "NickAcPT"
+  ],
+  "version": "0.1.0",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NickAcPT/ears-tools-rs"
+  },
+  "files": [
+    "ears_manipulator_bg.wasm",
+    "ears_manipulator.js",
+    "ears_manipulator.d.ts"
+  ],
+  "main": "ears_manipulator.js",
+  "homepage": "https://ears.nickac.dev/",
+  "types": "ears_manipulator.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
