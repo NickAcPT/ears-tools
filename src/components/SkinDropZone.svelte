@@ -31,6 +31,10 @@
         if ($page.url.searchParams.has("base64")) return;
 
         let blobPart = undefined;
+        if (slimArms) {
+            $slimArms = true;
+        }
+
 
         const cancelled = dispatch(
             "offerDemoSkin",
@@ -61,9 +65,6 @@
         let file = new File([blobPart], "demo-skin.png", { type: "image/png" });
         list.items.add(file);
 
-        if (slimArms) {
-            $slimArms = true;
-        }
         dispatch("files", list.files);
     }
 

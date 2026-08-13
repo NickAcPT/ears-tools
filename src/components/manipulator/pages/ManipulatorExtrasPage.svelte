@@ -1,7 +1,9 @@
 <script lang="ts">
-    import { capeImage, chestSize, emissivePalette, emissiveSkin } from "$lib/stores";
+    import { LegMode } from "$lib/ears-manipulator";
+    import { capeImage, chestSize, emissivePalette, emissiveSkin, legMode } from "$lib/stores";
     import DeleteIcon from "../../icons/DeleteIcon.svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
+    import ManipulatorEnumPicker from "../ManipulatorEnumPicker.svelte";
 
     async function handleCapeFile(e: CustomEvent<FileList>) {
         let files = e.detail;
@@ -66,7 +68,7 @@
             <div class="flex flex-1 items-start gap-2">
                 <!-- prettier-ignore -->
                 <img class="h-full pixelated aspect-auto" src={URL.createObjectURL(new Blob([$capeImage], { type: "image/png" }))} alt="Cape texture" />
-                <button class="mt-2" on:click={() => $capeImage = undefined}>Remove</button>
+                <button class="mt-2" on:click={() => ($capeImage = undefined)}>Remove</button>
             </div>
         {/if}
     </div>
@@ -75,6 +77,11 @@
     <h2 class="text-2xl">Chest size</h2>
     <label for="chest-size">Chest Size</label>
     <input type="range" id="chest-size" min="0" max="1" step="0.1" bind:value={$chestSize} />
+</div>
+
+<div>
+    <h2 class="text-2xl">Legs</h2>
+    <ManipulatorEnumPicker elements={LegMode} kind="leg-mode" value={legMode} class="py-4" />
 </div>
 
 <div>

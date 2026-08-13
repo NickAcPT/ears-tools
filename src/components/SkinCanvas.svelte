@@ -72,7 +72,7 @@
         }
         isLoadedAlready = false;
         isInitialized = false;
-        
+
         const renderingOverride = $page.url.searchParams.get("rendering");
         if (renderingOverride) {
             let targetSupport: RenderingSupport | undefined = undefined;
@@ -81,15 +81,14 @@
             } catch (e) {
                 console.error("Invalid rendering override provided", e);
             }
-            
+
             if (targetSupport != undefined && targetSupport != $currentRenderingSupport) {
                 console.log("Overriding rendering support to", RenderingSupport[targetSupport]);
                 $currentRenderingSupport = targetSupport;
                 throw new Error("Rendering support overridden");
             }
         }
-        
-        
+
         try {
             let renderers = import.meta.glob("./../tools/skin-renderer/*.js");
             let name = "";
@@ -120,9 +119,9 @@
                     fallbackRenderingSupport();
                 };
                 await init().catch(handleError);
-                
-                console.log("Initialized skin renderer module", width, height)
-                
+
+                console.log("Initialized skin renderer module", width, height);
+
                 if (width % 4 != 0) {
                     // Width must be a multiple of 4
                     throw new Error("Width must be a multiple of 4");
@@ -175,7 +174,7 @@
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
         if (module == null) throw new Error("Module is null");
 
-        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, SceneMovementSettings, setup_scene, get_camera, get_sun } = module;
+        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, setup_scene, get_camera, get_sun } = module;
 
         if (isLoadedAlready) {
             let cameraSettings = get_camera();
@@ -210,9 +209,7 @@
         character.is_slim = slimArms;
         character.has_cape = showCape;
 
-        let movement = new SceneMovementSettings();
-        
-        await setup_scene(settings, lighting, character, movement, new Uint8Array(await skinFile.arrayBuffer()));
+        await setup_scene(settings, lighting, character, new Uint8Array(await skinFile.arrayBuffer()));
         console.log("Setup scene");
         isLoadedAlready = true;
     }
@@ -284,21 +281,21 @@
 {#key $currentRenderingSupport}
     <RequiresWasm updateReceiver={currentRenderingSupport} init={initWasm} />
 
-    <div class="flex min-h-0 max-h-full">
+    <div class="flex max-h-full min-h-0">
         <canvas
-        style:width="100%"
-        style:touch-action="none"
-        style:display={isInitialized ? "block" : "none"}
-        bind:this={canvas}
-        {...$$restProps}
-        on:touchstart|preventDefault={handleTouchStart}
-        on:touchend|preventDefault={handleTouchEnd}
-        on:touchmove|preventDefault={handleTouchMove}
-        on:pointerdown|preventDefault={handlePointerDown}
-        on:pointerup|preventDefault={handlePointerUp}
-        on:pointermove|preventDefault={handlePointerMove}
-        on:wheel|preventDefault={handleScroll}
-    ></canvas>
+            style:width="100%"
+            style:touch-action="none"
+            style:display={isInitialized ? "block" : "none"}
+            bind:this={canvas}
+            {...$$restProps}
+            on:touchstart|preventDefault={handleTouchStart}
+            on:touchend|preventDefault={handleTouchEnd}
+            on:touchmove|preventDefault={handleTouchMove}
+            on:pointerdown|preventDefault={handlePointerDown}
+            on:pointerup|preventDefault={handlePointerUp}
+            on:pointermove|preventDefault={handlePointerMove}
+            on:wheel|preventDefault={handleScroll}
+        ></canvas>
     </div>
 {/key}
 

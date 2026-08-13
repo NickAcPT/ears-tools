@@ -11,6 +11,7 @@ export interface EarsFeatures {
     snout?: SnoutSettings;
     wings: WingSettings;
     cape?: Uint8Array;
+    legMode: LegMode;
     chestSize: number;
     alfalfa?: AlfalfaData;
     emissives: EmissiveData;
@@ -38,6 +39,8 @@ export interface TailSettings {
     mode: TailMode;
     segments: 1 | 2 | 3 | 4;
     bends: number[];
+    animate: boolean;
+    swap_jacket_back: boolean;
     source: TextureSource;
 }
 
@@ -71,7 +74,7 @@ export enum EarsMode {
     Out,
     Cross,
     Tall,
-    TallCross
+    TallCross,
 }
 
 export enum EarsAnchor {
@@ -82,7 +85,22 @@ export enum EarsAnchor {
 
 export enum Protrusion {
     Claws,
-    Horns
+    Horns,
+    Halo,
+    DoubleHalo,
+}
+
+export enum LegMode {
+    Plantigrade,
+    DigitigradePartial,
+    DigitigradeFull,
+}
+
+export enum HeadProtrusion {
+    None,
+    Horns,
+    Halo,
+    DoubleHalo,
 }
 
 export enum TailMode {
@@ -109,5 +127,6 @@ export enum WingsMode {
 
 export enum WingsAnimations {
     Normal,
-    None
+    None,
+    NoFlight,
 }

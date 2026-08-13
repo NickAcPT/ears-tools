@@ -14,6 +14,7 @@
         manipulatorShowCape,
         manipulatorOutSkinFile,
         originalManipulatorSkinFile,
+        manipulatorSkinIsGeneratedTemplate,
         manipulatorSkinSlimModel,
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
@@ -23,7 +24,7 @@
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import type { SkinCanvasSunSettings } from "$lib/skin-canvas";
     import { RenderingSupport, renderingSupport } from "$lib/rendering-support";
-    import init, { get_ears_features } from "../../../tools/ears-manipulator/ears_manipulator";
+    import init, { get_ears_features, get_template_skin } from "../../../tools/ears-manipulator/ears_manipulator";
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     import { apply_features } from "../../../tools/ears-manipulator/ears_manipulator";
@@ -58,7 +59,7 @@
     $: currentPage != undefined && ($manipulatorShowCape = true);
     $: canvasScale = renderingSupport != undefined && $renderingSupport == RenderingSupport.SoftwareRendering ? 0.75 : 1;
 
-    $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $originalManipulatorSkinFile && tick().then(updateFeatures);
+    $: manipulatorInitialized != undefined && $earsFeatures !== $lastEarsFeatures && $originalManipulatorSkinFile && tick().then(() => updateFeatures());
 
     resetManipulatorEarsFeatures(true);
     
@@ -70,17 +71,44 @@
         ambient: $emissiveSkin && $lightsOut ? 0.0 : null,
     } as SkinCanvasSunSettings;
     
-    async function updateFeatures() {
+    async function updateFeatures(regenerateTemplateBase = false) {
         if (!$originalManipulatorSkinFile || !manipulatorInitialized) {
             console.log(!$originalManipulatorSkinFile, !manipulatorInitialized);
             return;
         }
 
+        const originalSkinFile = $originalManipulatorSkinFile;
         $lastEarsFeatures = $earsFeatures;
         console.log("Updating features");
 
         try {
-            const newFile = apply_features(new Uint8Array(await $originalManipulatorSkinFile.arrayBuffer()), $earsFeatures);
+            let baseSkin: Uint8Array;
+            if ($manipulatorSkinIsGeneratedTemplate && regenerateTemplateBase) {
+                console.log("Regenerating template base skin", {
+                    slimArms: $manipulatorSkinSlimModel,
+                    features: $earsFeatures,
+                });
+                baseSkin = get_template_skin($earsFeatures, $manipulatorSkinSlimModel);
+                console.log("Regenerated template base skin", {
+                    slimArms: $manipulatorSkinSlimModel,
+                    byteLength: baseSkin.byteLength,
+                });
+            } else {
+                baseSkin = new Uint8Array(await originalSkinFile.arrayBuffer());
+            }
+
+            if ($manipulatorSkinIsGeneratedTemplate && regenerateTemplateBase) {
+                $originalManipulatorSkinFile = new File([baseSkin], originalSkinFile.name, {
+                    type: originalSkinFile.type,
+                    lastModified: new Date().getTime(),
+                });
+            }
+
+            const newFile = apply_features(
+                baseSkin,
+                $earsFeatures,
+                $manipulatorSkinSlimModel,
+            );
 
             $manipulatorOutSkinFile = new File([newFile], $originalManipulatorSkinFile.name, {
                 type: $originalManipulatorSkinFile.type,
@@ -136,7 +164,12 @@
         />
         <label for="manipulator-use-slim-arms" class="flex items-center gap-2">
             <span>Use slim arms for preview</span>
-            <input type="checkbox" id="manipulator-use-slim-arms" bind:checked={$manipulatorSkinSlimModel} />
+            <input
+                type="checkbox"
+                id="manipulator-use-slim-arms"
+                bind:checked={$manipulatorSkinSlimModel}
+                on:change={() => tick().then(() => updateFeatures(true))}
+            />
         </label>
         
         

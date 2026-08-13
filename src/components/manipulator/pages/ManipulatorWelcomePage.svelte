@@ -1,11 +1,20 @@
 <script lang="ts">
-    import { earsFeatures, manipulatorOutSkinFile, originalManipulatorSkinFile, manipulatorSkinSlimModel, setEarsFeatures } from "$lib/stores";
+    import {
+        earsFeatures,
+        manipulatorOutSkinFile,
+        manipulatorSkinIsGeneratedTemplate,
+        originalManipulatorSkinFile,
+        manipulatorSkinSlimModel,
+        setEarsFeatures,
+    } from "$lib/stores";
     import { createEventDispatcher } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
     import { get_ears_features, get_template_skin } from "../../../tools/ears-manipulator/ears_manipulator";
 
     const dispatcher = createEventDispatcher();
+
+    let isDemoTemplate = false;
 
     async function handleFiles(e: CustomEvent<FileList>) {
         const list = e.detail;
@@ -14,6 +23,9 @@
             console.error("Only one file can be uploaded at a time.");
             return;
         }
+
+        const isDemoSkin = isDemoTemplate;
+        isDemoTemplate = false;
 
         const file = list[0];
         $manipulatorOutSkinFile = file;
@@ -24,6 +36,7 @@
             console.log("Updating features from skin", features);
 
             setEarsFeatures(features);
+            $manipulatorSkinIsGeneratedTemplate = isDemoSkin;
         } catch (e: any) {
             console.error(e);
         }
@@ -33,7 +46,16 @@
 
     function handleDemoSkinTemplate(e: CustomEvent<{ replace: (skin: BlobPart) => void; }>): void {
         e.preventDefault();
-        const skin = get_template_skin($earsFeatures);
+        console.log("Generating demo template skin", {
+            slimArms: $manipulatorSkinSlimModel,
+            features: $earsFeatures,
+        });
+        const skin = get_template_skin($earsFeatures, $manipulatorSkinSlimModel);
+        console.log("Generated demo template skin", {
+            slimArms: $manipulatorSkinSlimModel,
+            byteLength: skin.byteLength,
+        });
+        isDemoTemplate = true;
         e.detail.replace(skin);
     }
 </script>
