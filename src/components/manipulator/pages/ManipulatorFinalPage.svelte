@@ -15,6 +15,14 @@
     <div class="space-y-2">
         <h1 class="text-3xl font-semibold">Export</h1>
     </div>
+    <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-secondary-500/30 p-4 shadow-sm" for="manipulator-apply-template">
+        <input class="mt-0.5 shrink-0" type="checkbox" id="manipulator-apply-template" bind:checked={$applyTemplate} />
+        <span class="space-y-1">
+            <span class="block font-medium">Apply ears parts template to skin</span>
+            <span class="block text-sm text-text/80">Includes placeholders in the final skin to make it easier to visually find the new Ears parts.</span>
+        </span>
+    </label>
+
 
     <div class="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,22rem)]">
         <div class="rounded-2xl border border-secondary-500/30 p-4 shadow-sm">
@@ -72,12 +80,6 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-start gap-3 rounded-xl p-2">
-                        <input class="mt-0.5 shrink-0" type="checkbox" id="manipulator-apply-template" bind:checked={$applyTemplate} />
-                        <div class="space-y-1">
-                            <label class="block text-sm font-medium" for="manipulator-apply-template">Apply template</label>
-                        </div>
-                    </div>
                 </div>
             </details>
         </aside>
