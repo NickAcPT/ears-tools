@@ -39,7 +39,7 @@
 
     let module: SkinRendererModule | null = null;
 
-    function checkWebGpuSupport(): boolean {
+    async function checkWebGpuSupport(): Promise<boolean> {
         if (!browser || $currentRenderingSupport !== RenderingSupport.WebGPU) {
             return true;
         }
@@ -57,7 +57,20 @@
                 if (!canvas.getContext("webgpu")) {
                     throw new Error("WebGPU is supported, but no context could be created");
                 }
-                return true;
+            } catch (error) {
+                return false;
+            }
+            
+            // Try to request an adapter and device
+            try {
+                const adapter = await navigator.gpu.requestAdapter();
+                if (!adapter) {
+                    throw new Error("WebGPU is supported, but no adapter could be requested");
+                }
+                const device = await adapter.requestDevice();
+                if (!device) {
+                    throw new Error("WebGPU is supported, but no device could be requested");
+                }
             } catch (error) {
                 return false;
             }
@@ -104,7 +117,7 @@
                     break;
             }
 
-            if (renderingOverride == undefined && !checkWebGpuSupport()) {
+            if (renderingOverride == undefined && !(await checkWebGpuSupport())) {
                 throw new Error("WebGPU is not supported - Performing fallback");
             }
 
