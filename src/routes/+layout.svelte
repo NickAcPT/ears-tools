@@ -7,7 +7,9 @@
     
     if (browser) {
         import("eruda").then((eruda) => {
-            eruda.default.init();
+            if (window.location.search.includes("eruda")) {
+                eruda.default.init();
+            }
         });
     }
 </script>
