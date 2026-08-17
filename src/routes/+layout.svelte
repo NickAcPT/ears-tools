@@ -3,6 +3,13 @@
     import { page } from "$app/stores";
     import Navbar from "../components/Navbar.svelte";
     import { base } from "$app/paths";
+    import { browser } from "$app/environment";
+    
+    if (browser) {
+        import("eruda").then((eruda) => {
+            eruda.default.init();
+        });
+    }
 </script>
 
 <svelte:head>
