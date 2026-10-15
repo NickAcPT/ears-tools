@@ -1,4 +1,4 @@
-export type AlfalfaPredefinedKey = "END" | "wing" | "erase" | "cape";
+export type AlfalfaPredefinedKey = "END" | "wing" | "erase" | "cape" | "locator";
 export type AlfalfaKey = AlfalfaPredefinedKey | string;
 
 export interface AlfalfaBinaryEntryData {
@@ -28,8 +28,18 @@ export type AlfalfaEntry = {
     value: AlfalfaEntryData;
 };
 
+// Keys holding PNG data that the wasm reader doesn't know about (it only tags `cape` and `wing` as images).
+// Image and binary entries are encoded identically, so this only affects how the entry is presented.
+const EXTRA_IMAGE_KEYS: AlfalfaKey[] = ["locator"];
+
 export class AlfalfaData {
     constructor(public data: Record<AlfalfaKey, AlfalfaEntryData>) {
+        for (const key of EXTRA_IMAGE_KEYS) {
+            const entry = data[key];
+            if (entry?.type === "binary") {
+                data[key] = { type: "image", value: entry.value };
+            }
+        }
     }
 
     get(key: AlfalfaKey): AlfalfaEntryData | undefined {
