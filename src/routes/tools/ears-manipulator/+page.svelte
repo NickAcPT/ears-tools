@@ -8,6 +8,7 @@
     import ManipulatorFinalPage from "../../../components/manipulator/pages/ManipulatorFinalPage.svelte";
 
     import {
+        applyTemplate,
         earsFeatures,
         emissiveSkin,
         lastEarsFeatures,
@@ -184,6 +185,12 @@
             <span>Show ears</span>
             <input type="checkbox" id="manipulator-show-ears" bind:checked={$showEars} />
         </label>
+        {#if currentPage !== pages.length - 1}
+            <label for="manipulator-preview-template" class="flex items-center gap-2" title="Includes placeholders in the skin to make it easier to visually find the new Ears parts.">
+                <span>Show Ears template</span>
+                <input type="checkbox" id="manipulator-preview-template" bind:checked={$applyTemplate} />
+            </label>
+        {/if}
 
         {#if $emissiveSkin}
             <label for="manipulator-lights-out" class="flex items-center gap-2">
