@@ -44,6 +44,8 @@
     let skinDropZone: SkinDropZone;
 
     let demoUsesSlimSkin = writable(false);
+    let showLayers = writable(true);
+    let showEars = writable(true);
 
     async function initWasm() {
         if (!browser) {
@@ -330,6 +332,14 @@
                 <label for="slim-skin">Use slim skin</label>
                 <input type="checkbox" id="slim-skin" bind:checked={$demoUsesSlimSkin} />
             </div>
+            <div class="flex gap-2">
+                <label for="show-layers">Show layers</label>
+                <input type="checkbox" id="show-layers" bind:checked={$showLayers} />
+            </div>
+            <div class="flex gap-2">
+                <label for="show-ears">Show ears</label>
+                <input type="checkbox" id="show-ears" bind:checked={$showEars} />
+            </div>
             {#if $renderingSupport == RenderingSupport.SoftwareRendering}
                 <div class="min-w-none w-full break-words">
                     <p>Warning: Software rendering enabled for the skin preview.</p>
@@ -373,6 +383,8 @@
                     class="flex-1 object-contain"
                     skin={$lastSkin}
                     slimArms={$demoUsesSlimSkin}
+                    renderLayers={$showLayers}
+                    renderEars={$showEars}
                 />
             </div>
         </div>

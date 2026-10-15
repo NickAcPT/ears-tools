@@ -64,6 +64,9 @@
     resetManipulatorEarsFeatures(true);
     
     let lightsOut = writable(false);
+    let showLayers = writable(true);
+    let showEars = writable(true);
+
     $: sun = {
         direction: [0.0, 1.0, 1.0],
         renderShading: true,
@@ -160,6 +163,8 @@
             currentRenderingSupport={renderingSupport}
             skin={$manipulatorOutSkinFile}
             slimArms={$manipulatorSkinSlimModel}
+            renderLayers={$showLayers}
+            renderEars={$showEars}
             bind:sun
         />
         <label for="manipulator-use-slim-arms" class="flex items-center gap-2">
@@ -171,8 +176,15 @@
                 on:change={() => tick().then(() => updateFeatures(true))}
             />
         </label>
-        
-        
+        <label for="manipulator-show-layers" class="flex items-center gap-2">
+            <span>Show layers</span>
+            <input type="checkbox" id="manipulator-show-layers" bind:checked={$showLayers} />
+        </label>
+        <label for="manipulator-show-ears" class="flex items-center gap-2">
+            <span>Show ears</span>
+            <input type="checkbox" id="manipulator-show-ears" bind:checked={$showEars} />
+        </label>
+
         {#if $emissiveSkin}
             <label for="manipulator-lights-out" class="flex items-center gap-2">
                 <span>Lights out! <em>(To test emissive skins)</em></span>
