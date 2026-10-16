@@ -34,6 +34,7 @@ import {
     snoutWidth,
     tailBends,
     tailSegments,
+    tailSwapJacketBack,
 } from "./stores";
 
 export interface ManipulatorPreviewSource {
@@ -42,8 +43,8 @@ export interface ManipulatorPreviewSource {
     slimArms: boolean;
     /** The snout an enabled snout gets, also while the skin has none. */
     snout: SnoutSettings;
-    /** The shape tails get. */
-    tail: Pick<TailSettings, "segments" | "bends">;
+    /** The shape and texture of tails. */
+    tail: Pick<TailSettings, "segments" | "bends" | "swap_jacket_back">;
 }
 
 /** Object URLs of the rendered previews, keyed by enum picker kind and then by enum value. */
@@ -196,7 +197,7 @@ export function captureManipulatorPreviewSource(skin: Uint8Array): ManipulatorPr
         slimArms: get(manipulatorSkinSlimModel),
         snout: { width: get(snoutWidth), height: get(snoutHeight), length: get(snoutLength), offset: get(snoutOffset), source: get(snoutSource) },
         // The bends array is mutated in place by the tail page, so the source needs its own copy
-        tail: { segments: get(tailSegments), bends: get(tailBends).slice() },
+        tail: { segments: get(tailSegments), bends: get(tailBends).slice(), swap_jacket_back: get(tailSwapJacketBack) },
     };
 }
 
