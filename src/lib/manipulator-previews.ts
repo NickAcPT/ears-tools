@@ -11,6 +11,7 @@ import {
     headProtrusionToProtrusion,
     type EarsFeatures,
     type SnoutSettings,
+    type TailSettings,
 } from "./ears-manipulator";
 import { enumKeys } from "./misc";
 import { RenderingSupport, renderingSupport } from "./rendering-support";
@@ -23,7 +24,17 @@ import {
     type SkinRendererModule,
     type SkinCanvasSunSettings,
 } from "./skin-canvas";
-import { earsFeatures, manipulatorSkinSlimModel, snoutHeight, snoutLength, snoutOffset, snoutSource, snoutWidth } from "./stores";
+import {
+    earsFeatures,
+    manipulatorSkinSlimModel,
+    snoutHeight,
+    snoutLength,
+    snoutOffset,
+    snoutSource,
+    snoutWidth,
+    tailBends,
+    tailSegments,
+} from "./stores";
 
 export interface ManipulatorPreviewSource {
     skin: Uint8Array;
@@ -31,6 +42,8 @@ export interface ManipulatorPreviewSource {
     slimArms: boolean;
     /** The snout an enabled snout gets, also while the skin has none. */
     snout: SnoutSettings;
+    /** The shape tails get. */
+    tail: Pick<TailSettings, "segments" | "bends">;
 }
 
 /** Object URLs of the rendered previews, keyed by enum picker kind and then by enum value. */
@@ -142,7 +155,7 @@ const PREVIEW_TARGETS: Record<string, PreviewTarget> = {
         focus: ["body"],
         rotation: [-130, 10, 0],
         lookAt: BODY_CENTER,
-        apply: (features, value) => (features.tail.mode = value),
+        apply: (features, value, source) => (features.tail = { ...features.tail, ...source.tail, mode: value }),
     },
     "protrusion-claws": {
         elements: FeatureStatus,
@@ -182,6 +195,8 @@ export function captureManipulatorPreviewSource(skin: Uint8Array): ManipulatorPr
         features: structuredClone(get(earsFeatures)),
         slimArms: get(manipulatorSkinSlimModel),
         snout: { width: get(snoutWidth), height: get(snoutHeight), length: get(snoutLength), offset: get(snoutOffset), source: get(snoutSource) },
+        // The bends array is mutated in place by the tail page, so the source needs its own copy
+        tail: { segments: get(tailSegments), bends: get(tailBends).slice() },
     };
 }
 
@@ -190,7 +205,7 @@ export function changedPreviewKinds(previous: ManipulatorPreviewSource | null, n
     if (!previous || previous.skin !== next.skin || previous.features !== next.features || previous.slimArms !== next.slimArms) {
         return Object.keys(PREVIEW_TARGETS);
     }
-    return previous.snout !== next.snout ? ["snout-mode"] : [];
+    return [...(previous.snout !== next.snout ? ["snout-mode"] : []), ...(previous.tail !== next.tail ? ["tail-mode"] : [])];
 }
 
 interface PreviewRenderer {

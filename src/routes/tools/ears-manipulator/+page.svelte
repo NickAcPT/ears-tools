@@ -27,6 +27,8 @@
         snoutOffset,
         snoutSource,
         snoutWidth,
+        tailBends,
+        tailSegments,
         wingsImage,
     } from "$lib/stores";
     import {
@@ -99,6 +101,7 @@
     onDestroy(manipulatorPreviewSource.subscribe(regeneratePreviews));
     $: refreshPreviewSource($applyTemplate, $wingsImage);
     $: refreshSnoutPreviews({ width: $snoutWidth, height: $snoutHeight, length: $snoutLength, offset: $snoutOffset, source: $snoutSource });
+    $: refreshTailPreviews($tailSegments, $tailBends);
 
     async function regeneratePreviews(source: ManipulatorPreviewSource | null) {
         const previous = renderedPreviewSource;
@@ -175,6 +178,17 @@
         }
 
         $manipulatorPreviewSource = { ...source, snout };
+    }
+
+    /** Re-renders only the tail previews when the tail segments or bends changed since they were rendered. */
+    function refreshTailPreviews(segments: 1 | 2 | 3 | 4, bends: number[]) {
+        const source = $manipulatorPreviewSource;
+        if (!source) return;
+        const sameBends = source.tail.bends.length === bends.length && source.tail.bends.every((bend, i) => bend === bends[i]);
+        if (source.tail.segments === segments && sameBends) return;
+
+        // The tail page mutates the bends array in place, so the source keeps its own copy
+        $manipulatorPreviewSource = { ...source, tail: { segments, bends: bends.slice() } };
     }
 
     onDestroy(() => {
