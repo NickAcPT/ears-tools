@@ -170,9 +170,6 @@ function __wbg_get_imports() {
             const ret = Array.from(arg0);
             return ret;
         },
-        __wbg_getRandomValues_cc7f052a444bb2ce: function() { return handleError(function (arg0, arg1) {
-            globalThis.crypto.getRandomValues(getArrayU8FromWasm0(arg0, arg1));
-        }, arguments); },
         __wbg_get_44e98e27bda25b5b: function() { return handleError(function (arg0, arg1) {
             const ret = Reflect.get(arg0, arg1);
             return ret;
@@ -555,7 +552,7 @@ async function __wbg_load(module, imports) {
 }
 
 function initSync(module) {
-    // if (wasm !== undefined) return wasm;
+    if (wasm !== undefined) return wasm;
 
 
     if (module !== undefined) {
@@ -575,7 +572,7 @@ function initSync(module) {
 }
 
 async function __wbg_init(module_or_path) {
-    // if (wasm !== undefined) return wasm;
+    if (wasm !== undefined) return wasm;
 
 
     if (module_or_path !== undefined) {
