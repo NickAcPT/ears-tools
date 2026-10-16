@@ -9,6 +9,8 @@ import {
     TailMode,
     WingsAnimations,
     WingsMode,
+    LocatorBarIcon,
+    LocatorBarIconShape,
     type EarsFeatures,
     type AlfalfaData,
     TextureSource,
@@ -38,6 +40,10 @@ const HEAD_PROTRUSION_DEFAULT = HeadProtrusion.None;
 
 const CHEST_SIZE_DEFAULT = 0.0;
 const EMISSIVE_DEFAULT = false;
+
+const LOCATOR_BAR_ICON_DEFAULT = LocatorBarIcon.MinecraftDefault;
+const LOCATOR_BAR_ICON_SHAPE_DEFAULT = LocatorBarIconShape.Dot;
+const LOCATOR_BAR_ICON_COLOUR_DEFAULT = "#ffffff";
 
 const DATA_VERSION_DEFAULT = 1;
 
@@ -88,6 +94,12 @@ export const dataVersion = writable(DATA_VERSION_DEFAULT);
 export const wingsImage = writable<Uint8Array | undefined>(undefined);
 export const capeImage = writable<Uint8Array | undefined>(undefined);
 
+export const locatorBarIcon = writable(LOCATOR_BAR_ICON_DEFAULT);
+export const locatorBarIconShape = writable(LOCATOR_BAR_ICON_SHAPE_DEFAULT);
+export const locatorBarIconColour = writable(LOCATOR_BAR_ICON_COLOUR_DEFAULT);
+export const locatorBarCustomImage = writable<Uint8Array | undefined>(undefined);
+export const locatorBarImage = writable<Uint8Array | undefined>(undefined);
+
 export const alfalfaData = writable<AlfalfaData | undefined>(undefined);
 
 export const applyTemplate = writable<boolean>(true);
@@ -112,6 +124,7 @@ export const earsFeatures: Readable<EarsFeatures> = derived(
         claws,
         headProtrusion,
         capeImage,
+        locatorBarImage,
         wingsImage,
         legMode,
         chestSize,
@@ -144,6 +157,7 @@ export const earsFeatures: Readable<EarsFeatures> = derived(
         $claws,
         $headProtrusion,
         $capeImage,
+        $locatorBarImage,
         $wingsFile,
         $legMode,
         $chestSize,
@@ -207,6 +221,7 @@ export const earsFeatures: Readable<EarsFeatures> = derived(
             legMode: $legMode,
             chestSize: $chestSize,
             cape: $capeImage,
+            locator: $locatorBarImage,
             alfalfa: $alfalfaData,
             emissives: {
                 enabled: $emissiveSkin,
@@ -257,6 +272,10 @@ export function setEarsFeatures(features: EarsFeatures | null) {
     chestSize.set(features.chestSize);
     legMode.set(features.legMode ?? LEG_MODE_DEFAULT);
     capeImage.set(features.cape);
+
+    locatorBarImage.set(features.locator);
+    locatorBarCustomImage.set(features.locator);
+    locatorBarIcon.set(features.locator ? LocatorBarIcon.CustomImage : LOCATOR_BAR_ICON_DEFAULT);
 
     alfalfaData.set(features.alfalfa);
 
@@ -310,6 +329,11 @@ export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
     dataVersion.set(DATA_VERSION_DEFAULT);
 
     capeImage.set(undefined);
+    locatorBarIcon.set(LOCATOR_BAR_ICON_DEFAULT);
+    locatorBarIconShape.set(LOCATOR_BAR_ICON_SHAPE_DEFAULT);
+    locatorBarIconColour.set(LOCATOR_BAR_ICON_COLOUR_DEFAULT);
+    locatorBarCustomImage.set(undefined);
+    locatorBarImage.set(undefined);
     alfalfaData.set(undefined);
     applyTemplate.set(true);
 }

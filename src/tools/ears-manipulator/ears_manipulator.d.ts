@@ -5,7 +5,11 @@ export function apply_features(skin_data: Uint8Array, features: any, slim_arms: 
 
 export function get_ears_features(skin_data: Uint8Array): any;
 
+export function get_locator_sprites(atlas_data: Uint8Array): Array<any>;
+
 export function get_template_skin(features: any, slim_arms: boolean): Uint8Array;
+
+export function tint_locator_atlas(atlas_data: Uint8Array, color: number): Uint8Array;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -13,7 +17,9 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly apply_features: (a: number, b: number, c: any, d: number) => [number, number, number];
     readonly get_ears_features: (a: number, b: number) => [number, number, number];
+    readonly get_locator_sprites: (a: number, b: number) => [number, number, number];
     readonly get_template_skin: (a: any, b: number) => [number, number, number];
+    readonly tint_locator_atlas: (a: number, b: number, c: number) => [number, number, number];
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_exn_store: (a: number) => void;

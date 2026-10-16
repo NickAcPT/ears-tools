@@ -11,6 +11,7 @@ export interface EarsFeatures {
     snout?: SnoutSettings;
     wings: WingSettings;
     cape?: Uint8Array;
+    locator?: Uint8Array;
     legMode: LegMode;
     chestSize: number;
     alfalfa?: AlfalfaData;
@@ -129,4 +130,15 @@ export enum WingsAnimations {
     Normal,
     None,
     NoFlight,
+}
+
+export enum LocatorBarIcon {
+    MinecraftDefault,
+    CustomColour,
+    CustomImage,
+}
+
+export enum LocatorBarIconShape {
+    Dot,
+    BowTie,
 }

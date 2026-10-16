@@ -5,6 +5,7 @@
     const dispatch = createEventDispatcher();
 
     export let hovered = writable(false);
+    export let acceptPaste = true;
 
     function handleDrop(event: DragEvent) {
         event.preventDefault();
@@ -14,7 +15,8 @@
     }
 
     function handlePaste(e: ClipboardEvent) {
-        if (e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
+        if (acceptPaste && e.clipboardData?.files?.length && e.clipboardData?.files?.length > 0) {
+            console.log(e.clipboardData.files);
             dispatch("files", e.clipboardData.files);
         }
     }

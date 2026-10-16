@@ -20,7 +20,7 @@
         const list = e.detail;
 
         if (list.length !== 1) {
-            console.error("Only one file can be uploaded at a time.");
+            console.error("Only one file can be uploaded at a time.", list.length);
             return;
         }
 

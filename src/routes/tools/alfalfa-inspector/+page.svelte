@@ -11,10 +11,11 @@
     import { browser } from "$app/environment";
     import { createLazyPromise } from "$lib/misc";
     import UploadIcon from "../../../components/icons/UploadIcon.svelte";
+    import { writable, type Writable } from "svelte/store";
 
     let data: AlfalfaData = new AlfalfaData({});
 
-    let currentSkin: File | null = null;
+    let currentSkin: Writable<File | null> = writable<File | null>(null);
 
     let newEntryKey: AlfalfaKey = "";
     let newEntryValue: string = "";
@@ -145,12 +146,12 @@
 
     async function notifyDataChange() {
         // Update our skin file
-        if (currentSkin) {
+        if ($currentSkin) {
             try {
-                let skinData = new Uint8Array(await currentSkin.arrayBuffer());
+                let skinData = new Uint8Array(await $currentSkin.arrayBuffer());
                 let fileData = write_alfalfa_data(skinData, data.data);
 
-                currentSkin = new File([fileData], currentSkin.name, { type: currentSkin.type });
+                $currentSkin = new File([fileData], $currentSkin.name, { type: $currentSkin.type });
             } catch (error) {
                 if (error instanceof Error) {
                     if (error.message.includes("Cannot write more than 1428 bytes of data")) {
@@ -167,8 +168,6 @@
     }
 
     async function handleFiles(e: CustomEvent<FileList>) {
-        await loadPromise;
-
         let files = e.detail;
 
         if (files.length > 1) {
@@ -183,7 +182,7 @@
 
         let file = files[0];
 
-        currentSkin = file;
+        $currentSkin = file;
     }
 
     async function updateAlfalfaDataFromFile(file: File) {
@@ -206,31 +205,31 @@
     }
 
     function downloadCurrentSkin() {
-        if (currentSkin) {
-            saveAs(currentSkin);
+        if ($currentSkin) {
+            saveAs($currentSkin);
         }
     }
 
     function closeCurrentFile() {
-        currentSkin = null;
+        $currentSkin = null;
         data = new AlfalfaData({});
     }
 
     function openInEraserTool(e: CustomEvent<AlfalfaEntry>) {
-        $earsRegionEditorCurrentFile = currentSkin;
+        $earsRegionEditorCurrentFile = $currentSkin;
         goto("/tools/region-eraser");
     }
 
-    $: currentSkin && updateAlfalfaDataFromFile(currentSkin);
+    $: $currentSkin && updateAlfalfaDataFromFile($currentSkin);
 </script>
 
 <RequiresWasm init={initWasm} />
 
 <div class="container flex flex-col gap-2">
     <div class="flex items-center justify-center">
-        {#if currentSkin}
+        {#if $currentSkin}
             <div class="flex flex-col gap-2">
-                <p class="text-center">Currently inspecting file &quot;{currentSkin.name}&quot;.</p>
+                <p class="text-center">Currently inspecting file &quot;{$currentSkin.name}&quot;.</p>
 
                 <div class="flex gap-2">
                     <button on:click={downloadCurrentSkin}>Download edited file</button>
@@ -242,7 +241,7 @@
         {/if}
     </div>
 
-    {#if currentSkin}
+    {#if $currentSkin}
         <div class="grid grid-rows-[auto] gap-2">
             {#each data.entries() as entry (entry.key)}
                 <AlfalfaEntryRow

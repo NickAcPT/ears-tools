@@ -124,7 +124,7 @@
 
             if (e instanceof Error) {
                 if (e.message.includes("Cannot write more than 1428 bytes of data")) {
-                    alert("The cape/wings file you uploaded is too large.\nPlease upload a smaller file.");
+                    alert("The cape, wings or locator bar icon file you uploaded is too large.\nPlease upload a smaller file.");
                 } else {
                     alert(
                         "An error occurred while attempting to apply the features to the skin.\nPlease fix the error (check browser console) and try again."

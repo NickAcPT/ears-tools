@@ -31,12 +31,41 @@ export function get_ears_features(skin_data) {
 }
 
 /**
+ * @param {Uint8Array} atlas_data
+ * @returns {Array<any>}
+ */
+export function get_locator_sprites(atlas_data) {
+    const ptr0 = passArray8ToWasm0(atlas_data, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.get_locator_sprites(ptr0, len0);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
  * @param {any} features
  * @param {boolean} slim_arms
  * @returns {Uint8Array}
  */
 export function get_template_skin(features, slim_arms) {
     const ret = wasm.get_template_skin(features, slim_arms);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * @param {Uint8Array} atlas_data
+ * @param {number} color
+ * @returns {Uint8Array}
+ */
+export function tint_locator_atlas(atlas_data, color) {
+    const ptr0 = passArray8ToWasm0(atlas_data, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.tint_locator_atlas(ptr0, len0, color);
     if (ret[2]) {
         throw takeFromExternrefTable0(ret[1]);
     }
@@ -234,6 +263,10 @@ function __wbg_get_imports() {
         },
         __wbg_prototypesetcall_956c7493c68e29b4: function(arg0, arg1, arg2) {
             Uint8Array.prototype.set.call(getArrayU8FromWasm0(arg0, arg1), arg2);
+        },
+        __wbg_push_ceb8ef046afb2041: function(arg0, arg1) {
+            const ret = arg0.push(arg1);
+            return ret;
         },
         __wbg_set_5f806304fb633ab3: function(arg0, arg1, arg2) {
             const ret = arg0.set(arg1, arg2);

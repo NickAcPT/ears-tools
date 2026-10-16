@@ -15,6 +15,7 @@
     let filePicker: HTMLInputElement;
     export let slimArms: Writable<boolean> | undefined = undefined;
     export let offerDemoSkin: boolean = true;
+    export let acceptPageInput: boolean = true;
 
     function pickFile() {
         filePicker.click();
@@ -72,7 +73,7 @@
 
     // Workaround: Load skin from page URL
     onMount(async () => {
-        if (browser) {
+        if (browser && acceptPageInput) {
             const base64File = $page.url.searchParams.get("base64")?.replace(/-/g, "+")?.replace(/_/g, "/");
             const slimArmsFromUrl = $page.url.searchParams.has("slim");
             if (base64File) {
@@ -106,11 +107,11 @@
     });
 </script>
 
-<DropZone hovered={pickerHovered} on:files>
+<DropZone hovered={pickerHovered} acceptPaste={acceptPageInput} on:files>
     <div
         class="flex h-fit w-full max-w-2xl flex-col justify-around gap-5 rounded-2xl border-2 border-dashed border-accent-500 p-10 {pickerBgClass} items-center"
     >
-        <p>Drop your <slot name="file">skin</slot> file here or paste it in this page.</p>
+        <p>Drop your <slot name="file">skin</slot> file here{#if acceptPageInput}{" "}or paste it in this page{/if}.</p>
         <hr class="m-0 w-full" />
         <div class="text-center">
             <p class="inline">Or alternatively,</p>
