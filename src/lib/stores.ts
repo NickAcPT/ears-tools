@@ -98,6 +98,8 @@ export const emissivePalette = writable<number[] | undefined>(undefined);
 export const dataVersion = writable(DATA_VERSION_DEFAULT);
 
 export const wingsImage = writable<Uint8Array | undefined>(undefined);
+/** The wings mode `wingsImage` was generated for when it is a sample texture, `null` for user-provided textures. */
+export const wingsSampleMode = writable<WingsMode | null>(null);
 export const capeImage = writable<Uint8Array | undefined>(undefined);
 
 export const locatorBarIcon = writable(LOCATOR_BAR_ICON_DEFAULT);
@@ -259,6 +261,7 @@ export function setEarsFeatures(features: EarsFeatures | null) {
     wingsMode.set(features.wings.mode);
     wingsAnimations.set(features.wings.animations);
     wingsImage.set(features.wings.wings);
+    wingsSampleMode.set(null);
 
     claws.set(features.protrusions.includes(Protrusion.Claws) ? FeatureStatus.Enabled : FeatureStatus.Disabled);
     headProtrusion.set(
@@ -321,6 +324,7 @@ export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
     wingsMode.set(WINGS_MODE_DEFAULT);
     wingsAnimations.set(WINGS_ANIMATIONS_DEFAULT);
     wingsImage.set(undefined);
+    wingsSampleMode.set(null);
     wingsSource.set(SOURCE_DEFAULT);
     legMode.set(LEG_MODE_DEFAULT);
 

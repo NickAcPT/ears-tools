@@ -45,12 +45,37 @@ export function get_locator_sprites(atlas_data) {
 }
 
 /**
+ * Sample cape texture in the Ears cape layout.
+ * @returns {Uint8Array}
+ */
+export function get_template_cape() {
+    const ret = wasm.get_template_cape();
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
  * @param {any} features
  * @param {boolean} slim_arms
  * @returns {Uint8Array}
  */
 export function get_template_skin(features, slim_arms) {
     const ret = wasm.get_template_skin(features, slim_arms);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * Sample wings texture laid out for `mode` (a `WingsMode` value).
+ * @param {any} mode
+ * @returns {Uint8Array}
+ */
+export function get_template_wings(mode) {
+    const ret = wasm.get_template_wings(mode);
     if (ret[2]) {
         throw takeFromExternrefTable0(ret[1]);
     }

@@ -117,7 +117,7 @@
             <p class="inline">Or alternatively,</p>
             {#if offerDemoSkin}
                 <p class="inline">you can try a</p>
-                <button class="link" on:click={selectDemoSkin}>demo skin</button>
+                <button class="link" on:click={selectDemoSkin}><slot name="demo">demo skin</slot></button>
                 <p class="inline">or</p>
             {/if}
             <button on:click={pickFile}>Pick a file instead</button>

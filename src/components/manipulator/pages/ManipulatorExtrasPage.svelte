@@ -12,7 +12,7 @@
         locatorBarIconShape,
         locatorBarImage,
     } from "$lib/stores";
-    import { get_locator_sprites, tint_locator_atlas } from "../../../tools/ears-manipulator/ears_manipulator";
+    import { get_locator_sprites, get_template_cape, tint_locator_atlas } from "../../../tools/ears-manipulator/ears_manipulator";
     import dotLocatorAtlas from "$lib/assets/locator-bar/default.png";
     import bowTieLocatorAtlas from "$lib/assets/locator-bar/bowtie.png";
     import DeleteIcon from "../../icons/DeleteIcon.svelte";
@@ -29,6 +29,11 @@
 
         let file = files[0];
         $capeImage = new Uint8Array(await file.arrayBuffer());
+    }
+
+    function handleSampleCape(e: CustomEvent<{ replace: (cape: BlobPart) => void }>) {
+        e.preventDefault();
+        e.detail.replace(get_template_cape());
     }
 
     const locatorAtlasUrls = {
@@ -144,8 +149,9 @@
 <div>
     <h2 class="text-2xl">Cape</h2>
     <div class="flex h-min gap-2">
-        <SkinDropZone on:files={handleCapeFile} offerDemoSkin={false}>
+        <SkinDropZone on:files={handleCapeFile} on:offerDemoSkin={handleSampleCape}>
             <svelte:fragment slot="file">cape texture</svelte:fragment>
+            <svelte:fragment slot="demo">sample cape texture</svelte:fragment>
         </SkinDropZone>
         {#if $capeImage}
             <div class="flex flex-1 items-start gap-2">
