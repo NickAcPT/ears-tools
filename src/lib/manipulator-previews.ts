@@ -7,10 +7,10 @@ import {
     Protrusion,
     TailMode,
     TextureSource,
-    WingsAnimations,
     WingsMode,
     headProtrusionToProtrusion,
     type EarsFeatures,
+    type SnoutSettings,
 } from "./ears-manipulator";
 import { enumKeys } from "./misc";
 import { RenderingSupport, renderingSupport } from "./rendering-support";
@@ -29,6 +29,8 @@ export interface ManipulatorPreviewSource {
     skin: Uint8Array;
     features: EarsFeatures;
     slimArms: boolean;
+    /** The snout an enabled snout gets, also while the skin has none. */
+    snout: SnoutSettings;
 }
 
 /** Object URLs of the rendered previews, keyed by enum picker kind and then by enum value. */
@@ -43,7 +45,7 @@ interface PreviewTarget {
     lookAt: [number, number, number];
     /** Wings are only rendered with a texture, so a placeholder is used when the skin has none. */
     needsWingsTexture?: boolean;
-    apply(features: EarsFeatures, value: number): void;
+    apply(features: EarsFeatures, value: number, source: ManipulatorPreviewSource): void;
     /**
      * Builds an extra render used only to find the region to frame: the difference to it must cover everything the
      * options add, even where the options look alike.
@@ -133,18 +135,7 @@ const PREVIEW_TARGETS: Record<string, PreviewTarget> = {
         focus: ["head"],
         rotation: [55, 5, 0],
         lookAt: HEAD_CENTER,
-        apply: (features, value) => {
-            features.snout =
-                value === FeatureStatus.Enabled
-                    ? features.snout ?? {
-                          width: get(snoutWidth),
-                          height: get(snoutHeight),
-                          length: get(snoutLength),
-                          offset: get(snoutOffset),
-                          source: get(snoutSource),
-                      }
-                    : undefined;
-        },
+        apply: (features, value, source) => (features.snout = value === FeatureStatus.Enabled ? source.snout : undefined),
     },
     "tail-mode": {
         elements: TailMode,
@@ -183,30 +174,31 @@ const PREVIEW_TARGETS: Record<string, PreviewTarget> = {
         needsWingsTexture: true,
         apply: (features, value) => (features.wings.mode = value),
     },
-    "wings-animations": {
-        elements: WingsAnimations,
-        focus: ["body"],
-        rotation: [-155, 15, 0],
-        lookAt: BODY_CENTER,
-        needsWingsTexture: true,
-        apply: (features, value) => {
-            features.wings.animations = value;
-            // The animation is only visible with wings to animate
-            if (features.wings.mode === WingsMode.None) features.wings.mode = WingsMode.SymmetricDual;
-        },
-        // Still renders of the animations look the same, so frame them by the difference to having no wings
-        reference: (features) => (features.wings.mode = WingsMode.None),
-    },
 };
 
 export function captureManipulatorPreviewSource(skin: Uint8Array): ManipulatorPreviewSource {
-    return { skin, features: structuredClone(get(earsFeatures)), slimArms: get(manipulatorSkinSlimModel) };
+    return {
+        skin,
+        features: structuredClone(get(earsFeatures)),
+        slimArms: get(manipulatorSkinSlimModel),
+        snout: { width: get(snoutWidth), height: get(snoutHeight), length: get(snoutLength), offset: get(snoutOffset), source: get(snoutSource) },
+    };
+}
+
+/** Picker kinds whose previews differ between two sources. */
+export function changedPreviewKinds(previous: ManipulatorPreviewSource | null, next: ManipulatorPreviewSource): string[] {
+    if (!previous || previous.skin !== next.skin || previous.features !== next.features || previous.slimArms !== next.slimArms) {
+        return Object.keys(PREVIEW_TARGETS);
+    }
+    return previous.snout !== next.snout ? ["snout-mode"] : [];
 }
 
 interface PreviewRenderer {
     module: SkinRendererModule;
     canvas: HTMLCanvasElement;
     context: OffscreenCanvasRenderingContext2D;
+    /** Settles once the last queued shot is done; the renderer holds a single scene, so shots must not interleave. */
+    queue: Promise<unknown>;
 }
 
 let previewRenderer: Promise<PreviewRenderer> | null = null;
@@ -236,7 +228,7 @@ function getPreviewRenderer(): Promise<PreviewRenderer> {
                 const context = new OffscreenCanvas(RENDER_SIZE, RENDER_SIZE).getContext("2d", { willReadFrequently: true });
                 if (!context) throw new Error("Unable to create a 2D canvas context");
 
-                return { module, canvas, context };
+                return { module, canvas, context, queue: Promise.resolve() };
             } catch (e) {
                 console.log("Unable to set up the preview renderer with", RenderingSupport[support], e);
                 lastError = e;
@@ -248,7 +240,18 @@ function getPreviewRenderer(): Promise<PreviewRenderer> {
     return previewRenderer;
 }
 
-async function renderShot(
+function renderShot(
+    renderer: PreviewRenderer,
+    camera: SkinCanvasCameraSettings,
+    character: SkinCanvasCharacterSettings,
+    skin: Uint8Array
+): Promise<ImageData> {
+    const shot = renderer.queue.then(() => renderQueuedShot(renderer, camera, character, skin));
+    renderer.queue = shot.catch(() => undefined);
+    return shot;
+}
+
+async function renderQueuedShot(
     renderer: PreviewRenderer,
     camera: SkinCanvasCameraSettings,
     character: SkinCanvasCharacterSettings,
@@ -461,12 +464,13 @@ async function renderTargetPreviews(
 }
 
 /**
- * Renders a preview image for every option of the enum pickers, using one hidden renderer for all of them, and hands
- * each picker's previews over as soon as they are ready. Stops once `isCancelled` returns true.
+ * Renders a preview image for every option of the given enum pickers, using one hidden renderer for all of them, and
+ * hands each picker's previews over as soon as they are ready. Skips the pickers `isCancelled` returns true for.
  */
 export async function generateManipulatorPreviews(
     source: ManipulatorPreviewSource,
-    isCancelled: () => boolean,
+    kinds: string[],
+    isCancelled: (kind: string) => boolean,
     onRendered: (kind: string, previews: Record<number, string>) => void
 ) {
     const renderer = await getPreviewRenderer();
@@ -478,8 +482,9 @@ export async function generateManipulatorPreviews(
         baseWingsFeatures.wings.source = TextureSource.YourSkin;
     }
 
-    for (const [kind, target] of Object.entries(PREVIEW_TARGETS)) {
-        if (isCancelled()) return;
+    for (const kind of kinds) {
+        const target = PREVIEW_TARGETS[kind];
+        if (isCancelled(kind)) continue;
 
         const groups = new Map<string, { values: number[]; variants: Uint8Array[] }>();
         let reference: Uint8Array | undefined;
@@ -488,7 +493,7 @@ export async function generateManipulatorPreviews(
             for (const key of enumKeys(target.elements)) {
                 const value = target.elements[key] as number;
                 const features = structuredClone(baseFeatures);
-                target.apply(features, value);
+                target.apply(features, value, source);
                 const groupKey = target.framingGroup?.(value) ?? "";
                 const group = groups.get(groupKey) ?? { values: [], variants: [] };
                 group.values.push(value);
@@ -507,11 +512,12 @@ export async function generateManipulatorPreviews(
 
         const rendered: [number, Blob][] = [];
         for (const { values, variants } of groups.values()) {
-            const images = await renderTargetPreviews(renderer, target, source.slimArms, variants, reference, isCancelled);
-            if (!images || isCancelled()) return;
+            const images = await renderTargetPreviews(renderer, target, source.slimArms, variants, reference, () => isCancelled(kind));
+            if (!images) break;
             rendered.push(...values.map((value, i): [number, Blob] => [value, images[i]]));
         }
         // Object URLs are only created when they are handed over, so a cancelled generation leaks none
+        if (isCancelled(kind)) continue;
         onRendered(kind, Object.fromEntries(rendered.map(([value, image]) => [value, URL.createObjectURL(image)])));
     }
 }

@@ -23,7 +23,7 @@
 </div>
 <div>
     <h3 class="text-xl">Animations</h3>
-    <ManipulatorEnumPicker elements={WingsAnimations} kind="wings-animations" value={wingsAnimations} class="py-4" preview />
+    <ManipulatorEnumPicker elements={WingsAnimations} kind="wings-animations" value={wingsAnimations} class="py-4" />
 </div>
 
 <div>

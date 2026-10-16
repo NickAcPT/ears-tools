@@ -22,8 +22,20 @@
         manipulatorWizardPageTitle,
         resetManipulatorEarsFeatures,
         setEarsFeatures,
+        snoutHeight,
+        snoutLength,
+        snoutOffset,
+        snoutSource,
+        snoutWidth,
+        wingsImage,
     } from "$lib/stores";
-    import { generateManipulatorPreviews, revokeManipulatorPreviews, type ManipulatorPreviewSource } from "$lib/manipulator-previews";
+    import {
+        changedPreviewKinds,
+        generateManipulatorPreviews,
+        revokeManipulatorPreviews,
+        type ManipulatorPreviewSource,
+    } from "$lib/manipulator-previews";
+    import type { SnoutSettings } from "$lib/ears-manipulator";
 
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import type { SkinCanvasSunSettings } from "$lib/skin-canvas";
@@ -78,24 +90,36 @@
         ambient: $emissiveSkin && $lightsOut ? 0.0 : null,
     } as SkinCanvasSunSettings;
 
-    let previewGeneration = 0;
+    /** Bumped per picker kind whenever its previews are re-rendered, cancelling older renders of them. */
+    const previewGenerations: Record<string, number> = {};
+    let renderedPreviewSource: ManipulatorPreviewSource | null = null;
+    let previewsDestroyed = false;
 
-    $: regeneratePreviews($manipulatorPreviewSource);
-    $: $applyTemplate !== undefined && refreshPreviewSource();
+    // A subscription instead of a reactive statement: sources set from other reactive statements would be missed
+    onDestroy(manipulatorPreviewSource.subscribe(regeneratePreviews));
+    $: refreshPreviewSource($applyTemplate, $wingsImage);
+    $: refreshSnoutPreviews({ width: $snoutWidth, height: $snoutHeight, length: $snoutLength, offset: $snoutOffset, source: $snoutSource });
 
     async function regeneratePreviews(source: ManipulatorPreviewSource | null) {
-        const generation = ++previewGeneration;
+        const previous = renderedPreviewSource;
+        renderedPreviewSource = source;
         if (!source) {
+            for (const kind in previewGenerations) previewGenerations[kind]++;
             revokeManipulatorPreviews($manipulatorPreviews);
             $manipulatorPreviews = {};
             return;
         }
 
+        // Only the pickers affected by what changed get re-rendered
+        const kinds = changedPreviewKinds(previous, source);
+        const generations = Object.fromEntries(kinds.map((kind) => [kind, (previewGenerations[kind] = (previewGenerations[kind] ?? 0) + 1)]));
+
         try {
-            // The previous previews stay until replaced, so toggling a setting doesn't flash placeholders
+            // The previous previews stay until replaced, so changing a setting doesn't flash placeholders
             await generateManipulatorPreviews(
                 source,
-                () => generation !== previewGeneration,
+                kinds,
+                (kind) => previewsDestroyed || generations[kind] !== previewGenerations[kind],
                 (kind, previews) => {
                     const replaced = $manipulatorPreviews[kind];
                     $manipulatorPreviews = { ...$manipulatorPreviews, [kind]: previews };
@@ -107,22 +131,54 @@
         }
     }
 
-    /** Re-renders the previews when the slim arms or template preview settings changed since they were rendered. */
-    async function refreshPreviewSource() {
+    /**
+     * Re-renders the previews when the slim arms, template preview or wings texture changed since they were rendered.
+     * Without a wings texture, the previews fall back to a placeholder, see `generateManipulatorPreviews`.
+     */
+    async function refreshPreviewSource(applyTemplateValue: boolean, wings: Uint8Array | undefined) {
         const source = $manipulatorPreviewSource;
         if (!source || !$originalManipulatorSkinFile) return;
-        if (source.slimArms === $manipulatorSkinSlimModel && source.features.applyTemplate === $applyTemplate) return;
+        if (
+            source.slimArms === $manipulatorSkinSlimModel &&
+            source.features.applyTemplate === applyTemplateValue &&
+            source.features.wings.wings === wings
+        ) {
+            return;
+        }
+
+        // Generated template skins are regenerated for the arm model, see `updateFeatures`
+        const skin = new Uint8Array(await $originalManipulatorSkinFile.arrayBuffer());
+        // A newly loaded skin replaced the source in the meantime
+        if ($manipulatorPreviewSource !== source) return;
 
         $manipulatorPreviewSource = {
-            // Generated template skins are regenerated for the arm model, see `updateFeatures`
-            skin: new Uint8Array(await $originalManipulatorSkinFile.arrayBuffer()),
+            ...source,
+            skin,
             slimArms: $manipulatorSkinSlimModel,
-            features: { ...source.features, applyTemplate: $applyTemplate },
+            features: { ...source.features, applyTemplate: applyTemplateValue, wings: { ...source.features.wings, wings } },
         };
     }
 
+    /** Re-renders only the snout previews when the snout settings changed since they were rendered. */
+    function refreshSnoutPreviews(snout: SnoutSettings) {
+        const source = $manipulatorPreviewSource;
+        if (!source) return;
+        const current = source.snout;
+        if (
+            current.width === snout.width &&
+            current.height === snout.height &&
+            current.length === snout.length &&
+            current.offset === snout.offset &&
+            current.source === snout.source
+        ) {
+            return;
+        }
+
+        $manipulatorPreviewSource = { ...source, snout };
+    }
+
     onDestroy(() => {
-        previewGeneration++;
+        previewsDestroyed = true;
         revokeManipulatorPreviews($manipulatorPreviews);
         $manipulatorPreviews = {};
     });
@@ -226,7 +282,7 @@
                 type="checkbox"
                 id="manipulator-use-slim-arms"
                 bind:checked={$manipulatorSkinSlimModel}
-                on:change={() => tick().then(() => updateFeatures(true)).then(refreshPreviewSource)}
+                on:change={() => tick().then(() => updateFeatures(true)).then(() => refreshPreviewSource($applyTemplate, $wingsImage))}
             />
         </label>
         <label for="manipulator-show-layers" class="flex items-center gap-2">
