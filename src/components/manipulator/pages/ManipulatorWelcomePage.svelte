@@ -2,11 +2,13 @@
     import {
         earsFeatures,
         manipulatorOutSkinFile,
+        manipulatorPreviewSource,
         manipulatorSkinIsGeneratedTemplate,
         originalManipulatorSkinFile,
         manipulatorSkinSlimModel,
         setEarsFeatures,
     } from "$lib/stores";
+    import { captureManipulatorPreviewSource } from "$lib/manipulator-previews";
     import { createEventDispatcher } from "svelte";
     import SkinDropZone from "../../SkinDropZone.svelte";
     import NickAc from "../../homepage/NickAc.svelte";
@@ -31,8 +33,9 @@
         $manipulatorOutSkinFile = file;
         $originalManipulatorSkinFile = file;
 
+        const skin = new Uint8Array(await file.arrayBuffer());
         try {
-            const features = await get_ears_features(new Uint8Array(await $manipulatorOutSkinFile.arrayBuffer()));
+            const features = await get_ears_features(skin);
             console.log("Updating features from skin", features);
 
             setEarsFeatures(features);
@@ -40,6 +43,8 @@
         } catch (e: any) {
             console.error(e);
         }
+
+        $manipulatorPreviewSource = captureManipulatorPreviewSource(skin);
 
         dispatcher("next");
     }

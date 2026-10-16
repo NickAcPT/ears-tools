@@ -14,7 +14,9 @@ import {
     type EarsFeatures,
     type AlfalfaData,
     TextureSource,
+    headProtrusionToProtrusion,
 } from "./ears-manipulator";
+import type { ManipulatorPreviewSource, ManipulatorPreviews } from "./manipulator-previews";
 
 export const earsRegionEditorCurrentFile = writable<File | null>(null);
 
@@ -56,6 +58,10 @@ export const originalManipulatorSkinFile = writable<File | null>(null);
 export const manipulatorOutSkinFile = writable<File | null>(null);
 export const manipulatorSkinSlimModel = writable<boolean>(false);
 export const manipulatorSkinIsGeneratedTemplate = writable<boolean>(false);
+
+/** Skin and features captured when the initial skin is loaded, kept in sync with the slim arms and template preview settings; the enum picker previews are rendered from it. */
+export const manipulatorPreviewSource = writable<ManipulatorPreviewSource | null>(null);
+export const manipulatorPreviews = writable<ManipulatorPreviews>({});
 
 export const snout = writable(FEATURE_DEFAULT);
 export const claws = writable(FEATURE_DEFAULT);
@@ -176,6 +182,8 @@ export const earsFeatures: Readable<EarsFeatures> = derived(
             snoutOffset.set(8 - $snoutHeight);
         }
 
+        const headProtrusionValue = headProtrusionToProtrusion($headProtrusion);
+
         return {
             ears: {
                 mode: $ears,
@@ -209,13 +217,7 @@ export const earsFeatures: Readable<EarsFeatures> = derived(
             },
             protrusions: [
                 ...($claws === FeatureStatus.Enabled ? [Protrusion.Claws] : []),
-                ...($headProtrusion === HeadProtrusion.Horns
-                    ? [Protrusion.Horns]
-                    : $headProtrusion === HeadProtrusion.Halo
-                      ? [Protrusion.Halo]
-                      : $headProtrusion === HeadProtrusion.DoubleHalo
-                        ? [Protrusion.DoubleHalo]
-                        : []),
+                ...(headProtrusionValue !== undefined ? [headProtrusionValue] : []),
             ],
             protrusionsSource: $protrusionsSource,
             legMode: $legMode,
@@ -291,6 +293,7 @@ export function resetManipulatorEarsFeatures(resetFile: boolean = false) {
         originalManipulatorSkinFile.set(null);
         manipulatorSkinSlimModel.set(false);
         manipulatorSkinIsGeneratedTemplate.set(false);
+        manipulatorPreviewSource.set(null);
     }
 
     earsMode.set(EARS_MODE_DEFAULT);

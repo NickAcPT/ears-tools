@@ -14,6 +14,8 @@
         lastEarsFeatures,
         manipulatorShowCape,
         manipulatorOutSkinFile,
+        manipulatorPreviews,
+        manipulatorPreviewSource,
         originalManipulatorSkinFile,
         manipulatorSkinIsGeneratedTemplate,
         manipulatorSkinSlimModel,
@@ -21,6 +23,7 @@
         resetManipulatorEarsFeatures,
         setEarsFeatures,
     } from "$lib/stores";
+    import { generateManipulatorPreviews, revokeManipulatorPreviews, type ManipulatorPreviewSource } from "$lib/manipulator-previews";
 
     import SkinCanvas from "../../../components/SkinCanvas.svelte";
     import type { SkinCanvasSunSettings } from "$lib/skin-canvas";
@@ -29,7 +32,7 @@
     import RequiresWasm from "../../../components/RequiresWasm.svelte";
 
     import { apply_features } from "../../../tools/ears-manipulator/ears_manipulator";
-    import { tick } from "svelte";
+    import { onDestroy, tick } from "svelte";
     import { browser } from "$app/environment";
     import ManipulatorExtrasPage from "../../../components/manipulator/pages/ManipulatorExtrasPage.svelte";
     import { writable } from "svelte/store";
@@ -74,6 +77,55 @@
         intensity: $emissiveSkin && $lightsOut ? 0.0 : null,
         ambient: $emissiveSkin && $lightsOut ? 0.0 : null,
     } as SkinCanvasSunSettings;
+
+    let previewGeneration = 0;
+
+    $: regeneratePreviews($manipulatorPreviewSource);
+    $: $applyTemplate !== undefined && refreshPreviewSource();
+
+    async function regeneratePreviews(source: ManipulatorPreviewSource | null) {
+        const generation = ++previewGeneration;
+        if (!source) {
+            revokeManipulatorPreviews($manipulatorPreviews);
+            $manipulatorPreviews = {};
+            return;
+        }
+
+        try {
+            // The previous previews stay until replaced, so toggling a setting doesn't flash placeholders
+            await generateManipulatorPreviews(
+                source,
+                () => generation !== previewGeneration,
+                (kind, previews) => {
+                    const replaced = $manipulatorPreviews[kind];
+                    $manipulatorPreviews = { ...$manipulatorPreviews, [kind]: previews };
+                    if (replaced) revokeManipulatorPreviews({ [kind]: replaced });
+                }
+            );
+        } catch (e) {
+            console.error("Unable to generate the manipulator previews", e);
+        }
+    }
+
+    /** Re-renders the previews when the slim arms or template preview settings changed since they were rendered. */
+    async function refreshPreviewSource() {
+        const source = $manipulatorPreviewSource;
+        if (!source || !$originalManipulatorSkinFile) return;
+        if (source.slimArms === $manipulatorSkinSlimModel && source.features.applyTemplate === $applyTemplate) return;
+
+        $manipulatorPreviewSource = {
+            // Generated template skins are regenerated for the arm model, see `updateFeatures`
+            skin: new Uint8Array(await $originalManipulatorSkinFile.arrayBuffer()),
+            slimArms: $manipulatorSkinSlimModel,
+            features: { ...source.features, applyTemplate: $applyTemplate },
+        };
+    }
+
+    onDestroy(() => {
+        previewGeneration++;
+        revokeManipulatorPreviews($manipulatorPreviews);
+        $manipulatorPreviews = {};
+    });
     
     async function updateFeatures(regenerateTemplateBase = false) {
         if (!$originalManipulatorSkinFile || !manipulatorInitialized) {
@@ -174,7 +226,7 @@
                 type="checkbox"
                 id="manipulator-use-slim-arms"
                 bind:checked={$manipulatorSkinSlimModel}
-                on:change={() => tick().then(() => updateFeatures(true))}
+                on:change={() => tick().then(() => updateFeatures(true)).then(refreshPreviewSource)}
             />
         </label>
         <label for="manipulator-show-layers" class="flex items-center gap-2">

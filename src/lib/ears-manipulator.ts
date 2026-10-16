@@ -104,6 +104,19 @@ export enum HeadProtrusion {
     DoubleHalo,
 }
 
+export function headProtrusionToProtrusion(headProtrusion: HeadProtrusion): Protrusion | undefined {
+    switch (headProtrusion) {
+        case HeadProtrusion.Horns:
+            return Protrusion.Horns;
+        case HeadProtrusion.Halo:
+            return Protrusion.Halo;
+        case HeadProtrusion.DoubleHalo:
+            return Protrusion.DoubleHalo;
+        case HeadProtrusion.None:
+            return undefined;
+    }
+}
+
 export enum TailMode {
     None,
     Down,

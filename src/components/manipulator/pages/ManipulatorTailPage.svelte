@@ -22,10 +22,7 @@
 
 <div>
     <h3 class="text-xl">Mode</h3>
-    <ManipulatorEnumPicker let:element elements={TailMode} kind="tail-mode" value={tailMode} class="px-10 py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
-    </ManipulatorEnumPicker>
+    <ManipulatorEnumPicker elements={TailMode} kind="tail-mode" value={tailMode} class="px-10 py-5" preview />
 </div>
 <div>
     <h3 class="text-xl">Segments</h3>
@@ -63,9 +60,3 @@
         </label>
     </div>
 </div>
-
-<style lang="postcss">
-    canvas {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEVmZmaZmZmoZ+Z2AAAAD0lEQVQIW2PkZ4TADxAIABIoBAXF3RsYAAAAAElFTkSuQmCC");
-    }
-</style>

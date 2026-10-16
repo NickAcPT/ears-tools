@@ -8,22 +8,10 @@
 
 <div>
     <h2 class="text-2xl">Claws</h2>
-    <ManipulatorEnumPicker let:element elements={FeatureStatus} kind="protrusion-claws" value={claws} class="py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
-    </ManipulatorEnumPicker>
+    <ManipulatorEnumPicker elements={FeatureStatus} kind="protrusion-claws" value={claws} class="py-5" preview />
 </div>
 
 <div>
     <h2 class="text-2xl">Head adornment</h2>
-    <ManipulatorEnumPicker let:element elements={HeadProtrusion} kind="protrusion-head" value={headProtrusion} class="py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
-    </ManipulatorEnumPicker>
+    <ManipulatorEnumPicker elements={HeadProtrusion} kind="protrusion-head" value={headProtrusion} class="py-5" preview />
 </div>
-
-<style lang="postcss">
-    canvas {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEVmZmaZmZmoZ+Z2AAAAD0lEQVQIW2PkZ4TADxAIABIoBAXF3RsYAAAAAElFTkSuQmCC");
-    }
-</style>

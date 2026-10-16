@@ -14,15 +14,6 @@
     
     <div>
         <h2 class="text-xl">Mode</h2>
-        <ManipulatorEnumPicker let:element elements={EarsMode} kind="ears-mode" value={earsMode} class="py-4">
-            <canvas class="flex-1" width="96" height="96"></canvas>
-            {element}
-        </ManipulatorEnumPicker>
+        <ManipulatorEnumPicker elements={EarsMode} kind="ears-mode" value={earsMode} class="py-4" preview />
     </div>
 </div>
-
-<style lang="postcss">
-    canvas {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEVmZmaZmZmoZ+Z2AAAAD0lEQVQIW2PkZ4TADxAIABIoBAXF3RsYAAAAAElFTkSuQmCC");
-    }
-</style>

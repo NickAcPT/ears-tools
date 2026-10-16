@@ -7,10 +7,7 @@
 </script>
 
 <div>
-    <ManipulatorEnumPicker let:element elements={FeatureStatus} kind="snout-mode" value={snout} class="px-10 py-5">
-        <canvas class="flex-1" width="96" height="96"></canvas>
-        {element}
-    </ManipulatorEnumPicker>
+    <ManipulatorEnumPicker elements={FeatureStatus} kind="snout-mode" value={snout} class="px-10 py-5" preview />
 </div>
 
 <div class="grid grid-cols-2 justify-items-center">
@@ -31,9 +28,3 @@
         <input type="range" id="snout-length" min="1" max="6" step="1" bind:value={$snoutLength} />
     </div>
 </div>
-
-<style lang="postcss">
-    canvas {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEVmZmaZmZmoZ+Z2AAAAD0lEQVQIW2PkZ4TADxAIABIoBAXF3RsYAAAAAElFTkSuQmCC");
-    }
-</style>

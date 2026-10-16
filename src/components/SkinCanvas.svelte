@@ -1,13 +1,18 @@
 <script lang="ts">
     import { browser, dev } from "$app/environment";
     import { RenderingSupport, fallbackToNext as fallbackRenderingSupport } from "$lib/rendering-support";
-    import type { SkinCanvasCameraSettings, SkinCanvasSunSettings } from "$lib/skin-canvas";
+    import {
+        checkWebGpuSupport,
+        importSkinRendererModule,
+        setupSkinScene,
+        type SkinCanvasCameraSettings,
+        type SkinCanvasSunSettings,
+        type SkinRendererModule,
+    } from "$lib/skin-canvas";
     import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
     import { page } from "$app/stores";
     import { onDestroy } from "svelte";
-
-    type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
     export let width = 512;
     export let height = 832;
@@ -48,46 +53,6 @@
 
     let module: SkinRendererModule | null = null;
 
-    async function checkWebGpuSupport(): Promise<boolean> {
-        if (!browser || $currentRenderingSupport !== RenderingSupport.WebGPU) {
-            return true;
-        }
-
-        // @ts-expect-error gpu is available in browser when using webgpu
-        if (!navigator.gpu) {
-            return false;
-        }
-
-        // @ts-expect-error gpu is available in browser when using webgpu
-        if (browser && navigator.gpu) {
-            // Try to get a canvas context
-            try {
-                const canvas = document.createElement("canvas");
-                if (!canvas.getContext("webgpu")) {
-                    throw new Error("WebGPU is supported, but no context could be created");
-                }
-            } catch (error) {
-                return false;
-            }
-            
-            // Try to request an adapter and device
-            try {
-                const adapter = await navigator.gpu.requestAdapter();
-                if (!adapter) {
-                    throw new Error("WebGPU is supported, but no adapter could be requested");
-                }
-                const device = await adapter.requestDevice();
-                if (!device) {
-                    throw new Error("WebGPU is supported, but no device could be requested");
-                }
-            } catch (error) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     async function initWasm() {
         if (!browser) {
             return Promise.resolve();
@@ -112,25 +77,15 @@
         }
 
         try {
-            let renderers = import.meta.glob("./../tools/skin-renderer/*.js");
-            let name = "";
-            switch ($currentRenderingSupport) {
-                case RenderingSupport.WebGPU:
-                    name = "skin-renderer-webgpu_wasm";
-                    break;
-                case RenderingSupport.WebGL:
-                    name = "skin-renderer-webgl_wasm";
-                    break;
-                case RenderingSupport.SoftwareRendering:
-                    name = "skin-renderer-software_wasm";
-                    break;
-            }
-
-            if (renderingOverride == undefined && !(await checkWebGpuSupport())) {
+            if (
+                renderingOverride == undefined &&
+                $currentRenderingSupport === RenderingSupport.WebGPU &&
+                !(await checkWebGpuSupport())
+            ) {
                 throw new Error("WebGPU is not supported - Performing fallback");
             }
 
-            module = <SkinRendererModule>await renderers[`../tools/skin-renderer/${name}.js`]();
+            module = await importSkinRendererModule($currentRenderingSupport);
 
             let init = module?.default;
             let initialize = module?.initialize;
@@ -173,16 +128,6 @@
         animationFrame = window.requestAnimationFrame(renderSkin);
     }
 
-    function vec2(x: number, y: number) {
-        if (module == null) throw new Error("Module is null");
-        return new module.WasmVec2(x, y);
-    }
-
-    function vec3(x: number, y: number, z: number) {
-        if (module == null) throw new Error("Module is null");
-        return new module.WasmVec3(x, y, z);
-    }
-
     async function setupScene(
         skinFile: File,
         camera: SkinCanvasCameraSettings,
@@ -197,7 +142,7 @@
         if (!browser || !skinFile || !isInitialized) return Promise.resolve();
         if (module == null) throw new Error("Module is null");
 
-        let { SceneCameraSettings, SceneLightingSettings, SceneCharacterSettings, setup_scene, get_camera, get_sun } = module;
+        let { get_camera, get_sun } = module;
 
         if (isLoadedAlready) {
             let cameraSettings = get_camera();
@@ -214,31 +159,16 @@
             cameraSettings.free();
         }
 
-        let settings = new SceneCameraSettings();
-        settings.size = canvasSize();
-        settings.distance = camera.distance;
-        settings.rotation = vec3(camera.rotation[0], camera.rotation[1], camera.rotation[2]);
-        settings.look_at = vec3(camera.look_at[0], camera.look_at[1], camera.look_at[2]);
-
-        let lighting = new SceneLightingSettings();
-        lighting.direction = vec3(sun.direction[0], sun.direction[1], sun.direction[2]);
-        lighting.ambient = sun.ambient != undefined ? sun.ambient : sun.renderShading ? 0.621 : 1.0;
-        lighting.intensity = sun.intensity != undefined ? sun.intensity : 2.0;
-
-        let character = new SceneCharacterSettings();
-        character.has_ears = renderEars;
-        character.has_hat_layer = renderLayers;
-        character.has_layers = renderLayers;
-        character.is_slim = slimArms;
-        character.has_cape = showCape;
-
-        await setup_scene(settings, lighting, character, new Uint8Array(await skinFile.arrayBuffer()));
+        await setupSkinScene(
+            module,
+            [width, height],
+            camera,
+            sun,
+            { renderEars, renderLayers, slimArms, showCape },
+            new Uint8Array(await skinFile.arrayBuffer())
+        );
         console.log("Setup scene");
         isLoadedAlready = true;
-    }
-
-    function canvasSize() {
-        return vec2(width, height);
     }
 
     async function handlePointerDown(e: PointerEvent) {
