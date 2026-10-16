@@ -5,6 +5,7 @@
     import type { Readable } from "svelte/store";
     import RequiresWasm from "./RequiresWasm.svelte";
     import { page } from "$app/stores";
+    import { onDestroy } from "svelte";
 
     type SkinRendererModule = typeof import("../tools/skin-renderer/skin-renderer-webgpu_wasm");
 
@@ -36,6 +37,14 @@
     let isInitialized = false;
 
     let canvas: HTMLCanvasElement;
+
+    let animationFrame: number | undefined;
+    let destroyed = false;
+
+    onDestroy(() => {
+        destroyed = true;
+        if (animationFrame !== undefined) cancelAnimationFrame(animationFrame);
+    });
 
     let module: SkinRendererModule | null = null;
 
@@ -145,7 +154,7 @@
                 canvas.height = height;
                 isInitialized = true;
 
-                window.requestAnimationFrame(renderSkin);
+                animationFrame = window.requestAnimationFrame(renderSkin);
             }
         } catch (e) {
             console.log("An error occurred while setting up the skin renderer module, falling back", e);
@@ -154,13 +163,14 @@
     }
 
     async function renderSkin() {
-        if (module == null || !isInitialized) return;
+        if (destroyed || module == null || !isInitialized) return;
 
         let { render_frame } = module;
 
         await render_frame();
 
-        window.requestAnimationFrame(renderSkin);
+        if (destroyed) return;
+        animationFrame = window.requestAnimationFrame(renderSkin);
     }
 
     function vec2(x: number, y: number) {
