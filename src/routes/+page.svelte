@@ -8,55 +8,48 @@
     import AlphaMagnifierIcon from "../components/icons/AlphaMagnifierIcon.svelte";
     import MirrorIcon from "../components/icons/MirrorIcon.svelte";
     import PlusIcon from "../components/icons/PlusIcon.svelte";
-    import FlaskIcon from "../components/icons/FlaskIcon.svelte";
+    import ImageEditIcon from "../components/icons/ImageEditIcon.svelte";
 
     const tools: Tool[] = [
         {
-            // @ts-ignore I don't know how to type this lol
-            icon: EraserIcon,
-            name: "Ears Region Eraser",
-            url: "region-eraser",
-            description: ["Easily add Ears mod erase regions to your Minecraft skin."],
+            icon: ImageEditIcon,
+            name: "Ears Manipulator",
+            description: [
+                "Create your own Ears-compatible skin following a step-by-step wizard.",
+            ],
+            url: "ears-manipulator",
+            span: 2
         },
         {
-            // @ts-ignore I don't know how to type this lol
-            icon: CubeScanIcon,
-            name: "Blockbench Model Generator",
-            url: "bbmodel-generator",
-            description: ["Generate a Blockbench model from a Minecraft skin, including Ears mod features."],
-        },
-        {
-            // @ts-ignore I don't know how to type this lol
             icon: MirrorIcon,
             name: "Skin Preview",
             url: "skin-preview",
             description: ["Preview your Minecraft skin, with or without Ears mod features."],
         },
         {
-            // @ts-ignore I don't know how to type this lol
+            icon: EraserIcon,
+            name: "Ears Region Eraser",
+            url: "region-eraser",
+            description: ["Easily add Ears mod erase regions to your Minecraft skin."],
+        },
+        {
+            icon: CubeScanIcon,
+            name: "Blockbench Model Generator",
+            url: "bbmodel-generator",
+            description: ["Generate a Blockbench model from a Minecraft skin, including Ears mod features."],
+        },
+        {
             icon: AlphaMagnifierIcon,
             name: "Alfalfa Inspector",
             description: ["Inspect and Edit low-level Alfalfa data stored in an Ears skin."],
             url: "alfalfa-inspector",
         },
-        // @ts-ignore I don't know how to type this lol
         {
-            // @ts-ignore I don't know how to type this lol
-            icon: FlaskIcon,
-            name: "Ears Manipulator",
-            description: [
-                "Create your own Ears-compatible skin following a step-by-step wizard.",
-                "Just like a science experiment, this might go wrong.",
-            ],
-            url: "ears-manipulator",
-            wip: true,
-        },
-        {
-            // @ts-ignore I don't know how to type this lol
             icon: PlusIcon,
             name: "Your tool idea here..",
             description: ["Got a useful tool idea that could help with using the Ears mod?", "Contact @nickac on Discord."],
             ghost: true,
+            span: 2
         },
     ];
 </script>
@@ -76,12 +69,15 @@
         {:else}
             <div class="3xl grid grid-cols-1 justify-items-stretch gap-4 md:grid-cols-2">
                 {#each tools as tool}
+                    {@const span = tool.span ?? 1}
                     {#if tool.url}
-                        <a href="{base}/tools/{tool.url}">
+                        <a class="block" style="grid-column: span {span} / span {span}" href="{base}/tools/{tool.url}">
                             <ToolBox {...tool} />
                         </a>
                     {:else}
-                        <ToolBox {...tool} />
+                        <div class="block" style="grid-column: span {span} / span {span}">
+                            <ToolBox {...tool} />
+                        </div>
                     {/if}
                 {/each}
             </div>
