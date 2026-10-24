@@ -1,13 +1,22 @@
 <script lang="ts">
     import { dev } from "$app/environment";
-    import { dataVersion, earsFeatures, manipulatorOutSkinFile, resetManipulatorEarsFeatures, applyTemplate } from "$lib/stores";
+    import { dataVersion, earsFeatures, manipulatorOutSkinFile, resetManipulatorEarsFeatures, applyTemplate, earsRegionEditorCurrentFile } from "$lib/stores";
+    import { goto } from "$app/navigation";
     import saveAs from "file-saver";
+    import EraserIcon from "../../icons/EraserIcon.svelte";
     
     $: outImageSrc = $manipulatorOutSkinFile && URL.createObjectURL($manipulatorOutSkinFile);
     
     function replacer(key: string, value: any) {
         if (value instanceof Uint8Array) return "[binary data]";
         else return value;
+    }
+
+    function openInRegionEraser() {
+        const skin = $manipulatorOutSkinFile;
+        if (!skin) return;
+        $earsRegionEditorCurrentFile = skin;
+        goto("/tools/region-eraser");
     }
 
 </script>
@@ -47,6 +56,14 @@
         </div>
 
         <aside class="space-y-3">
+            <div class="space-y-3 rounded-2xl border border-secondary-500/30 p-4 shadow-sm">
+                <div class="space-y-1">
+                    <h2 class="text-lg font-semibold">Want to add erase regions to your skin?</h2>
+                    <p class="text-sm text-text/80">Hide parts of your base skin for people with the Ears mod. Clicking will open your new skin in the Region Eraser.</p>
+                </div>
+                <button class="flex items-center justify-center" disabled={!$manipulatorOutSkinFile} on:click={openInRegionEraser}><EraserIcon class="h-5" />Open in Eraser Tool</button>
+            </div>
+
             <details class="rounded-2xl border border-secondary-500/30 p-4 shadow-sm">
                 <summary class="cursor-pointer list-none text-lg font-semibold">
                     <span class="flex items-center justify-between gap-4">
