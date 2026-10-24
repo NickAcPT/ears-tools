@@ -143,6 +143,7 @@ export enum WingsAnimations {
     Normal,
     None,
     NoFlight,
+    FlightOnly,
 }
 
 export enum LocatorBarIcon {
